@@ -34,6 +34,24 @@
     #00000080
   );
 
+  --highlight-text: linear-gradient(
+    to left,
+    rgb(21, 255, 0),
+    rgb(163, 254, 163)
+  );
+
+  --highlight-text-glow: 0 0 10px rgb(21, 255, 0), 0 0 20px rgb(21, 255, 0),
+    0 0 30px rgb(21, 255, 0), 0 0 40px rgb(21, 255, 0);
+
+  --highlight-link: linear-gradient(
+    to left,
+    rgb(255, 3, 247),
+    rgb(253, 149, 251)
+  );
+
+  --highlight-link-glow: 0 0 10px rgb(255, 0, 251), 0 0 20px rgb(255, 0, 251),
+    0 0 30px rgb(255, 0, 251), 0 0 40px rgb(255, 0, 251);
+
   --callout-rgb: 238, 240, 241;
   --callout-border-rgb: 172, 175, 176;
   --card-rgb: 180, 185, 188;
@@ -46,12 +64,15 @@
     --background-start-rgb: 0, 0, 0;
     --background-end-rgb: 0, 0, 0;
 
-    --primary-glow: radial-gradient(rgba(1, 65, 255, 0.4), rgba(1, 65, 255, 0));
+    --primary-glow: radial-gradient(
+      rgba(196, 1, 255, 0.4),
+      rgba(1, 65, 255, 0)
+    );
     --secondary-glow: linear-gradient(
       to bottom right,
       rgba(1, 65, 255, 0),
       rgba(1, 65, 255, 0),
-      rgba(1, 65, 255, 0.3)
+      rgba(196, 1, 255, 0.3)
     );
 
     --tile-start-rgb: 2, 13, 46;
