@@ -9,6 +9,12 @@
   --background-start-rgb: 214, 219, 220;
   --background-end-rgb: 255, 255, 255;
 
+  --primary-site-color: rgb(21, 255, 0);
+  --primary-site-fade: rgb(144, 250, 144);
+
+  --secondary-site-color: rgb(255, 3, 247);
+  --secondary-site-fade: rgb(253, 149, 251);
+
   --primary-glow: conic-gradient(
     from 180deg at 50% 50%,
     #16abff33 0deg,
@@ -36,21 +42,23 @@
 
   --highlight-text: linear-gradient(
     to left,
-    rgb(21, 255, 0),
-    rgb(163, 254, 163)
+    var(--primary-site-color),
+    var(--primary-site-fade)
   );
 
-  --highlight-text-glow: 0 0 10px rgb(21, 255, 0), 0 0 20px rgb(21, 255, 0),
-    0 0 30px rgb(21, 255, 0), 0 0 40px rgb(21, 255, 0);
+  --highlight-text-glow: 0 0 10px var(--primary-site-color),
+    0 0 20px var(--primary-site-color), 0 0 30px var(--primary-site-color),
+    0 0 40px var(--primary-site-color);
 
   --highlight-link: linear-gradient(
     to left,
-    rgb(255, 3, 247),
-    rgb(253, 149, 251)
+    var(--secondary-site-color),
+    var(--secondary-site-fade)
   );
 
-  --highlight-link-glow: 0 0 10px rgb(255, 0, 251), 0 0 20px rgb(255, 0, 251),
-    0 0 30px rgb(255, 0, 251), 0 0 40px rgb(255, 0, 251);
+  --highlight-link-glow: 0 0 10px var(--secondary-site-color),
+    0 0 20px var(--secondary-site-color), 0 0 30px var(--secondary-site-color),
+    0 0 40px var(--secondary-site-color);
 
   --callout-rgb: 238, 240, 241;
   --callout-border-rgb: 172, 175, 176;
@@ -62,14 +70,20 @@
   :root {
     --foreground-rgb: 255, 255, 255;
     --background-start-rgb: 0, 0, 0;
-    --background-end-rgb: 0, 0, 0;
+    --background-end-rgb: 44, 43, 43;
+
+    --primary-site-color: rgb(21, 255, 0);
+    --primary-site-fade: rgb(144, 250, 144);
+
+    --secondary-site-color: rgb(255, 3, 247);
+    --secondary-site-fade: rgb(253, 149, 251);
 
     --primary-glow: radial-gradient(
       rgba(196, 1, 255, 0.4),
       rgba(1, 65, 255, 0)
     );
     --secondary-glow: linear-gradient(
-      to bottom right,
+      to top right,
       rgba(1, 65, 255, 0),
       rgba(1, 65, 255, 0),
       rgba(196, 1, 255, 0.3)
@@ -103,13 +117,14 @@
 html,
 body {
   max-width: 100vw;
+  min-height: 100vh;
   overflow-x: hidden;
 }
 
 body {
   color: rgb(var(--foreground-rgb));
   background: linear-gradient(
-      to bottom,
+      to top,
       transparent,
       rgb(var(--background-end-rgb))
     )

@@ -7,7 +7,10 @@ export default function Home() {
       <main className={styles.main}>
         <div>
           <h2>
-            Welcome to <span className={styles.highlight}>des Lauriers</span>{" "}
+            Welcome to{" "}
+            <span className={styles.highlight}>
+              <strong>des Lauriers</strong>
+            </span>{" "}
             world.
           </h2>
           <div className={styles.center}>

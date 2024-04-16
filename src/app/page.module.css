@@ -3,32 +3,8 @@
   flex-direction: column;
   justify-content: space-between;
   align-items: center;
-  padding:2rem 6rem;
+  padding: 2rem 6rem;
   min-height: 100vh;
-}
-
-span.highlight {
-  background: var(--highlight-text);
-  background-clip: text;
-  -webkit-background-clip: text;
-  color: transparent;
-  -webkit-text-fill-color: transparent;
-  font-weight: bold;
-}
-
-.locallink {
-  background: var(--highlight-link);
-  font-weight: bold;
-  text-decoration: none;
-  background-clip: text;
-  -webkit-background-clip: text;
-  color: transparent;
-  -webkit-text-fill-color: transparent;
-}
-
-.locallink:hover {
-  transition: 0.3s;
-  text-shadow: var(--highlight-link-glow);
 }
 
 .center {
@@ -62,6 +38,30 @@ span.highlight {
   position: absolute;
   filter: blur(45px);
   transform: translateZ(0);
+}
+
+span.highlight {
+  background: var(--highlight-text);
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+  font-weight: bold;
+}
+
+.locallink {
+  background: var(--highlight-link);
+  font-weight: bold;
+  text-decoration: none;
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+}
+
+.locallink:hover {
+  transition: 0.3s;
+  text-shadow: var(--highlight-link-glow);
 }
 
 /* Enable hover only on non-touch devices */

@@ -1,0 +1,135 @@
+.main {
+  width: 90%;
+  max-width: 75rem;
+  margin: 3rem auto;
+  color: white;
+  min-height: 100vh;
+}
+
+.header {
+  gap: 3rem;
+  margin: 3rem auto 5rem auto;
+  width: 90%;
+  max-width: 75rem;
+  color: #d4e5cb;
+  font-size: 1.2rem;
+}
+
+span.highlight {
+  background: var(--highlight-text);
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+}
+
+.form {
+  max-width: 50rem;
+}
+
+.form label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-size: 1rem;
+  font-family: "Montserrat", sans-serif;
+  text-transform: uppercase;
+
+  font-weight: bold;
+}
+
+.form input {
+  display: block;
+  width: 100%;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  border: 1px solid #60635f;
+  background: rgb(var(--background-end-rgb));
+  font-size: 1.25rem;
+  font-family: "Montserrat", sans-serif;
+}
+
+.form input:focus {
+  transition: 0.3s;
+  outline-style: solid;
+  outline-color: var(--primary-site-color);
+  background-color: rgb(9, 9, 9);
+  box-shadow: 0 0 40px var(--primary-site-color);
+}
+
+.row {
+  display: flex;
+
+  margin-bottom: 1.2rem;
+}
+
+.row p {
+  width: 100%;
+}
+
+.date {
+  width: 100%;
+}
+
+.daterow {
+  display: flex;
+  justify-content: space-between;
+}
+
+.daterow select:focus {
+  transition: 0.3s;
+  outline: none;
+  outline-style: none;
+  outline-color: var(--primary-site-color);
+  background-color: rgb(9, 9, 9);
+  box-shadow: 0 0 40px var(--primary-site-color);
+}
+
+.birthdate {
+  font-size: 1.25rem;
+  font-family: "Montserrat", sans-serif;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  border: 1px solid #60635f;
+  background: rgb(var(--background-end-rgb));
+  width: 100%;
+}
+
+.birthdate:not(:last-child) {
+  margin-right: 1rem;
+}
+
+.actions button {
+  margin-top: 1rem;
+  border: 0;
+  border: none;
+  border-radius: 2px;
+  padding: 0.75rem 2rem;
+  background: linear-gradient(
+    90deg,
+    var(--primary-site-fade),
+    var(--primary-site-color)
+  );
+  width: 100%;
+  cursor: pointer;
+  font: inherit;
+  font-size: 1.25rem;
+  text-transform: uppercase;
+}
+
+.actions button:hover,
+.actions button:focus {
+  transition: 0.3s;
+  outline-style: none;
+  box-shadow: 0 0 40px var(--primary-site-color);
+}
+
+.actions button:disabled {
+  background: #ccc;
+  color: #979797;
+  cursor: not-allowed;
+}
+
+.actions button:hover:disabled,
+.actions button:focus:disabled {
+  box-shadow: 0 0 40px #60635f;
+}
