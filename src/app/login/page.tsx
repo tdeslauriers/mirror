@@ -12,7 +12,7 @@ export default function Login() {
       <main className={styles.header}>
         <form className={styles.form}>
           <div className={styles.row}>
-            <p>
+            <div className={styles.field}>
               <label className={styles.label} htmlFor="username">
                 email
               </label>
@@ -23,10 +23,10 @@ export default function Login() {
                 name="username"
                 required
               />
-            </p>
+            </div>
           </div>
           <div className={styles.row}>
-            <p>
+            <div className={styles.field}>
               <label className={styles.label} htmlFor="password">
                 Password
               </label>
@@ -37,14 +37,14 @@ export default function Login() {
                 name="password"
                 required
               />
-            </p>
+            </div>
           </div>
           <div className={styles.row}>
-            <p className={styles.actions}>
+            <div className={styles.actions}>
               <button>
                 <strong>Login</strong>
               </button>
-            </p>
+            </div>
           </div>
         </form>
       </main>

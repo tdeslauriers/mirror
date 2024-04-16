@@ -17,11 +17,13 @@ export default function Register() {
       <main className={styles.header}>
         <form className={styles.form} action={formAction}>
           <div className={styles.row}>
-            <p>
+            <div className={styles.field}>
               <label className={styles.label} htmlFor="username">
                 email
               </label>
-              {state?.message && <div>{state.message}</div>}
+              {state?.message && (
+                <div className={styles.error}>{state.message}</div>
+              )}
               <input
                 className={styles.form}
                 type="text"
@@ -29,10 +31,10 @@ export default function Register() {
                 name="username"
                 required
               />
-            </p>
+            </div>
           </div>
           <div className={styles.row}>
-            <p>
+            <div className={styles.field}>
               <label className={styles.label} htmlFor="password">
                 Password
               </label>
@@ -43,10 +45,10 @@ export default function Register() {
                 name="password"
                 required
               />
-            </p>
+            </div>
           </div>
           <div className={styles.row}>
-            <p>
+            <div className={styles.field}>
               <label className={styles.label} htmlFor="confirm_password">
                 Confirm Password
               </label>
@@ -57,10 +59,10 @@ export default function Register() {
                 name="confirm_password"
                 required
               />
-            </p>
+            </div>
           </div>
           <div className={styles.row}>
-            <p>
+            <div className={styles.field}>
               <label className={styles.label} htmlFor="firstname">
                 Firstname
               </label>
@@ -71,10 +73,10 @@ export default function Register() {
                 name="firstname"
                 required
               />
-            </p>
+            </div>
           </div>
           <div className={styles.row}>
-            <p>
+            <div className={styles.field}>
               <label className={styles.label} htmlFor="lastname">
                 Lastname
               </label>
@@ -85,7 +87,7 @@ export default function Register() {
                 name="lastname"
                 required
               />
-            </p>
+            </div>
           </div>
           <div className={styles.row}>
             <div className={styles.date}>
@@ -133,11 +135,11 @@ export default function Register() {
             </div>
           </div>
           <div className={styles.row}>
-            <p className={styles.actions}>
-              <button disabled={pending}>
+            <div className={styles.actions}>
+              <button type="submit" disabled={pending}>
                 {pending ? "Registering..." : "Register"}
               </button>
-            </p>
+            </div>
           </div>
         </form>
       </main>

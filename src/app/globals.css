@@ -78,6 +78,9 @@
     --secondary-site-color: rgb(255, 3, 247);
     --secondary-site-fade: rgb(253, 149, 251);
 
+    --error-site-color: rgb(255, 45, 3);
+    --error-site-fade: rgb(254, 126, 100);
+
     --primary-glow: radial-gradient(
       rgba(196, 1, 255, 0.4),
       rgba(1, 65, 255, 0)

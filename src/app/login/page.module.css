@@ -37,6 +37,10 @@ span.highlight {
   font-weight: bold;
 }
 
+.field {
+  width: 100%;
+}
+
 .form input {
   display: block;
   width: 100%;
@@ -49,6 +53,7 @@ span.highlight {
 }
 
 .form input:focus {
+  transition: 0.3s;
   outline-style: solid;
   outline-color: var(--primary-site-color);
   background-color: rgb(9, 9, 9);
@@ -60,7 +65,7 @@ span.highlight {
   margin-bottom: 1.2rem;
 }
 
-.row p {
+.actions {
   width: 100%;
 }
 
@@ -84,6 +89,7 @@ span.highlight {
 
 .actions button:hover,
 .actions button:focus {
+  transition: 0.3s;
   outline-style: none;
   box-shadow: 0 0 40px var(--primary-site-color);
 }

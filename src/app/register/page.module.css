@@ -27,6 +27,10 @@ span.highlight {
   max-width: 50rem;
 }
 
+.field {
+  width: 100%;
+}
+
 .form label {
   display: block;
   margin-bottom: 0.5rem;
@@ -58,12 +62,7 @@ span.highlight {
 
 .row {
   display: flex;
-
   margin-bottom: 1.2rem;
-}
-
-.row p {
-  width: 100%;
 }
 
 .date {
@@ -96,6 +95,10 @@ span.highlight {
 
 .birthdate:not(:last-child) {
   margin-right: 1rem;
+}
+
+.actions {
+  width: 100%;
 }
 
 .actions button {
@@ -132,4 +135,10 @@ span.highlight {
 .actions button:hover:disabled,
 .actions button:focus:disabled {
   box-shadow: 0 0 40px #60635f;
+}
+
+.error {
+  color: var(--error-site-color);
+  font-size: 0.9rem;
+  margin-top: 0.5rem;
 }
