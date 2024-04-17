@@ -70,7 +70,6 @@ export async function handleRegister(prevFormData: any, formData: FormData) {
       "If entering a birthdate, all fields are required, otherwise leave all blank.";
   }
 
-  console.log(birthYear, birthMonth, birthDay);
   const birthdateCheck: FieldValidation = checkBirthdate(
     birthYear,
     birthMonth,

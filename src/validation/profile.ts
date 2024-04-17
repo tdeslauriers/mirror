@@ -28,7 +28,7 @@ const PASSWORD_KEYBOARD_SEQUENCES: string[] = [
 
 const NAME_MIN_LENGTH = 1;
 const NAME_MAX_LENGTH = 32;
-const NAME_REGEX: RegExp = /^[a-zA-Z_-]+$/;
+const NAME_REGEX: RegExp = /^[a-zA-Z_'-]+$/;
 
 export type FieldValidation = {
   isValid: boolean;
@@ -148,7 +148,8 @@ export function checkName(name: string) {
   if (!NAME_REGEX.test(name)) {
     return {
       isValid: false,
-      message: "Name must only contain letters, hyphens, and/or underscores.",
+      message:
+        "Name must only contain letters, hyphens, apostrophes, and/or underscores.",
     };
   }
 
