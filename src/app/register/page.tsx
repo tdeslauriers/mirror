@@ -21,8 +21,8 @@ export default function Register() {
               <label className={styles.label} htmlFor="username">
                 email
               </label>
-              {state?.message && (
-                <div className={styles.error}>{state.message}</div>
+              {state?.errors?.username && (
+                <div className={styles.error}>{state.errors.username}</div>
               )}
               <input
                 className={styles.form}
@@ -38,6 +38,9 @@ export default function Register() {
               <label className={styles.label} htmlFor="password">
                 Password
               </label>
+              {state?.errors?.password && (
+                <div className={styles.error}>{state.errors.password}</div>
+              )}
               <input
                 className={styles.form}
                 type="password"
@@ -52,6 +55,11 @@ export default function Register() {
               <label className={styles.label} htmlFor="confirm_password">
                 Confirm Password
               </label>
+              {state?.errors?.confirm_password && (
+                <div className={styles.error}>
+                  {state.errors.confirm_password}
+                </div>
+              )}
               <input
                 className={styles.form}
                 type="password"
@@ -66,6 +74,9 @@ export default function Register() {
               <label className={styles.label} htmlFor="firstname">
                 Firstname
               </label>
+              {state?.errors?.firstname && (
+                <div className={styles.error}>{state.errors.firstname}</div>
+              )}
               <input
                 className={styles.form}
                 type="text"
@@ -80,6 +91,9 @@ export default function Register() {
               <label className={styles.label} htmlFor="lastname">
                 Lastname
               </label>
+              {state?.errors?.lastname && (
+                <div className={styles.error}>{state.errors.lastname}</div>
+              )}
               <input
                 className={styles.form}
                 type="text"
@@ -94,6 +108,12 @@ export default function Register() {
               <label className={styles.label} htmlFor="birthdate">
                 Birthdate
               </label>
+              {state?.errors?.dobIncomplete && (
+                <div className={styles.error}>{state.errors.dobIncomplete}</div>
+              )}
+              {state?.errors?.dobInvalid && (
+                <div className={styles.error}>{state.errors.dobInvalid}</div>
+              )}
               <div className={styles.daterow}>
                 <select
                   className={styles.birthdate}
