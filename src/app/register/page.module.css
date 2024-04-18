@@ -23,8 +23,14 @@ span.highlight {
   -webkit-text-fill-color: transparent;
 }
 
+
 .form {
   max-width: 50rem;
+}
+
+.row {
+  display: flex;
+  margin-bottom: 1.2rem;
 }
 
 .field {
@@ -57,12 +63,9 @@ span.highlight {
   outline-style: solid;
   outline-color: var(--primary-site-color);
   background-color: rgb(9, 9, 9);
-  box-shadow: 0 0 40px var(--primary-site-color);
-}
-
-.row {
-  display: flex;
-  margin-bottom: 1.2rem;
+  animation: glow-input 3s ease-in-out infinite alternate;
+  transform: translateZ(0); /* trigger GPU acceleration */
+  will-change: transform; /* inform the browser that this element will be animated */
 }
 
 .date {
@@ -80,7 +83,9 @@ span.highlight {
   outline-style: none;
   outline-color: var(--primary-site-color);
   background-color: rgb(9, 9, 9);
-  box-shadow: 0 0 40px var(--primary-site-color);
+  animation: glow-input 3s ease-in-out infinite alternate;
+  transform: translateZ(0); /* trigger GPU acceleration */
+  will-change: transform; /* inform the browser that this element will be animated */
 }
 
 .birthdate {
@@ -123,7 +128,8 @@ span.highlight {
 .actions button:focus {
   transition: 0.3s;
   outline-style: none;
-  box-shadow: 0 0 40px var(--primary-site-color);
+  /* box-shadow: 0 0 40px var(--primary-site-color); */
+  animation: glow-input 5s ease-in-out infinite alternate;
 }
 
 .actions button:disabled {
@@ -137,8 +143,26 @@ span.highlight {
   box-shadow: 0 0 40px #60635f;
 }
 
-.error {
-  color: var(--error-site-color);
-  font-size: 0.9rem;
-  margin-top: 0.5rem;
+@keyframes glow-input {
+  0% {
+    box-shadow: 0 0 5px var(--primary-site-color),
+      0 0 10px var(--primary-site-color), 0 0 15px var(--primary-site-color),
+      0 0 20px var(--primary-site-color);
+  }
+  100% {
+    box-shadow: 0 0 10px var(--primary-site-color),
+      0 0 20px var(--primary-site-color), 0 0 30px var(--primary-site-color),
+      0 0 40px var(--primary-site-color);
+  }
+}
+
+@keyframes glow-input-fix {
+  0% {
+    box-shadow: 0 0 5px #fdc702, 0 0 10px #fdc702, 0 0 15px #fdc702,
+      0 0 20px #fdc702;
+  }
+  100% {
+    box-shadow: 0 0 10px #fdc702, 0 0 20px #fdc702, 0 0 30px #fdc702,
+      0 0 40px #fdc702;
+  }
 }

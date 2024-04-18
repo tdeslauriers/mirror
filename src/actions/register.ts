@@ -67,7 +67,7 @@ export async function handleRegister(prevFormData: any, formData: FormData) {
     (birthYear && (!birthMonth || !birthDay))
   ) {
     errors.dobIncomplete =
-      "If entering a birthdate, all fields are required, otherwise leave all blank.";
+      "If entering a birth date, all fields are required, otherwise leave all blank.";
   }
 
   const birthdateCheck: FieldValidation = checkBirthdate(
@@ -76,7 +76,7 @@ export async function handleRegister(prevFormData: any, formData: FormData) {
     birthDay
   );
 
-  if (!birthdateCheck.isValid) {
+  if (!errors?.dobIncomplete && !birthdateCheck.isValid) {
     errors.dobInvalid = birthdateCheck.message;
   }
 
@@ -84,13 +84,6 @@ export async function handleRegister(prevFormData: any, formData: FormData) {
   if (Object.keys(errors).length > 0) {
     return { errors };
   }
-
-  // field errors for dob are returned above, needs to be set to value or undefined
-  const bday: string | undefined =
-    birthYear && birthMonth && birthDay && birthdateCheck.isValid
-      ? `${birthYear}-${birthMonth}-${birthDay}`
-      : undefined;
-
   // create the registration object
   const registration: Registration = {
     username: user,
@@ -98,6 +91,23 @@ export async function handleRegister(prevFormData: any, formData: FormData) {
     confirm_password: confirm,
     firstname: first,
     lastname: last,
-    birthdate: bday,
   };
+
+  if (birthYear && birthMonth && birthDay && birthdateCheck.isValid) {
+    const dob = new Date(
+      parseInt(birthYear),
+      parseInt(birthMonth),
+      parseInt(birthDay)
+    );
+    const dobFormatted = dob.toISOString().split("T")[0]; // YYYY-MM-DD: adds leading 0s to month and day if needed
+    registration.birthdate = dobFormatted;
+  }
+
+  //   // field errors for dob are returned above, needs to be set to value or undefined
+  //   const bday: string | undefined =
+  //     birthYear && birthMonth && birthDay && birthdateCheck.isValid
+  //       ? `${dobFormatted}`
+  //       : undefined;
+
+  //   console.log("bday", bday);
 }

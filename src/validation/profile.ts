@@ -37,58 +37,48 @@ export type FieldValidation = {
 
 // checkEmail checks if an email address is valid
 export function checkEmail(email: string) {
+  let errors: string[] = [];
   if (email.length < EMAIL_MIN_LENGTH || email.length > EMAIL_MAX_LENGTH) {
-    return {
-      isValid: false,
-      message: "Email must be between 6 and 254 characters long.",
-    };
+    errors.push("Email must be between 6 and 254 characters long.");
   }
 
   if (!EMAIL_REGEX.test(email)) {
-    return { isValid: false, message: "Invalid email address." };
+    errors.push("Email address must be valid format, eg., 'name@domain.com'");
+  }
+
+  if (errors.length > 0) {
+    return { isValid: false, message: errors.join(" ") };
   }
 
   return { isValid: true, message: "" };
 }
 
 export function checkPassword(password: string) {
+  let errors: string[] = [];
   if (
     password.length < PASSWORD_MIN_LENGTH ||
     password.length > PASSWORD_MAX_LENGTH
   ) {
-    return {
-      isValid: false,
-      message: `Password must be between ${PASSWORD_MIN_LENGTH} and ${PASSWORD_MAX_LENGTH} characters long.`,
-    };
+    errors.push(
+      `Passwsord must be between ${PASSWORD_MIN_LENGTH} and ${PASSWORD_MAX_LENGTH} characters long.`
+    );
   }
 
   // checks psssword for uppercase, lowercase, digit, special character, and common keyboard sequences
   if (!PASSWORD_UPPERCASE_REGEX.test(password)) {
-    return {
-      isValid: false,
-      message: "Password must contain aat least one uppercase letter.",
-    };
+    errors.push("Password must contain at least one uppercase letter.");
   }
 
   if (!PASSWORD_LOWERCASE_REGEX.test(password)) {
-    return {
-      isValid: false,
-      message: "Password must contain at least one lowercase letter.",
-    };
+    errors.push("Password must contain at least one lowercase letter.");
   }
 
   if (!PASSWORD_DIGIT_REGEX.test(password)) {
-    return {
-      isValid: false,
-      message: "Password must contain at least one digit.",
-    };
+    errors.push("Password must contain at least one digit.");
   }
 
   if (!PASSWORD_SPECIAL_REGEX.test(password)) {
-    return {
-      isValid: false,
-      message: "Password must contain at least one special character.",
-    };
+    errors.push("Password must contain at least one special character.");
   }
 
   for (const sequence of PASSWORD_KEYBOARD_SEQUENCES) {
@@ -100,21 +90,17 @@ export function checkPassword(password: string) {
       s.split("").reverse().join("")
     );
     const allSubstrings = [...substrings, ...reversedSubstrings];
-    if (
-      allSubstrings.some((substring) => {
-        const includes = password.includes(substring);
-        if (includes) {
-          console.log(`Password contains sequence: ${substring}`);
-        }
-        return includes;
-      })
-    ) {
-      return {
-        isValid: false,
-        message:
-          "Password must not contain keyboard sequences larger than 4 characters long.",
-      };
+
+    if (allSubstrings.some((substring) => password.includes(substring))) {
+      errors.push(
+        "Password must not contain keyboard sequences larger than 4 characters long."
+      );
+      break;
     }
+  }
+
+  if (errors.length > 0) {
+    return { isValid: false, message: errors.join(" ") };
   }
 
   return { isValid: true, message: "" };
@@ -130,7 +116,9 @@ function generateSubstrings(str: string, maxLength: number) {
       length <= maxLength && i + length <= str.length;
       length++
     ) {
-      substrings.push(str.substring(i, i + length));
+      const substring = str.substring(i, i + length);
+      substrings.push(substring);
+      substrings.push(substring.toUpperCase());
     }
   }
   return substrings;
@@ -138,19 +126,21 @@ function generateSubstrings(str: string, maxLength: number) {
 
 // checks if a name (first or last) is valid
 export function checkName(name: string) {
+  let errors: string[] = [];
   if (name.length < NAME_MIN_LENGTH || name.length > NAME_MAX_LENGTH) {
-    return {
-      isValid: false,
-      message: `Name must be between ${NAME_MIN_LENGTH} and ${NAME_MAX_LENGTH} characters long.`,
-    };
+    errors.push(
+      `Name must be between ${NAME_MIN_LENGTH} and ${NAME_MAX_LENGTH} characters long.`
+    );
   }
 
   if (!NAME_REGEX.test(name)) {
-    return {
-      isValid: false,
-      message:
-        "Name must only contain letters, hyphens, apostrophes, and/or underscores.",
-    };
+    errors.push(
+      "Name must only contain letters, hyphens, apostrophes, and/or underscores."
+    );
+  }
+
+  if (errors.length > 0) {
+    return { isValid: false, message: errors.join(" ") };
   }
 
   return { isValid: true, message: "" };

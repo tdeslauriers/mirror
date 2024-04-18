@@ -2,6 +2,7 @@
 
 import styles from "./page.module.css";
 import { handleRegister } from "@/actions/register";
+import ErrorField from "@/components/error-field";
 import { useFormState, useFormStatus } from "react-dom";
 
 export default function Register() {
@@ -22,7 +23,7 @@ export default function Register() {
                 email
               </label>
               {state?.errors?.username && (
-                <div className={styles.error}>{state.errors.username}</div>
+                <ErrorField errorMsg={state.errors.username} />
               )}
               <input
                 className={styles.form}
@@ -39,7 +40,7 @@ export default function Register() {
                 Password
               </label>
               {state?.errors?.password && (
-                <div className={styles.error}>{state.errors.password}</div>
+                <ErrorField errorMsg={state.errors.password} />
               )}
               <input
                 className={styles.form}
@@ -56,9 +57,7 @@ export default function Register() {
                 Confirm Password
               </label>
               {state?.errors?.confirm_password && (
-                <div className={styles.error}>
-                  {state.errors.confirm_password}
-                </div>
+                <ErrorField errorMsg={state.errors.confirm_password} />
               )}
               <input
                 className={styles.form}
@@ -75,7 +74,7 @@ export default function Register() {
                 Firstname
               </label>
               {state?.errors?.firstname && (
-                <div className={styles.error}>{state.errors.firstname}</div>
+                <ErrorField errorMsg={state.errors.firstname} />
               )}
               <input
                 className={styles.form}
@@ -92,7 +91,7 @@ export default function Register() {
                 Lastname
               </label>
               {state?.errors?.lastname && (
-                <div className={styles.error}>{state.errors.lastname}</div>
+                <ErrorField errorMsg={state.errors.lastname} />
               )}
               <input
                 className={styles.form}
@@ -105,11 +104,23 @@ export default function Register() {
           </div>
           <div className={styles.row}>
             <div className={styles.date}>
-              <label className={styles.label} htmlFor="birthdate">
-                Birthdate
+              <label
+                className={styles.label}
+                htmlFor="birthdate"
+                title="only required for allowance app"
+              >
+                Birth date{" "}
+                <sup>
+                  <span
+                    className={styles.highlight}
+                    style={{ textTransform: "lowercase" }}
+                  >
+                    optional
+                  </span>
+                </sup>
               </label>
               {state?.errors?.dobIncomplete && (
-                <div className={styles.error}>{state.errors.dobIncomplete}</div>
+                <ErrorField errorMsg={state.errors.dobIncomplete} />
               )}
               {state?.errors?.dobInvalid && (
                 <div className={styles.error}>{state.errors.dobInvalid}</div>
@@ -157,10 +168,25 @@ export default function Register() {
           <div className={styles.row}>
             <div className={styles.actions}>
               <button type="submit" disabled={pending}>
-                {pending ? "Registering..." : "Register"}
+                {pending ? (
+                  <>
+                    <strong>Registering...</strong>
+                  </>
+                ) : (
+                  <>
+                    <strong>Register</strong>
+                  </>
+                )}
               </button>
             </div>
           </div>
+          {state?.errors && (
+            <div className={styles.row}>
+              <div className={styles.field}>
+                <ErrorField errorMsg="Registration error(s): please correct and re-submit." />
+              </div>
+            </div>
+          )}
         </form>
       </main>
     </>
