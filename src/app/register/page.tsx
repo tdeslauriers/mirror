@@ -5,7 +5,6 @@ import styles from "./page.module.css";
 import ErrorField from "@/components/error-field";
 import {
   FieldValidation,
-  checkBirthdate,
   checkEmail,
   checkName,
   checkPassword,
@@ -66,11 +65,8 @@ export default function Register() {
 
   const handleOnBlur = () => {
     const errors = validateRegistration(registration);
-    console.log(errors);
     setFieldErrors(errors);
   };
-
-  console.log(fieldErrors.username);
 
   return (
     <>
