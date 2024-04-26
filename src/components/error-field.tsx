@@ -1,15 +1,23 @@
 import styles from "./error-field.module.css";
 
 export default function ErrorField({
-  errorMsg,
+  errorMsgs,
 }: Readonly<{
-  errorMsg: string;
+  errorMsgs: string[];
 }>): React.ReactElement {
   return (
     <div className={styles.error}>
-      <span className={styles.highlightError}>
-        <strong>{errorMsg}</strong>
-      </span>
+      <ul>
+        {errorMsgs.length > 0
+          ? errorMsgs.map((e: string, i: number) => (
+              <li className={styles.listError} key={`err_${i}`}>
+                <span className={styles.highlightError}>
+                  <strong>{e}</strong>
+                </span>
+              </li>
+            ))
+          : null}
+      </ul>
     </div>
   );
 }

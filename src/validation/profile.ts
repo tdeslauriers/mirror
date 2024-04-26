@@ -28,29 +28,30 @@ const PASSWORD_KEYBOARD_SEQUENCES: string[] = [
 
 const NAME_MIN_LENGTH = 1;
 const NAME_MAX_LENGTH = 32;
-const NAME_REGEX: RegExp = /^[a-zA-Z_'-]+$/;
+const NAME_REGEX: RegExp = /^[a-zA-Z_'-\s]+$/;
 
 export type FieldValidation = {
   isValid: boolean;
-  message: string;
+  messages: string[];
 };
 
 // checkEmail checks if an email address is valid
 export function checkEmail(email: string) {
   let errors: string[] = [];
   if (email.length < EMAIL_MIN_LENGTH || email.length > EMAIL_MAX_LENGTH) {
-    errors.push("Email must be between 6 and 254 characters long.");
+    errors.push("Email address must be between 6 and 254 characters long.");
   }
 
   if (!EMAIL_REGEX.test(email)) {
-    errors.push("Email address must be valid format, eg., 'name@domain.com'");
+    errors.push("Email address must be valid format, eg., name@domain.com");
   }
 
   if (errors.length > 0) {
-    return { isValid: false, message: errors.join(" ") };
+    console.log(errors);
+    return { isValid: false, messages: errors };
   }
 
-  return { isValid: true, message: "" };
+  return { isValid: true, messages: [] };
 }
 
 export function checkPassword(password: string) {
@@ -60,7 +61,7 @@ export function checkPassword(password: string) {
     password.length > PASSWORD_MAX_LENGTH
   ) {
     errors.push(
-      `Passwsord must be between ${PASSWORD_MIN_LENGTH} and ${PASSWORD_MAX_LENGTH} characters long.`
+      `Password must be between ${PASSWORD_MIN_LENGTH} and ${PASSWORD_MAX_LENGTH} characters long.`
     );
   }
 
@@ -100,10 +101,10 @@ export function checkPassword(password: string) {
   }
 
   if (errors.length > 0) {
-    return { isValid: false, message: errors.join(" ") };
+    return { isValid: false, messages: errors };
   }
 
-  return { isValid: true, message: "" };
+  return { isValid: true, messages: [] };
 }
 
 // helper function to generate all substrings of a string up to a certain length
@@ -140,18 +141,17 @@ export function checkName(name: string) {
   }
 
   if (errors.length > 0) {
-    return { isValid: false, message: errors.join(" ") };
+    return { isValid: false, messages: errors };
   }
 
-  return { isValid: true, message: "" };
+  return { isValid: true, messages: [] };
 }
 
 // checks if a birthdate is valid
+// server-side only.  Not needed for client-side form
+// no need to check for null/undefined values
 export function checkBirthdate(year: string, month: string, day: string) {
-  // jump out if all fields are empty
-  if (!year && !month && !day) {
-    return { isValid: true, message: "" };
-  }
+  let errors: string[] = [];
 
   // check if all fields are numbers
   const birthYear = parseInt(year);
@@ -160,7 +160,7 @@ export function checkBirthdate(year: string, month: string, day: string) {
 
   // Check if the values are numbers
   if (isNaN(birthYear) || isNaN(birthMonth) || isNaN(birthDay)) {
-    return { isValid: false, message: "Year, month, and day must be numbers." };
+    errors.push("Year, month, and day must be numbers.");
   }
 
   // Create a Date object from the birth date
@@ -168,7 +168,7 @@ export function checkBirthdate(year: string, month: string, day: string) {
 
   // Check if the date is valid
   if (isNaN(birthDate.getTime())) {
-    return { isValid: false, message: "Invalid birth date." };
+    errors.push("Birth date must be a valid date.");
   }
 
   // Create Date objects for today and the start date
@@ -177,11 +177,12 @@ export function checkBirthdate(year: string, month: string, day: string) {
 
   // Check if the birth date is before today and after the start date
   if (birthDate >= today || birthDate < startDate) {
-    return {
-      isValid: false,
-      message: "Birth date must be before today and after 1901-01-01.",
-    };
+    errors.push("Birth date must be before today and after 1901-01-01.");
   }
 
-  return { isValid: true, message: "" };
+  if (errors.length > 0) {
+    return { isValid: false, message: errors };
+  }
+
+  return { isValid: true, message: [] };
 }

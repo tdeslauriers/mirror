@@ -1,13 +1,77 @@
 "use client";
 
+import { ChangeEvent, useState } from "react";
 import styles from "./page.module.css";
-import { handleRegister } from "@/actions/register";
 import ErrorField from "@/components/error-field";
-import { useFormState, useFormStatus } from "react-dom";
+import {
+  FieldValidation,
+  checkBirthdate,
+  checkEmail,
+  checkName,
+  checkPassword,
+} from "@/validation/profile";
+
+// different from server side registration object
+// server side concatenates birthdate into a single string
+// after validation
+type Registration = {
+  username: string;
+  password: string;
+  confirm_password: string;
+  firstname: string;
+  lastname: string;
+  birthMonth?: string;
+  birthDay?: string;
+  birthYear?: string;
+};
+
+type Err = { [key: string]: string[] };
+
+const months: string[] = [
+  "January",
+  "February",
+  "March",
+  "April",
+  "May",
+  "June",
+  "July",
+  "August",
+  "September",
+  "October",
+  "November",
+  "December",
+];
 
 export default function Register() {
-  const { pending } = useFormStatus();
-  const [state, formAction] = useFormState(handleRegister, undefined);
+  const [pending, setPending] = useState(false);
+  const [registration, setRegistration] = useState<Registration>({
+    username: "",
+    password: "",
+    confirm_password: "",
+    firstname: "",
+    lastname: "",
+  });
+  const [fieldErrors, setFieldErrors] = useState<Err>({}); // client side errors
+
+  // data entry
+  const handleFieldChange = (
+    event: ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
+    const { name, value } = event.target;
+    setRegistration((prevRegistration) => ({
+      ...prevRegistration,
+      [name]: value,
+    }));
+  };
+
+  const handleOnBlur = () => {
+    const errors = validateRegistration(registration);
+    console.log(errors);
+    setFieldErrors(errors);
+  };
+
+  console.log(fieldErrors.username);
+
   return (
     <>
       <header className={styles.header}>
@@ -16,14 +80,14 @@ export default function Register() {
         </h1>
       </header>
       <main className={styles.header}>
-        <form className={styles.form} action={formAction}>
+        <form className={styles.form}>
           <div className={styles.row}>
             <div className={styles.field}>
               <label className={styles.label} htmlFor="username">
                 email
               </label>
-              {state?.errors?.username && (
-                <ErrorField errorMsg={state.errors.username} />
+              {fieldErrors.username && (
+                <ErrorField errorMsgs={fieldErrors.username} />
               )}
               <input
                 className={styles.form}
@@ -31,6 +95,8 @@ export default function Register() {
                 id="username"
                 name="username"
                 required
+                onChange={handleFieldChange}
+                onBlur={handleOnBlur}
               />
             </div>
           </div>
@@ -39,8 +105,8 @@ export default function Register() {
               <label className={styles.label} htmlFor="password">
                 Password
               </label>
-              {state?.errors?.password && (
-                <ErrorField errorMsg={state.errors.password} />
+              {fieldErrors.password && (
+                <ErrorField errorMsgs={fieldErrors.password} />
               )}
               <input
                 className={styles.form}
@@ -48,6 +114,8 @@ export default function Register() {
                 id="password"
                 name="password"
                 required
+                onChange={handleFieldChange}
+                onBlur={handleOnBlur}
               />
             </div>
           </div>
@@ -56,8 +124,8 @@ export default function Register() {
               <label className={styles.label} htmlFor="confirm_password">
                 Confirm Password
               </label>
-              {state?.errors?.confirm_password && (
-                <ErrorField errorMsg={state.errors.confirm_password} />
+              {fieldErrors.confirm_password && (
+                <ErrorField errorMsgs={fieldErrors.confirm_password} />
               )}
               <input
                 className={styles.form}
@@ -65,6 +133,8 @@ export default function Register() {
                 id="confirm_password"
                 name="confirm_password"
                 required
+                onChange={handleFieldChange}
+                onBlur={handleOnBlur}
               />
             </div>
           </div>
@@ -73,8 +143,8 @@ export default function Register() {
               <label className={styles.label} htmlFor="firstname">
                 Firstname
               </label>
-              {state?.errors?.firstname && (
-                <ErrorField errorMsg={state.errors.firstname} />
+              {fieldErrors.firstname && (
+                <ErrorField errorMsgs={fieldErrors.firstname} />
               )}
               <input
                 className={styles.form}
@@ -82,6 +152,8 @@ export default function Register() {
                 id="firstname"
                 name="firstname"
                 required
+                onChange={handleFieldChange}
+                onBlur={handleOnBlur}
               />
             </div>
           </div>
@@ -90,8 +162,8 @@ export default function Register() {
               <label className={styles.label} htmlFor="lastname">
                 Lastname
               </label>
-              {state?.errors?.lastname && (
-                <ErrorField errorMsg={state.errors.lastname} />
+              {fieldErrors.lastname && (
+                <ErrorField errorMsgs={fieldErrors.lastname} />
               )}
               <input
                 className={styles.form}
@@ -99,6 +171,8 @@ export default function Register() {
                 id="lastname"
                 name="lastname"
                 required
+                onChange={handleFieldChange}
+                onBlur={handleOnBlur}
               />
             </div>
           </div>
@@ -119,22 +193,22 @@ export default function Register() {
                   </span>
                 </sup>
               </label>
-              {state?.errors?.dobIncomplete && (
-                <ErrorField errorMsg={state.errors.dobIncomplete} />
+              {fieldErrors.dobIncomplete && (
+                <ErrorField errorMsgs={fieldErrors.dobIncomplete} />
               )}
-              {state?.errors?.dobInvalid && (
-                <div className={styles.error}>{state.errors.dobInvalid}</div>
-              )}
+
               <div className={styles.daterow}>
                 <select
                   className={styles.birthdate}
                   id="birthMonth"
                   name="birthMonth"
+                  onChange={handleFieldChange}
+                  onBlur={handleOnBlur}
                 >
                   <option value="">Month</option>
                   {[...Array(12)].map((_, i) => (
                     <option key={i} value={i + 1}>
-                      {i + 1}
+                      {months[i]}
                     </option>
                   ))}
                 </select>
@@ -142,6 +216,8 @@ export default function Register() {
                   className={styles.birthdate}
                   id="birthDay"
                   name="birthDay"
+                  onChange={handleFieldChange}
+                  onBlur={handleOnBlur}
                 >
                   <option value="">Day</option>
                   {[...Array(31)].map((_, i) => (
@@ -154,6 +230,8 @@ export default function Register() {
                   className={styles.birthdate}
                   id="birthYear"
                   name="birthYear"
+                  onChange={handleFieldChange}
+                  onBlur={handleOnBlur}
                 >
                   <option value="">Year</option>
                   {[...Array(new Date().getFullYear() - 1900)].map((_, i) => (
@@ -180,15 +258,54 @@ export default function Register() {
               </button>
             </div>
           </div>
-          {state?.errors && (
-            <div className={styles.row}>
-              <div className={styles.field}>
-                <ErrorField errorMsg="Registration error(s): please correct and re-submit." />
-              </div>
-            </div>
-          )}
         </form>
       </main>
     </>
   );
+}
+
+function validateRegistration(registration: Registration) {
+  const errors: { [key: string]: string[] } = {};
+
+  // username
+  if (registration.username.length > 0) {
+    const usernameCheck: FieldValidation = checkEmail(registration.username);
+    if (!usernameCheck.isValid) {
+      errors.username = usernameCheck.messages;
+    }
+  }
+
+  // password
+  if (registration.password.length > 0) {
+    const passwordCheck: FieldValidation = checkPassword(registration.password);
+    if (!passwordCheck.isValid) {
+      errors.password = passwordCheck.messages;
+    }
+  }
+
+  // confirm_password: check if matches password
+  if (registration.confirm_password.length > 0) {
+    if (registration.password !== registration.confirm_password) {
+      errors.confirm_password = ["Passwords do not match."];
+    }
+  }
+
+  // check firstname
+  if (registration.firstname.length > 0) {
+    const firstnameCheck: FieldValidation = checkName(registration.firstname);
+    if (!firstnameCheck.isValid) {
+      errors.firstname = firstnameCheck.messages;
+    }
+  }
+
+  // check lastname
+  if (registration.lastname.length > 0) {
+    const lastnameCheck: FieldValidation = checkName(registration.lastname);
+    if (!lastnameCheck.isValid) {
+      errors.lastname = lastnameCheck.messages;
+    }
+  }
+
+  // only check if all birthdate fields are filled on submit
+  return errors;
 }
