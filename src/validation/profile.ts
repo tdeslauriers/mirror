@@ -47,7 +47,6 @@ export function checkEmail(email: string) {
   }
 
   if (errors.length > 0) {
-    console.log(errors);
     return { isValid: false, messages: errors };
   }
 
