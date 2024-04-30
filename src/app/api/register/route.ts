@@ -1,5 +1,3 @@
-import { stat } from "fs";
-import { NextRequest, NextResponse } from "next/server";
 import {
   FieldValidation,
   Registration,
