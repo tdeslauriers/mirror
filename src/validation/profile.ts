@@ -1,3 +1,14 @@
+export type Registration = {
+  username: string;
+  password: string;
+  confirm_password: string;
+  firstname: string;
+  lastname: string;
+  birthMonth?: string;
+  birthDay?: string;
+  birthYear?: string;
+};
+
 // regex's that for input validation of profile  type data
 const EMAIL_MIN_LENGTH = 6;
 const EMAIL_MAX_LENGTH = 254; // RFC 5321
@@ -180,8 +191,8 @@ export function checkBirthdate(year: string, month: string, day: string) {
   }
 
   if (errors.length > 0) {
-    return { isValid: false, message: errors };
+    return { isValid: false, messages: errors };
   }
 
-  return { isValid: true, message: [] };
+  return { isValid: true, messages: [] };
 }

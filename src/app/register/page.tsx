@@ -5,24 +5,11 @@ import styles from "./page.module.css";
 import ErrorField from "@/components/error-field";
 import {
   FieldValidation,
+  Registration,
   checkEmail,
   checkName,
   checkPassword,
 } from "@/validation/profile";
-
-// different from server side registration object
-// server side concatenates birthdate into a single string
-// after validation
-type Registration = {
-  username: string;
-  password: string;
-  confirm_password: string;
-  firstname: string;
-  lastname: string;
-  birthMonth?: string;
-  birthDay?: string;
-  birthYear?: string;
-};
 
 type Err = { [key: string]: string[] };
 
@@ -49,6 +36,9 @@ export default function Register() {
     confirm_password: "",
     firstname: "",
     lastname: "",
+    birthMonth: "",
+    birthDay: "",
+    birthYear: "",
   });
   const [fieldErrors, setFieldErrors] = useState<Err>({}); // client side errors
 
@@ -64,8 +54,61 @@ export default function Register() {
   };
 
   const handleOnBlur = () => {
-    const errors = validateRegistration(registration);
+    let errors = validateRegistration(registration);
+
+    if (
+      (fieldErrors.dobIncomplete?.length > 0 &&
+        !registration.birthMonth &&
+        !registration.birthDay &&
+        !registration.birthYear) ||
+      (fieldErrors.dobIncomplete?.length > 0 &&
+        registration.birthMonth &&
+        registration.birthDay &&
+        registration.birthYear)
+    ) {
+      delete errors.dobIncomplete;
+    }
     setFieldErrors(errors);
+  };
+
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    // check for errors
+    let errors = validateRegistration(registration);
+    setFieldErrors(errors);
+    if (
+      (registration.birthMonth &&
+        (!registration.birthDay || !registration.birthYear)) ||
+      (registration.birthDay &&
+        (!registration.birthMonth || !registration.birthYear)) ||
+      (registration.birthYear &&
+        (!registration.birthMonth || !registration.birthDay))
+    ) {
+      errors.dobIncomplete = ["Please fill out all birthdate fields."];
+    }
+
+    console.log(registration);
+
+    if (Object.keys(errors).length === 0) {
+      // setPending(true);
+      // make api call
+      const response = await fetch("/api/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(registration),
+      });
+      if (response.ok) {
+        // redirect to login page
+        window.location.href = "/login";
+      } else {
+        // handle error
+        const data = await response.json();
+        setFieldErrors(data);
+        setPending(false);
+      }
+    }
   };
 
   return (
@@ -76,7 +119,11 @@ export default function Register() {
         </h1>
       </header>
       <main className={styles.header}>
-        <form className={styles.form}>
+        <form className={styles.form} onSubmit={handleSubmit}>
+          {fieldErrors.server && <ErrorField errorMsgs={fieldErrors.server} />}
+          {fieldErrors.badrequest && (
+            <ErrorField errorMsgs={fieldErrors.badrequest} />
+          )}
           <div className={styles.row}>
             <div className={styles.field}>
               <label className={styles.label} htmlFor="username">
@@ -230,9 +277,12 @@ export default function Register() {
                   onBlur={handleOnBlur}
                 >
                   <option value="">Year</option>
-                  {[...Array(new Date().getFullYear() - 1900)].map((_, i) => (
-                    <option key={i} value={i + 1901}>
-                      {i + 1901}
+                  {Array.from(
+                    { length: new Date().getFullYear() - 1900 + 1 },
+                    (_, i) => new Date().getFullYear() - i
+                  ).map((year) => (
+                    <option key={year} value={year}>
+                      {year}
                     </option>
                   ))}
                 </select>
