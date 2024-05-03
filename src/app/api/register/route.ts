@@ -22,7 +22,7 @@ export async function POST(req: Request) {
     });
   }
 
-  // call registration endpoint
+  // call gateway registration endpoint
   process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
   try {
     const apiResponse = await fetch("https://localhost:8443/register", {
