@@ -58,6 +58,10 @@ span.highlight {
   outline-color: var(--primary-site-color);
   background-color: rgb(9, 9, 9);
   box-shadow: 0 0 40px var(--primary-site-color);
+  box-shadow: 0 0 40px var(--primary-site-color);
+  animation: glow-input 3s ease-in-out infinite alternate;
+  transform: translateZ(0); /* trigger GPU acceleration */
+  will-change: transform; /* inform the browser that this element will be animated */
 }
 
 .row {
@@ -91,7 +95,8 @@ span.highlight {
 .actions button:focus {
   transition: 0.3s;
   outline-style: none;
-  box-shadow: 0 0 40px var(--primary-site-color);
+  /* box-shadow: 0 0 40px var(--primary-site-color); */
+  animation: glow-input 5s ease-in-out infinite alternate;
 }
 
 .actions button:disabled {
@@ -103,4 +108,31 @@ span.highlight {
 .actions button:hover:disabled,
 .actions button:focus:disabled {
   box-shadow: 0 0 40px #60635f;
+  animation: glow-input-fix 3s ease-in-out infinite alternate;
+  transform: translateZ(0); /* trigger GPU acceleration */
+  will-change: transform; /* inform the browser that this element will be animated */
+}
+
+@keyframes glow-input {
+  0% {
+    box-shadow: 0 0 5px var(--primary-site-color),
+      0 0 10px var(--primary-site-color), 0 0 15px var(--primary-site-color),
+      0 0 20px var(--primary-site-color);
+  }
+  100% {
+    box-shadow: 0 0 10px var(--primary-site-color),
+      0 0 20px var(--primary-site-color), 0 0 30px var(--primary-site-color),
+      0 0 40px var(--primary-site-color);
+  }
+}
+
+@keyframes glow-input-fix {
+  0% {
+    box-shadow: 0 0 5px var(--info-site-color), 0 0 10px var(--info-site-color),
+      0 0 15px var(--info-site-color), 0 0 20px var(--info-site-color);
+  }
+  100% {
+    box-shadow: 0 0 10px var(--info-site-color), 0 0 20px var(--info-site-color),
+      0 0 30px var(--info-site-color), 0 0 40px var(--info-site-color);
+  }
 }

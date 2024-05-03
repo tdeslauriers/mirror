@@ -60,6 +60,12 @@
     0 0 20px var(--secondary-site-color), 0 0 30px var(--secondary-site-color),
     0 0 40px var(--secondary-site-color);
 
+  --highlight-info: linear-gradient(
+    to left,
+    var(--info-site-color),
+    var(--info-site-fade)
+  );
+
   --highlight-error: linear-gradient(
     to left,
     var(--error-site-color),
@@ -83,6 +89,9 @@
 
     --secondary-site-color: rgb(255, 3, 247);
     --secondary-site-fade: rgb(253, 149, 251);
+
+    --info-site-color: rgb(253, 169, 2);
+    --info-site-fade: rgb(248, 198, 97);
 
     --error-site-color: rgb(255, 45, 3);
     --error-site-fade: rgb(254, 126, 100);

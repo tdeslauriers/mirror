@@ -24,46 +24,47 @@ export async function POST(req: Request) {
 
   // call registration endpoint
   process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
-  const apiResponse = await fetch("https://localhost:8443/register", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(registration),
-  });
+  try {
+    const apiResponse = await fetch("https://localhost:8443/register", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(registration),
+    });
 
-  // handle registration errors
-  if (!apiResponse.ok) {
-    const data = await apiResponse.json();
-
-    // check if the error is a gateway error
-    if (!isGatewayError(data)) {
-      return new Response(JSON.stringify({ server: ["An error occurred."] }), {
-        status: 500,
+    if (apiResponse.ok) {
+      const success = await apiResponse.json();
+      return new Response(JSON.stringify(success), {
+        status: apiResponse.status, // 201 expected
         headers: {
           "Content-Type": "application/json",
         },
       });
+    } else {
+      const fail = await apiResponse.json();
+      if (isGatewayError(fail)) {
+        const errors = handleGatewayErrors(fail);
+        return new Response(JSON.stringify(errors), {
+          status: apiResponse.status,
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+      } else {
+        throw new Error(
+          "An error occurred. Please try again. If the problem persists, please contact me."
+        );
+      }
     }
-
-    // handle different error scenarios
-    const gatewayErrors = handleGatewayErrors(data);
-
-    return new Response(JSON.stringify(gatewayErrors), {
-      status: apiResponse.status,
+  } catch (error: any) {
+    return new Response(JSON.stringify({ server: [error.message] }), {
+      status: 500,
       headers: {
         "Content-Type": "application/json",
       },
     });
   }
-
-  // registration successful
-  return new Response(JSON.stringify({ message: "Registration successful." }), {
-    status: 200,
-    headers: {
-      "Content-Type": "application/json",
-    },
-  });
 }
 
 export type GatewayError = {
@@ -89,8 +90,26 @@ function handleGatewayErrors(gatewayError: GatewayError) {
       errors.username = [gatewayError.message];
       return errors;
     case 422:
-      errors.validation = [gatewayError.message];
-      return errors;
+      // temporary fix for now: determine which error received
+      switch (true) {
+        case gatewayError.message.includes("username"):
+          errors.username = [gatewayError.message];
+          return errors;
+        case gatewayError.message.includes("password"):
+          errors.password = [gatewayError.message];
+          return errors;
+        case gatewayError.message.includes("firstname"):
+          errors.firstname = [gatewayError.message];
+          return errors;
+        case gatewayError.message.includes("lastname"):
+          errors.lastname = [gatewayError.message];
+          return errors;
+        case gatewayError.message.includes("birthdate"):
+          errors.birthdate = [gatewayError.message];
+          return errors;
+        default:
+          break;
+      }
     default:
       errors.server = [
         gatewayError.message || "An error occurred. Please try again.",

@@ -10,6 +10,7 @@ import {
   checkName,
   checkPassword,
 } from "@/validation/profile";
+import Link from "next/link";
 
 type Err = { [key: string]: string[] };
 
@@ -29,6 +30,7 @@ const months: string[] = [
 ];
 
 export default function Register() {
+  const [registrationSuccess, setRegistrationSuccess] = useState(false);
   const [pending, setPending] = useState(false);
   const [registration, setRegistration] = useState<Registration>({
     username: "",
@@ -87,25 +89,31 @@ export default function Register() {
       errors.dobIncomplete = ["Please fill out all birthdate fields."];
     }
 
-    console.log(registration);
-
     if (Object.keys(errors).length === 0) {
-      // setPending(true);
+      setPending(true);
       // make api call
-      const response = await fetch("/api/register", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(registration),
-      });
-      if (response.ok) {
-        // redirect to login page
-        window.location.href = "/login";
-      } else {
-        // handle error
-        const data = await response.json();
-        setFieldErrors(data);
+      try {
+        const response = await fetch("/api/register", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(registration),
+        });
+
+        if (response.ok) {
+          const success = await response.json();
+          setPending(false);
+          setRegistration(success);
+          setRegistrationSuccess(true);
+        } else {
+          const fail = await response.json();
+          setFieldErrors(fail);
+          setPending(false);
+        }
+      } catch (error) {
+        // handle network error
+        console.error("Registration api call failed: ", error);
         setPending(false);
       }
     }
@@ -118,193 +126,234 @@ export default function Register() {
           <span className={styles.highlight}>Sign up</span> for an account.
         </h1>
       </header>
-      <main className={styles.header}>
-        <form className={styles.form} onSubmit={handleSubmit}>
-          {fieldErrors.server && <ErrorField errorMsgs={fieldErrors.server} />}
-          {fieldErrors.badrequest && (
-            <ErrorField errorMsgs={fieldErrors.badrequest} />
-          )}
-          <div className={styles.row}>
-            <div className={styles.field}>
-              <label className={styles.label} htmlFor="username">
-                email
-              </label>
-              {fieldErrors.username && (
-                <ErrorField errorMsgs={fieldErrors.username} />
-              )}
-              <input
-                className={styles.form}
-                type="text"
-                id="username"
-                name="username"
-                required
-                onChange={handleFieldChange}
-                onBlur={handleOnBlur}
-              />
-            </div>
-          </div>
-          <div className={styles.row}>
-            <div className={styles.field}>
-              <label className={styles.label} htmlFor="password">
-                Password
-              </label>
-              {fieldErrors.password && (
-                <ErrorField errorMsgs={fieldErrors.password} />
-              )}
-              <input
-                className={styles.form}
-                type="password"
-                id="password"
-                name="password"
-                required
-                onChange={handleFieldChange}
-                onBlur={handleOnBlur}
-              />
-            </div>
-          </div>
-          <div className={styles.row}>
-            <div className={styles.field}>
-              <label className={styles.label} htmlFor="confirm_password">
-                Confirm Password
-              </label>
-              {fieldErrors.confirm_password && (
-                <ErrorField errorMsgs={fieldErrors.confirm_password} />
-              )}
-              <input
-                className={styles.form}
-                type="password"
-                id="confirm_password"
-                name="confirm_password"
-                required
-                onChange={handleFieldChange}
-                onBlur={handleOnBlur}
-              />
-            </div>
-          </div>
-          <div className={styles.row}>
-            <div className={styles.field}>
-              <label className={styles.label} htmlFor="firstname">
-                Firstname
-              </label>
-              {fieldErrors.firstname && (
-                <ErrorField errorMsgs={fieldErrors.firstname} />
-              )}
-              <input
-                className={styles.form}
-                type="text"
-                id="firstname"
-                name="firstname"
-                required
-                onChange={handleFieldChange}
-                onBlur={handleOnBlur}
-              />
-            </div>
-          </div>
-          <div className={styles.row}>
-            <div className={styles.field}>
-              <label className={styles.label} htmlFor="lastname">
-                Lastname
-              </label>
-              {fieldErrors.lastname && (
-                <ErrorField errorMsgs={fieldErrors.lastname} />
-              )}
-              <input
-                className={styles.form}
-                type="text"
-                id="lastname"
-                name="lastname"
-                required
-                onChange={handleFieldChange}
-                onBlur={handleOnBlur}
-              />
-            </div>
-          </div>
-          <div className={styles.row}>
-            <div className={styles.date}>
-              <label
-                className={styles.label}
-                htmlFor="birthdate"
-                title="only required for allowance app"
-              >
-                Birth date{" "}
-                <sup>
-                  <span
-                    className={styles.highlight}
-                    style={{ textTransform: "lowercase" }}
-                  >
-                    optional
-                  </span>
-                </sup>
-              </label>
-              {fieldErrors.dobIncomplete && (
-                <ErrorField errorMsgs={fieldErrors.dobIncomplete} />
-              )}
-
-              <div className={styles.daterow}>
-                <select
-                  className={styles.birthdate}
-                  id="birthMonth"
-                  name="birthMonth"
+      <main className={styles.main}>
+        {!registrationSuccess && (
+          <form className={styles.form} onSubmit={handleSubmit}>
+            {fieldErrors.server && (
+              <ErrorField errorMsgs={fieldErrors.server} />
+            )}
+            {fieldErrors.badrequest && (
+              <ErrorField errorMsgs={fieldErrors.badrequest} />
+            )}
+            <div className={styles.row}>
+              <div className={styles.field}>
+                <label className={styles.label} htmlFor="username">
+                  email
+                </label>
+                {fieldErrors.username && (
+                  <ErrorField errorMsgs={fieldErrors.username} />
+                )}
+                <input
+                  className={styles.form}
+                  type="text"
+                  id="username"
+                  name="username"
+                  required
                   onChange={handleFieldChange}
                   onBlur={handleOnBlur}
-                >
-                  <option value="">Month</option>
-                  {[...Array(12)].map((_, i) => (
-                    <option key={i} value={i + 1}>
-                      {months[i]}
-                    </option>
-                  ))}
-                </select>
-                <select
-                  className={styles.birthdate}
-                  id="birthDay"
-                  name="birthDay"
-                  onChange={handleFieldChange}
-                  onBlur={handleOnBlur}
-                >
-                  <option value="">Day</option>
-                  {[...Array(31)].map((_, i) => (
-                    <option key={i} value={i + 1}>
-                      {i + 1}
-                    </option>
-                  ))}
-                </select>
-                <select
-                  className={styles.birthdate}
-                  id="birthYear"
-                  name="birthYear"
-                  onChange={handleFieldChange}
-                  onBlur={handleOnBlur}
-                >
-                  <option value="">Year</option>
-                  {Array.from(
-                    { length: new Date().getFullYear() - 1900 + 1 },
-                    (_, i) => new Date().getFullYear() - i
-                  ).map((year) => (
-                    <option key={year} value={year}>
-                      {year}
-                    </option>
-                  ))}
-                </select>
+                />
               </div>
             </div>
-          </div>
-          <div className={styles.row}>
-            <div className={styles.actions}>
-              <button type="submit" disabled={pending}>
-                {pending ? (
-                  <>
-                    <strong>Registering...</strong>
-                  </>
-                ) : (
-                  <>
-                    <strong>Register</strong>
-                  </>
+            <div className={styles.row}>
+              <div className={styles.field}>
+                <label className={styles.label} htmlFor="password">
+                  Password
+                </label>
+                {fieldErrors.password && (
+                  <ErrorField errorMsgs={fieldErrors.password} />
                 )}
-              </button>
+                <input
+                  className={styles.form}
+                  type="password"
+                  id="password"
+                  name="password"
+                  required
+                  onChange={handleFieldChange}
+                  onBlur={handleOnBlur}
+                />
+              </div>
             </div>
-          </div>
-        </form>
+            <div className={styles.row}>
+              <div className={styles.field}>
+                <label className={styles.label} htmlFor="confirm_password">
+                  Confirm Password
+                </label>
+                {fieldErrors.confirm_password && (
+                  <ErrorField errorMsgs={fieldErrors.confirm_password} />
+                )}
+                <input
+                  className={styles.form}
+                  type="password"
+                  id="confirm_password"
+                  name="confirm_password"
+                  required
+                  onChange={handleFieldChange}
+                  onBlur={handleOnBlur}
+                />
+              </div>
+            </div>
+            <div className={styles.row}>
+              <div className={styles.field}>
+                <label className={styles.label} htmlFor="firstname">
+                  Firstname
+                </label>
+                {fieldErrors.firstname && (
+                  <ErrorField errorMsgs={fieldErrors.firstname} />
+                )}
+                <input
+                  className={styles.form}
+                  type="text"
+                  id="firstname"
+                  name="firstname"
+                  required
+                  onChange={handleFieldChange}
+                  onBlur={handleOnBlur}
+                />
+              </div>
+            </div>
+            <div className={styles.row}>
+              <div className={styles.field}>
+                <label className={styles.label} htmlFor="lastname">
+                  Lastname
+                </label>
+                {fieldErrors.lastname && (
+                  <ErrorField errorMsgs={fieldErrors.lastname} />
+                )}
+                <input
+                  className={styles.form}
+                  type="text"
+                  id="lastname"
+                  name="lastname"
+                  required
+                  onChange={handleFieldChange}
+                  onBlur={handleOnBlur}
+                />
+              </div>
+            </div>
+            <div className={styles.row}>
+              <div className={styles.date}>
+                <label
+                  className={styles.label}
+                  htmlFor="birthdate"
+                  title="only required for allowance app"
+                >
+                  Birth date{" "}
+                  <sup>
+                    <span
+                      className={styles.highlight}
+                      style={{ textTransform: "lowercase" }}
+                    >
+                      optional
+                    </span>
+                  </sup>
+                </label>
+                {fieldErrors.dobIncomplete && (
+                  <ErrorField errorMsgs={fieldErrors.dobIncomplete} />
+                )}
+
+                <div className={styles.daterow}>
+                  <select
+                    className={styles.birthdate}
+                    id="birthMonth"
+                    name="birthMonth"
+                    onChange={handleFieldChange}
+                    onBlur={handleOnBlur}
+                  >
+                    <option value="">Month</option>
+                    {[...Array(12)].map((_, i) => (
+                      <option key={i} value={i + 1}>
+                        {months[i]}
+                      </option>
+                    ))}
+                  </select>
+                  <select
+                    className={styles.birthdate}
+                    id="birthDay"
+                    name="birthDay"
+                    onChange={handleFieldChange}
+                    onBlur={handleOnBlur}
+                  >
+                    <option value="">Day</option>
+                    {[...Array(31)].map((_, i) => (
+                      <option key={i} value={i + 1}>
+                        {i + 1}
+                      </option>
+                    ))}
+                  </select>
+                  <select
+                    className={styles.birthdate}
+                    id="birthYear"
+                    name="birthYear"
+                    onChange={handleFieldChange}
+                    onBlur={handleOnBlur}
+                  >
+                    <option value="">Year</option>
+                    {Array.from(
+                      { length: new Date().getFullYear() - 1900 + 1 },
+                      (_, i) => new Date().getFullYear() - i
+                    ).map((year) => (
+                      <option key={year} value={year}>
+                        {year}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+            </div>
+            <div className={styles.row}>
+              <div className={styles.actions}>
+                <button type="submit" disabled={pending}>
+                  {pending ? (
+                    <>
+                      <strong>Registering...</strong>
+                    </>
+                  ) : (
+                    <>
+                      <strong>Register</strong>
+                    </>
+                  )}
+                </button>
+              </div>
+            </div>
+          </form>
+        )}
+        {registrationSuccess && (
+          <>
+            <div className={styles.card}>
+              <h2>
+                Registration{" "}
+                <span className={styles.highlight}>successful</span>!
+              </h2>
+              <p>
+                Thanks for signing up,{" "}
+                <span className={styles.highlight}>
+                  {registration.firstname}
+                </span>
+                . Proceed to the{" "}
+                <Link className={styles.locallink} href="/login">
+                  login
+                </Link>{" "}
+                page, use{" "}
+                <span className={styles.highlight}>
+                  {registration.username}
+                </span>{" "}
+                as your username, and enter your password.
+              </p>
+              <ul>
+                <li>
+                  <span className={styles.info}>Note:</span> while you have an
+                  account and will be able to view your profile and other less
+                  sensitive content, you will not be able to view restricted
+                  content immediately.
+                </li>
+                <li>
+                  I still need to provision you access to various resources. I
+                  will send you an email when you have been granted access.
+                </li>
+              </ul>
+            </div>
+          </>
+        )}
       </main>
     </>
   );
