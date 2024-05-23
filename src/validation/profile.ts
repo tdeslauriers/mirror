@@ -9,6 +9,11 @@ export type Registration = {
   birthYear?: string;
 };
 
+export type Credentials = {
+  username: string;
+  password: string;
+};
+
 // regex's that for input validation of profile  type data
 const EMAIL_MIN_LENGTH = 6;
 const EMAIL_MAX_LENGTH = 254; // RFC 5321
