@@ -321,8 +321,9 @@ export default function Register() {
           <>
             <div className={styles.card}>
               <h2>
-                Registration{" "}
-                <span className={styles.highlight}>successful</span>!
+                <span className={styles.highlight}>
+                  Registration successful!
+                </span>
               </h2>
               <p>
                 Thanks for signing up,{" "}
@@ -339,12 +340,14 @@ export default function Register() {
                 </span>{" "}
                 as your username, and enter your password.
               </p>
+              <h3>
+                <span className={styles.highlight}>Note:</span>
+              </h3>
               <ul>
                 <li>
-                  <span className={styles.info}>Note:</span> while you have an
-                  account and will be able to view your profile and other less
-                  sensitive content, you will not be able to view restricted
-                  content immediately.
+                  While you have an account and will be able to view your
+                  profile and other less sensitive content, you will not be able
+                  to view restricted content immediately.
                 </li>
                 <li>
                   I still need to provision you access to various resources. I
@@ -363,7 +366,7 @@ function validateRegistration(registration: Registration) {
   const errors: { [key: string]: string[] } = {};
 
   // username
-  if (registration.username.length > 0) {
+  if (registration.username.trim().length > 0) {
     const usernameCheck: FieldValidation = checkEmail(registration.username);
     if (!usernameCheck.isValid) {
       errors.username = usernameCheck.messages;
@@ -371,7 +374,7 @@ function validateRegistration(registration: Registration) {
   }
 
   // password
-  if (registration.password.length > 0) {
+  if (registration.password.trim().length > 0) {
     const passwordCheck: FieldValidation = checkPassword(registration.password);
     if (!passwordCheck.isValid) {
       errors.password = passwordCheck.messages;
@@ -379,14 +382,14 @@ function validateRegistration(registration: Registration) {
   }
 
   // confirm_password: check if matches password
-  if (registration.confirm_password.length > 0) {
+  if (registration.confirm_password.trim().length > 0) {
     if (registration.password !== registration.confirm_password) {
       errors.confirm_password = ["Passwords do not match."];
     }
   }
 
   // check firstname
-  if (registration.firstname.length > 0) {
+  if (registration.firstname.trim().length > 0) {
     const firstnameCheck: FieldValidation = checkName(registration.firstname);
     if (!firstnameCheck.isValid) {
       errors.firstname = firstnameCheck.messages;
@@ -394,7 +397,7 @@ function validateRegistration(registration: Registration) {
   }
 
   // check lastname
-  if (registration.lastname.length > 0) {
+  if (registration.lastname.trim().length > 0) {
     const lastnameCheck: FieldValidation = checkName(registration.lastname);
     if (!lastnameCheck.isValid) {
       errors.lastname = lastnameCheck.messages;

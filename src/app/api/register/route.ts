@@ -13,7 +13,6 @@ export async function POST(req: Request) {
   // field validation
   const errors = validateRegistration(registration);
   if (errors && Object.keys(errors).length > 0) {
-    console.log("errors: ", errors);
     return new Response(JSON.stringify(errors), {
       status: 422,
       headers: {
