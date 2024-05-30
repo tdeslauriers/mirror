@@ -1,9 +1,10 @@
 "use client";
 
-import { ChangeEvent, useState } from "react";
+import { ChangeEvent, useEffect, useState } from "react";
 import styles from "./page.module.css";
 import { Credentials } from "@/validation/profile";
 import ErrorField from "@/components/error-field";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
 type Err = { [key: string]: string[] };
 
@@ -15,6 +16,54 @@ export default function Login() {
   });
   const [fieldErrors, setFieldErrors] = useState<Err>({}); // client side errors
   const [showPassword, setShowPassword] = useState(false);
+
+  const router = useRouter();
+  const path = usePathname();
+  const params = useSearchParams();
+  const [state, setState] = useState<string | null>(null);
+  const [nonce, setNonce] = useState<string | null>(null);
+  const [redirect, setRedirect] = useState<string | null>(null);
+
+  const fetchStateNonce = async () => {
+    if (!params.get("state") || !params.get("nonce")) {
+      try {
+        const response = await fetch("/api/login/state", {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+
+        if (response.ok) {
+          return response.json();
+        }
+      } catch (error) {
+        console.error("state-nonce api call failed: ", error);
+      }
+    }
+  };
+
+  useEffect(() => {
+    const state = params.get("state");
+    const nonce = params.get("nonce");
+
+    if (!state || !nonce) {
+      fetchStateNonce().then(({ state, nonce, redirect_url }) => {
+        if ({ state, nonce, redirect_url }) {
+          setState(state);
+          setNonce(nonce);
+          setRedirect(redirect_url);
+
+          // update url with state and nonce
+          router.replace(
+            `${path}?response_type=code&state=${state}&nonce=${nonce}&redirect_url=${encodeURIComponent(
+              redirect_url
+            )}`
+          );
+        }
+      });
+    }
+  }, [router]);
 
   const handleFieldChange = (event: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target;
@@ -34,9 +83,12 @@ export default function Login() {
 
     if (Object.keys(errors).length === 0) {
       setPending(true);
+
+      console.log;
       // post to login api
       try {
-        const response = await fetch("/api/login", {
+        const authUrl = `/api/login?response_type=code&state=${state}&nonce=${nonce}`;
+        const response = await fetch(authUrl, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",

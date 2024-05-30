@@ -6,8 +6,9 @@ import {
   checkName,
   checkPassword,
 } from "@/validation/profile";
+import { NextRequest, NextResponse } from "next/server";
 
-export async function POST(req: Request) {
+export async function POST(req: NextRequest) {
   const registration: Registration = await req.json();
 
   // field validation
@@ -34,7 +35,7 @@ export async function POST(req: Request) {
 
     if (apiResponse.ok) {
       const success = await apiResponse.json();
-      return new Response(JSON.stringify(success), {
+      return NextResponse.json(success, {
         status: apiResponse.status, // 201 expected
         headers: {
           "Content-Type": "application/json",
