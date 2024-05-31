@@ -9,7 +9,7 @@ import {
   checkEmail,
   checkName,
   checkPassword,
-} from "@/validation/profile";
+} from "@/validation/fields";
 import Link from "next/link";
 
 type Err = { [key: string]: string[] };

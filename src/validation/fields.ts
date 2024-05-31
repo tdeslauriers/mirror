@@ -46,6 +46,9 @@ const NAME_MIN_LENGTH = 1;
 const NAME_MAX_LENGTH = 32;
 const NAME_REGEX: RegExp = /^[a-zA-Z_'-\s]+$/;
 
+const UUID_REGEX =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+
 export type FieldValidation = {
   isValid: boolean;
   messages: string[];
@@ -201,6 +204,20 @@ export function checkBirthdate(year: string, month: string, day: string) {
   // Check if the birth date is before today and after the start date
   if (birthDate >= today || birthDate < startDate) {
     errors.push("Birth date must be before today and after 1901-01-01.");
+  }
+
+  if (errors.length > 0) {
+    return { isValid: false, messages: errors };
+  }
+
+  return { isValid: true, messages: [] };
+}
+
+// checks if a UUID is valid
+export function checkUuid(uuid: string) {
+  let errors: string[] = [];
+  if (!UUID_REGEX.test(uuid)) {
+    errors.push("UUID must be a valid UUID.");
   }
 
   if (errors.length > 0) {

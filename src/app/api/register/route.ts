@@ -5,7 +5,7 @@ import {
   checkEmail,
   checkName,
   checkPassword,
-} from "@/validation/profile";
+} from "@/validation/fields";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(req: NextRequest) {
@@ -45,7 +45,7 @@ export async function POST(req: NextRequest) {
       const fail = await apiResponse.json();
       if (isGatewayError(fail)) {
         const errors = handleGatewayErrors(fail);
-        return new Response(JSON.stringify(errors), {
+        return NextResponse.json(errors, {
           status: apiResponse.status,
           headers: {
             "Content-Type": "application/json",
@@ -58,12 +58,15 @@ export async function POST(req: NextRequest) {
       }
     }
   } catch (error: any) {
-    return new Response(JSON.stringify({ server: [error.message] }), {
-      status: 500,
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
+    return NextResponse.json(
+      { server: [error.message] },
+      {
+        status: 500,
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
   }
 }
 

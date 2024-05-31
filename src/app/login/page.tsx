@@ -2,7 +2,7 @@
 
 import { ChangeEvent, useEffect, useState } from "react";
 import styles from "./page.module.css";
-import { Credentials } from "@/validation/profile";
+import { Credentials } from "@/validation/fields";
 import ErrorField from "@/components/error-field";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
@@ -144,6 +144,7 @@ export default function Login() {
           {fieldErrors.badrequest && (
             <ErrorField errorMsgs={fieldErrors.badrequest} />
           )}
+          {fieldErrors.oauth && <ErrorField errorMsgs={fieldErrors.oauth} />}
           <div className={styles.row}>
             <div className={styles.field}>
               <label className={styles.label} htmlFor="username">
