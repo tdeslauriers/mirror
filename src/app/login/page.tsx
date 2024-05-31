@@ -18,28 +18,30 @@ export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
 
   const router = useRouter();
-  const path = usePathname();
   const params = useSearchParams();
-  const [state, setState] = useState<string | null>(null);
-  const [nonce, setNonce] = useState<string | null>(null);
-  const [redirect, setRedirect] = useState<string | null>(null);
+  const path = usePathname();
+  const [oauthState, setState] = useState<string | null>(null);
+  const [oauthNonce, setNonce] = useState<string | null>(null);
+  const [oauthRedirect, setRedirect] = useState<string | null>(null);
 
   const fetchStateNonce = async () => {
-    if (!params.get("state") || !params.get("nonce")) {
-      try {
-        const response = await fetch("/api/login/state", {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        });
+    try {
+      const response = await fetch("/api/login/state", {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
 
-        if (response.ok) {
-          return response.json();
-        }
-      } catch (error) {
-        console.error("state-nonce api call failed: ", error);
+      if (response.ok) {
+        return response.json();
+      } else {
+        const error = await response.json();
+        setFieldErrors(error);
+        return Promise.reject(error);
       }
+    } catch (error) {
+      return Promise.reject(error);
     }
   };
 
@@ -48,22 +50,32 @@ export default function Login() {
     const nonce = params.get("nonce");
 
     if (!state || !nonce) {
-      fetchStateNonce().then(({ state, nonce, redirect_url }) => {
-        if ({ state, nonce, redirect_url }) {
-          setState(state);
-          setNonce(nonce);
-          setRedirect(redirect_url);
+      fetchStateNonce()
+        .then(({ state, nonce, redirect_url }) => {
+          if (state && nonce && redirect_url) {
+            setState(state);
+            setNonce(nonce);
+            setRedirect(redirect_url);
 
-          // update url with state and nonce
-          router.replace(
-            `${path}?response_type=code&state=${state}&nonce=${nonce}&redirect_url=${encodeURIComponent(
-              redirect_url
-            )}`
-          );
-        }
-      });
+            // update url with state and nonce
+            router.replace(
+              `${path}?response_type=code&state=${state}&nonce=${nonce}&redirect_url=${encodeURIComponent(
+                redirect_url
+              )}`
+            );
+          }
+        })
+        .catch((error) => {
+          console.error("state-nonce api call failed 2: ", error);
+          const errMsg = error.server
+            ? error.server
+            : "Failed to get state, nonce, and default redirect url.";
+          setFieldErrors({
+            server: [errMsg, "If error continues, please contact me."],
+          });
+        });
     }
-  }, [router]);
+  }, [router, params, path]);
 
   const handleFieldChange = (event: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target;
@@ -87,7 +99,9 @@ export default function Login() {
       console.log;
       // post to login api
       try {
-        const authUrl = `/api/login?response_type=code&state=${state}&nonce=${nonce}`;
+        const authUrl = `/api/login?response_type=code&state=${oauthState}&nonce=${oauthNonce}&redirect_url=${encodeURIComponent(
+          oauthRedirect ?? ""
+        )}`;
         const response = await fetch(authUrl, {
           method: "POST",
           headers: {
