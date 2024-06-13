@@ -1,18 +1,4 @@
-export type Registration = {
-  username: string;
-  password: string;
-  confirm_password: string;
-  firstname: string;
-  lastname: string;
-  birthMonth?: string;
-  birthDay?: string;
-  birthYear?: string;
-};
 
-export type Credentials = {
-  username: string;
-  password: string;
-};
 
 // regex's that for input validation of profile  type data
 const EMAIL_MIN_LENGTH = 6;

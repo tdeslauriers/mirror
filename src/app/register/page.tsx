@@ -5,12 +5,12 @@ import styles from "./page.module.css";
 import ErrorField from "@/components/error-field";
 import {
   FieldValidation,
-  Registration,
   checkEmail,
   checkName,
   checkPassword,
 } from "@/validation/fields";
 import Link from "next/link";
+import { Registration } from "../api";
 
 type Err = { [key: string]: string[] };
 

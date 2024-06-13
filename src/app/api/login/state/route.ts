@@ -1,8 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
+import { GatewayError, isGatewayError } from "../..";
 
 export type OauthExchange = {
+  response_type: string | null;
   nonce: string | null;
   state: string | null;
+  client_id: string | null;
   redirect_url: string | null;
   created_at: string | null;
 };
@@ -29,7 +32,7 @@ export async function GET(req: NextRequest) {
     } else {
       const fail = await apiResponse.json();
       if (isGatewayError(fail)) {
-        const errors = handleGatewayErrors(fail);
+        const errors = handleOauthErrors(fail);
         return NextResponse.json(errors, {
           status: apiResponse.status,
           headers: {
@@ -55,20 +58,7 @@ export async function GET(req: NextRequest) {
   }
 }
 
-export type GatewayError = {
-  code: number;
-  message: string;
-};
-
-function isGatewayError(object: any): object is GatewayError {
-  return (
-    object &&
-    typeof object.code === "number" &&
-    typeof object.message === "string"
-  );
-}
-
-function handleGatewayErrors(gatewayError: GatewayError) {
+function handleOauthErrors(gatewayError: GatewayError) {
   const errors: { [key: string]: string[] } = {};
   errors.server = [
     gatewayError.message || "An error occurred. Please try again.",

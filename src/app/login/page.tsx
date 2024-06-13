@@ -2,9 +2,9 @@
 
 import { ChangeEvent, useEffect, useState } from "react";
 import styles from "./page.module.css";
-import { Credentials } from "@/validation/fields";
 import ErrorField from "@/components/error-field";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { Credentials } from "../api";
 
 type Err = { [key: string]: string[] };
 
@@ -20,11 +20,15 @@ export default function Login() {
   const router = useRouter();
   const params = useSearchParams();
   const path = usePathname();
-  const [oauthState, setState] = useState<string | null>(null);
-  const [oauthNonce, setNonce] = useState<string | null>(null);
-  const [oauthRedirect, setRedirect] = useState<string | null>(null);
+  const [oauthResponseType, setOauthResponseType] = useState<string | null>(
+    null
+  );
+  const [oauthState, setOauthState] = useState<string | null>(null);
+  const [oauthNonce, setOauthNonce] = useState<string | null>(null);
+  const [oauthClientId, setOauthClientId] = useState<string | null>(null);
+  const [oauthRedirect, setOauthRedirect] = useState<string | null>(null);
 
-  const fetchStateNonce = async () => {
+  const fetchOauthExchange = async () => {
     try {
       const response = await fetch("/api/login/state", {
         method: "GET",
@@ -46,20 +50,25 @@ export default function Login() {
   };
 
   useEffect(() => {
+    const response_type = params.get("response_type");
     const state = params.get("state");
     const nonce = params.get("nonce");
+    const client_id = params.get("client_id");
+    const redirect = params.get("redirect_url");
 
-    if (!state || !nonce) {
-      fetchStateNonce()
-        .then(({ state, nonce, redirect_url }) => {
+    if (!response_type || !state || !nonce || !client_id || !redirect) {
+      fetchOauthExchange()
+        .then(({ response_type, state, nonce, client_id, redirect_url }) => {
           if (state && nonce && redirect_url) {
-            setState(state);
-            setNonce(nonce);
-            setRedirect(redirect_url);
+            setOauthResponseType(response_type);
+            setOauthState(state);
+            setOauthNonce(nonce);
+            setOauthClientId(client_id);
+            setOauthRedirect(redirect_url);
 
             // update url with state and nonce
             router.replace(
-              `${path}?response_type=code&state=${state}&nonce=${nonce}&redirect_url=${encodeURIComponent(
+              `${path}?client_id=${client_id}&response_type=${response_type}&state=${state}&nonce=${nonce}&redirect_url=${encodeURIComponent(
                 redirect_url
               )}`
             );
@@ -74,6 +83,12 @@ export default function Login() {
             server: [errMsg, "If error continues, please contact me."],
           });
         });
+    } else {
+      setOauthResponseType(response_type);
+      setOauthState(state);
+      setOauthNonce(nonce);
+      setOauthClientId(client_id);
+      setOauthRedirect(redirect);
     }
   }, [router, params, path]);
 
@@ -96,10 +111,9 @@ export default function Login() {
     if (Object.keys(errors).length === 0) {
       setPending(true);
 
-      console.log;
       // post to login api
       try {
-        const authUrl = `/api/login?response_type=code&state=${oauthState}&nonce=${oauthNonce}&redirect_url=${encodeURIComponent(
+        const authUrl = `/api/login?client_id=${oauthClientId}&response_type=${oauthResponseType}&state=${oauthState}&nonce=${oauthNonce}&redirect_url=${encodeURIComponent(
           oauthRedirect ?? ""
         )}`;
         const response = await fetch(authUrl, {

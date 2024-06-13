@@ -1,12 +1,12 @@
 import {
   FieldValidation,
-  Registration,
   checkBirthdate,
   checkEmail,
   checkName,
   checkPassword,
 } from "@/validation/fields";
 import { NextRequest, NextResponse } from "next/server";
+import { GatewayError, Registration, isGatewayError } from "..";
 
 export async function POST(req: NextRequest) {
   const registration: Registration = await req.json();
@@ -44,7 +44,7 @@ export async function POST(req: NextRequest) {
     } else {
       const fail = await apiResponse.json();
       if (isGatewayError(fail)) {
-        const errors = handleGatewayErrors(fail);
+        const errors = handleRegistrationErrors(fail);
         return NextResponse.json(errors, {
           status: apiResponse.status,
           headers: {
@@ -70,20 +70,7 @@ export async function POST(req: NextRequest) {
   }
 }
 
-export type GatewayError = {
-  code: number;
-  message: string;
-};
-
-function isGatewayError(object: any): object is GatewayError {
-  return (
-    object &&
-    typeof object.code === "number" &&
-    typeof object.message === "string"
-  );
-}
-
-function handleGatewayErrors(gatewayError: GatewayError) {
+function handleRegistrationErrors(gatewayError: GatewayError) {
   const errors: { [key: string]: string[] } = {};
   switch (gatewayError.code) {
     case 400:
