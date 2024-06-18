@@ -159,6 +159,19 @@ export default function Login() {
             <ErrorField errorMsgs={fieldErrors.badrequest} />
           )}
           {fieldErrors.oauth && <ErrorField errorMsgs={fieldErrors.oauth} />}
+          {fieldErrors.credentials && (
+            <ErrorField errorMsgs={fieldErrors.credentials} />
+          )}
+          {fieldErrors.response_type && (
+            <ErrorField errorMsgs={fieldErrors.response_type} />
+          )}
+          {fieldErrors.state && <ErrorField errorMsgs={fieldErrors.state} />}
+          {fieldErrors.nonse && <ErrorField errorMsgs={fieldErrors.nonse} />}
+          {fieldErrors.redirect && <ErrorField errorMsgs={fieldErrors.nonse} />}
+          {fieldErrors.client_id && (
+            <ErrorField errorMsgs={fieldErrors.client_id} />
+          )}
+
           <div className={styles.row}>
             <div className={styles.field}>
               <label className={styles.label} htmlFor="username">

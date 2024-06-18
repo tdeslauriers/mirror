@@ -1,16 +1,12 @@
 import { checkUuid } from "@/validation/fields";
 import { NextRequest, NextResponse } from "next/server";
-import { Credentials, GatewayError, isGatewayError } from "..";
-
-export type LoginCmd = {
-  username: string;
-  password: string;
-  response_type: string;
-  state: string;
-  nonce: string;
-  client_id: string;
-  redirect: string;
-};
+import {
+  CallbackCmd,
+  Credentials,
+  GatewayError,
+  LoginCmd,
+  isGatewayError,
+} from "..";
 
 export async function POST(req: NextRequest) {
   // field validation
@@ -72,18 +68,8 @@ export async function POST(req: NextRequest) {
     errors.password = ["Password must be less than 64 characters."];
   }
 
-  // return field level errors to login page
-  if (errors && Object.keys(errors).length > 0) {
-    return NextResponse.json(errors, {
-      status: 422,
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
-  }
-
   // build login cmd
-  const loginCmd = {
+  const loginCmd: LoginCmd = {
     username: credentials.username,
     password: credentials.password,
     response_type: response_type,
@@ -105,12 +91,19 @@ export async function POST(req: NextRequest) {
     });
 
     if (apiResponse.ok) {
-      const success = await apiResponse.json();
+      const cmd: CallbackCmd = await apiResponse.json();
 
-      // TODO: handle redirect to oauth callback url
-      console.log("login success: ", success);
-      return NextResponse.json(success, {
-        status: apiResponse.status,
+      // build redirect url
+      const callback = new URL(
+        `${cmd.redirect}?client_id=${cmd.client_id}&response_type=${
+          cmd.response_type
+        }&auth_code=${cmd.auth_code}&state=${cmd.state}&nonce=${
+          cmd.nonce
+        }&redirect_url=${encodeURIComponent(cmd.redirect ?? "")}`
+      );
+      console.log("login success, redirecting to: ", cmd.redirect);
+      return NextResponse.redirect(callback.toString(), {
+        status: 307,
         headers: {
           "Content-Type": "application/json",
         },
@@ -147,4 +140,71 @@ export async function POST(req: NextRequest) {
 function handleLoginErrors(gatewayError: GatewayError) {
   console.log("login gateway error: ", gatewayError);
   const errors: { [key: string]: string[] } = {};
+  switch (gatewayError.code) {
+    case 400:
+      errors.badrequest = [gatewayError.message];
+      return errors;
+    case 401:
+      if (gatewayError.message.includes(",")) {
+        const errMsgs: string[] = gatewayError.message.split(",");
+        errMsgs.forEach((msg) => {
+          switch (true) {
+            case msg.includes("username or password"):
+              errors.credentials = [msg];
+              break;
+            case msg.includes("redirect url"):
+              errors.redirect = [msg];
+              break;
+            case msg.includes("client Id"):
+              errors.client_id = [msg];
+              break;
+            case msg.includes("response type"):
+              errors.response_type = [msg];
+              break;
+            default:
+              errors.server = [msg];
+              break;
+          }
+        });
+        return errors;
+      } else {
+        errors.server = [gatewayError.message];
+      }
+    case 405:
+      errors.badrequest = [gatewayError.message];
+      return errors;
+    case 422:
+      // these checks are very light weight
+      switch (true) {
+        case gatewayError.message.includes("username"):
+          errors.username = [gatewayError.message];
+          return errors;
+        case gatewayError.message.includes("password"):
+          errors.password = [gatewayError.message];
+          return errors;
+        case gatewayError.message.includes("response type"):
+          errors.response_type = [gatewayError.message];
+          return errors;
+        case gatewayError.message.includes("state"):
+          errors.state = [gatewayError.message];
+          return errors;
+        case gatewayError.message.includes("nonce"):
+          errors.nonce = [gatewayError.message];
+          return errors;
+        case gatewayError.message.includes("redirect"):
+          errors.redirect = [gatewayError.message];
+          return errors;
+        case gatewayError.message.includes("client id"):
+          errors.client_id = [gatewayError.message];
+          return errors;
+        default:
+          break;
+      }
+    default:
+      errors.server = [
+        gatewayError.message || "A login error occurred. Please try again.",
+        "If the problem persists, please contact me.",
+      ];
+      return errors;
+  }
 }

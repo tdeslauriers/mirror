@@ -76,6 +76,9 @@ function handleRegistrationErrors(gatewayError: GatewayError) {
     case 400:
       errors.badrequest = [gatewayError.message];
       return errors;
+    case 405:
+      errors.badrequest = [gatewayError.message];
+      return errors;
     case 409:
       errors.username = [gatewayError.message];
       return errors;
