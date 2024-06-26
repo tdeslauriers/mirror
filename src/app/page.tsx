@@ -1,7 +1,7 @@
-import styles from "./page.module.css";
 import Link from "next/link";
+import styles from "./page.module.css";
 
-export default function Home() {
+export default async function Home() {
   return (
     <>
       <main className={styles.main}>
@@ -15,10 +15,9 @@ export default function Home() {
           </h2>
           <div className={styles.center}>
             <p>
-              This is where you can find out what we are up to. It includes our
-              photo gallery, some art work, and I am adding to it all the time!
-              The site itself is a hobby project, sort of. To find out more,
-              checkout the{" "}
+              Freatures our photo gallery, some art work, and I am adding to it
+              all the time! The site itself is a hobby project, sort of. To find
+              out more, checkout the{" "}
               <Link className={styles.locallink} href={"/about"}>
                 about
               </Link>{" "}

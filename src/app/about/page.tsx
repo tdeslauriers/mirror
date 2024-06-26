@@ -20,7 +20,7 @@ export default function About() {
               Over the years, the site has become my Frankenstein&apos;s monster
               or as a friend said,{" "}
               <span style={{ fontStyle: "italic" }}>
-                &quot;the most over-engineered image server of all time.&quot;
+                &quot;the most over-engineered image-server of all time.&quot;
               </span>
               <br />
               <br />
@@ -55,7 +55,7 @@ export default function About() {
               <span className={styles.highlight}>
                 <strong>Go</strong>
               </span>{" "}
-              services in{" "}
+              micro-services in{" "}
               <span className={styles.highlight}>
                 <strong>Kubernetes.</strong>
               </span>
