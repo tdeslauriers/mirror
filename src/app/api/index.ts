@@ -7,16 +7,19 @@ export type Registration = {
   birthMonth?: string;
   birthDay?: string;
   birthYear?: string;
+  csrf: string;
 };
 
 export type Credentials = {
   username: string;
   password: string;
+  csrf: string;
 };
 
 export type LoginCmd = {
   username: string;
   password: string;
+  csrf: string;
   response_type: string | null;
   state: string | null;
   nonce: string | null;

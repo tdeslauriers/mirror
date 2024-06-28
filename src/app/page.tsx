@@ -1,3 +1,4 @@
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 import Link from "next/link";
 import styles from "./page.module.css";
 

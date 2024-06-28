@@ -8,7 +8,7 @@ export default async function middleware(request: NextRequest) {
   // check for session cookie
   const sessionId = cookies().get("session_id");
   if (!sessionId || sessionId.value === "") {
-    process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
+    // process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0"; // must be at top of page that calls this middleware
     try {
       const apiResponse = await fetch(
         "https://localhost:8443/session/anonymous",
@@ -26,8 +26,8 @@ export default async function middleware(request: NextRequest) {
         response.cookies.set("session_id", success.session_token, {
           httpOnly: true,
           sameSite: "strict",
-          maxAge: 60 * 60,
           secure: true,
+          maxAge: 60 * 60,
         });
 
         // auth status cookie --> convenience for UI rendering, not used for actual auth logic
@@ -35,8 +35,8 @@ export default async function middleware(request: NextRequest) {
         response.cookies.set("authenticated", success.authenticated, {
           httpOnly: false,
           sameSite: "strict",
-          maxAge: 60 * 60,
           secure: true,
+          maxAge: 60 * 60,
         });
 
         return response;
