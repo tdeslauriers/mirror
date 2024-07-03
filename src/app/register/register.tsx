@@ -93,9 +93,11 @@ export default function Register() {
     if (Object.keys(errors).length === 0) {
       setPending(true);
 
+      // append csrf token to registration object
       if (csrfToken) {
         registration.csrf = csrfToken;
       }
+
       // make api call
       try {
         const response = await fetch("/api/register", {

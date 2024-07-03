@@ -1,3 +1,12 @@
+export type OauthExchange = {
+  response_type: string | null;
+  nonce: string | null;
+  state: string | null;
+  client_id: string | null;
+  redirect_url: string | null;
+  created_at: string | null;
+};
+
 export type Registration = {
   username: string;
   password: string;
@@ -14,14 +23,14 @@ export type Registration = {
 export type Credentials = {
   username: string;
   password: string;
-  csrf: string | null;
-  session: string | null;
+  csrf?: string;
 };
 
 export type LoginCmd = {
   username: string;
   password: string;
-  csrf: string;
+  csrf?: string;
+  session?: string;
   response_type: string | null;
   state: string | null;
   nonce: string | null;

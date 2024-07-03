@@ -1,15 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { GatewayError, isGatewayError } from "../..";
 
-export type OauthExchange = {
-  response_type: string | null;
-  nonce: string | null;
-  state: string | null;
-  client_id: string | null;
-  redirect_url: string | null;
-  created_at: string | null;
-};
-
 export async function GET(req: NextRequest) {
   // call gateway oauth state + nonce endpoint
   process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";

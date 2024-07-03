@@ -6,6 +6,7 @@ import {
   GatewayError,
   LoginCmd,
   isGatewayError,
+  validateSessionId,
 } from "..";
 
 export async function POST(req: NextRequest) {
@@ -67,11 +68,28 @@ export async function POST(req: NextRequest) {
     console.log("password less than 64 characters.");
     errors.password = ["Password must be less than 64 characters."];
   }
+  if (
+    !credentials.csrf ||
+    credentials.csrf.length < 16 ||
+    credentials.csrf.length > 64
+  ) {
+    console.log("csrf token is required.");
+    errors.csrf = ["A valid CSRF token is required."];
+  }
+
+  // get session_id cookie to pass to gateway login endpoint
+  const sessionCookie = req.cookies.get("session_id");
+  if (!sessionCookie || !validateSessionId(sessionCookie.value)) {
+    console.log("session_id cookie is missing or not well formed.");
+    errors.server = ["A valid session cookie is required."];
+  }
 
   // build login cmd
   const loginCmd: LoginCmd = {
     username: credentials.username,
     password: credentials.password,
+    csrf: credentials.csrf,
+    session: sessionCookie?.value,
     response_type: response_type,
     state: state,
     nonce: nonce,
