@@ -1,3 +1,5 @@
+// api json objects
+
 export type OauthExchange = {
   response_type: string | null;
   nonce: string | null;
