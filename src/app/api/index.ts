@@ -7,13 +7,15 @@ export type Registration = {
   birthMonth?: string;
   birthDay?: string;
   birthYear?: string;
-  csrf: string;
+  csrf?: string;
+  session?: string;
 };
 
 export type Credentials = {
   username: string;
   password: string;
-  csrf: string;
+  csrf: string | null;
+  session: string | null;
 };
 
 export type LoginCmd = {
@@ -47,4 +49,12 @@ export function isGatewayError(object: any): object is GatewayError {
     typeof object.code === "number" &&
     typeof object.message === "string"
   );
+}
+
+// validate session_id: super light-weight, just check for absurd tampering
+export function validateSessionId(sessionId: string) {
+  if (!sessionId.length || sessionId.length < 16 || sessionId.length > 64) {
+    return false;
+  }
+  return true;
 }

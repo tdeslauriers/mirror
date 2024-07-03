@@ -1,19 +1,19 @@
 import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
-import { GatewayError, isGatewayError } from "..";
+import { GatewayError, isGatewayError, validateSessionId } from "..";
 
 export async function GET(req: NextRequest) {
   // get session_id cookie to be url param for gateway csrf endpoint
   // session_id will have been set by middleware on render of csrf-sourcing page
   // TODO: add error handling for missing session_id cookie
-  const sessionId = cookies().get("session_id");
+  const sessionCookie = cookies().get("session_id");
 
   // call gateway csrf endpoint
-  if (sessionId && validateSessionId(sessionId.value)) {
+  if (sessionCookie && validateSessionId(sessionCookie.value)) {
     process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
     try {
       const apiResponse = await fetch(
-        `https://localhost:8443/csrf/${sessionId.value}`,
+        `https://localhost:8443/session/csrf/${sessionCookie.value}`,
         {
           method: "GET",
           headers: {
@@ -24,11 +24,29 @@ export async function GET(req: NextRequest) {
 
       if (apiResponse.ok) {
         const success = await apiResponse.json();
-        return NextResponse.json(success, {
-          headers: {
-            "Cache-Control": "no-store",
-          },
-        });
+
+        // validate session token came back.
+        // mismatch should never happen. if it does, it's a security issue.
+        if (sessionCookie.value !== success.session_token) {
+          return NextResponse.json(
+            { server: ["Session token mismatch. Please try again."] },
+            {
+              status: 500,
+              headers: {
+                "Content-Type": "application/json",
+              },
+            }
+          );
+        }
+        // IMPORTANT: do not return session_token to client. XSS risk!
+        return NextResponse.json(
+          { csrf_token: success.csrf_token, created_at: success.created_at },
+          {
+            headers: {
+              "Cache-Control": "no-store",
+            },
+          }
+        );
       } else {
         const fail = await apiResponse.json();
         if (isGatewayError(fail)) {
@@ -57,14 +75,6 @@ export async function GET(req: NextRequest) {
       );
     }
   }
-}
-
-// validate session_id: super light-weight, just check for absurd tampering
-function validateSessionId(sessionId: string) {
-  if (!sessionId.length || sessionId.length < 16 || sessionId.length > 64) {
-    return false;
-  }
-  return true;
 }
 
 function handleCsrfErrors(gatewayError: GatewayError) {

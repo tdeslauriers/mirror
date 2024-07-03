@@ -6,7 +6,12 @@ import {
   checkPassword,
 } from "@/validation/fields";
 import { NextRequest, NextResponse } from "next/server";
-import { GatewayError, Registration, isGatewayError } from "..";
+import {
+  GatewayError,
+  Registration,
+  isGatewayError,
+  validateSessionId,
+} from "..";
 
 export async function POST(req: NextRequest) {
   const registration: Registration = await req.json();
@@ -20,6 +25,12 @@ export async function POST(req: NextRequest) {
         "Content-Type": "application/json",
       },
     });
+  }
+
+  // get session_id cookie to pass to gateway registration endpoint
+  const sessionCookie = req.cookies.get("session_id");
+  if (sessionCookie && validateSessionId(sessionCookie.value)) {
+    registration.session = sessionCookie.value;
   }
 
   // call gateway registration endpoint
@@ -172,6 +183,15 @@ function validateRegistration(registration: Registration) {
     if (!lastnameCheck.isValid) {
       errors.lastname = lastnameCheck.messages;
     }
+  }
+
+  // check csrf token: super light-weight, just check for absurd tampering
+  if (
+    !registration.csrf ||
+    registration.csrf.length < 16 ||
+    registration.csrf.length > 64
+  ) {
+    errors.csrf = ["A valid CSRF token is required."];
   }
 
   // check birthdate

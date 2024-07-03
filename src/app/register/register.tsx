@@ -40,10 +40,6 @@ export default function Register() {
     confirm_password: "",
     firstname: "",
     lastname: "",
-    birthMonth: "",
-    birthDay: "",
-    birthYear: "",
-    csrf: "",
   });
   const [fieldErrors, setFieldErrors] = useState<Err>({}); // client side errors
 
@@ -96,6 +92,10 @@ export default function Register() {
 
     if (Object.keys(errors).length === 0) {
       setPending(true);
+
+      if (csrfToken) {
+        registration.csrf = csrfToken;
+      }
       // make api call
       try {
         const response = await fetch("/api/register", {
