@@ -1,6 +1,6 @@
 import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
-import { GatewayError, isGatewayError, validateSessionId } from "..";
+import { GatewayError, isGatewayError, isValidSessionId } from "..";
 
 export async function GET(req: NextRequest) {
   // get session_id cookie to be url param for gateway csrf endpoint
@@ -9,7 +9,7 @@ export async function GET(req: NextRequest) {
   const sessionCookie = cookies().get("session_id");
 
   // call gateway csrf endpoint
-  if (sessionCookie && validateSessionId(sessionCookie.value)) {
+  if (sessionCookie && isValidSessionId(sessionCookie.value)) {
     process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
     try {
       const apiResponse = await fetch(

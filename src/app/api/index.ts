@@ -61,7 +61,7 @@ export function isGatewayError(object: any): object is GatewayError {
 }
 
 // validate session_id: super light-weight, just check for absurd tampering
-export function validateSessionId(sessionId: string) {
+export function isValidSessionId(sessionId: string) {
   if (!sessionId.length || sessionId.length < 16 || sessionId.length > 64) {
     return false;
   }

@@ -6,7 +6,7 @@ import {
   GatewayError,
   LoginCmd,
   isGatewayError,
-  validateSessionId,
+  isValidSessionId,
 } from "..";
 
 export async function POST(req: NextRequest) {
@@ -79,7 +79,7 @@ export async function POST(req: NextRequest) {
 
   // get session_id cookie to pass to gateway login endpoint
   const sessionCookie = req.cookies.get("session_id");
-  if (!sessionCookie || !validateSessionId(sessionCookie.value)) {
+  if (!sessionCookie || !isValidSessionId(sessionCookie.value)) {
     console.log("session_id cookie is missing or not well formed.");
     errors.server = ["A valid session cookie is required."];
   }

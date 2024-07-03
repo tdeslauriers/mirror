@@ -10,7 +10,7 @@ import {
   GatewayError,
   Registration,
   isGatewayError,
-  validateSessionId,
+  isValidSessionId,
 } from "..";
 
 export async function POST(req: NextRequest) {
@@ -29,7 +29,7 @@ export async function POST(req: NextRequest) {
 
   // get session_id cookie to pass to gateway registration endpoint
   const sessionCookie = req.cookies.get("session_id");
-  if (sessionCookie && validateSessionId(sessionCookie.value)) {
+  if (sessionCookie && isValidSessionId(sessionCookie.value)) {
     registration.session = sessionCookie.value;
   }
 
