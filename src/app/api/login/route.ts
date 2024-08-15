@@ -2,12 +2,15 @@ import { checkUuid } from "@/validation/fields";
 import { NextRequest, NextResponse } from "next/server";
 import {
   CallbackCmd,
+  CallbackUrl,
   Credentials,
+  ErrMsgGeneric,
   GatewayError,
   LoginCmd,
   isGatewayError,
   isValidSessionId,
 } from "..";
+import { cookies, headers } from "next/headers";
 
 export async function POST(req: NextRequest) {
   // field validation
@@ -60,11 +63,11 @@ export async function POST(req: NextRequest) {
 
   // check credentials --> very light weight validation
   const credentials: Credentials = await req.json();
-  if (credentials.username.trim().length > 254) {
+  if (credentials.username && credentials.username.trim().length > 254) {
     console.log("username less than 254 characters.");
     errors.username = ["Email/username must be less than 254 characters."];
   }
-  if (credentials.password.trim().length > 64) {
+  if (credentials.password && credentials.password.trim().length > 64) {
     console.log("password less than 64 characters.");
     errors.password = ["Password must be less than 64 characters."];
   }
@@ -73,28 +76,30 @@ export async function POST(req: NextRequest) {
     credentials.csrf.length < 16 ||
     credentials.csrf.length > 64
   ) {
-    console.log("csrf token is required.");
-    errors.csrf = ["A valid CSRF token is required."];
+    console.log("csrf token missing or not well formed.");
+    errors.csrf = [ErrMsgGeneric];
   }
 
   // get session_id cookie to pass to gateway login endpoint
-  const sessionCookie = req.cookies.get("session_id");
+  const sessionCookie = cookies().get("session_id");
   if (!sessionCookie || !isValidSessionId(sessionCookie.value)) {
     console.log("session_id cookie is missing or not well formed.");
-    errors.server = ["A valid session cookie is required."];
+    errors.server = [ErrMsgGeneric];
   }
 
   // build login cmd
   const loginCmd: LoginCmd = {
     username: credentials.username,
     password: credentials.password,
-    csrf: credentials.csrf,
-    session: sessionCookie?.value,
+
     response_type: response_type,
     state: state,
     nonce: nonce,
     client_id: client_id,
     redirect: redirect,
+
+    csrf: credentials.csrf,
+    session: sessionCookie?.value,
   };
 
   // post to gateway login endpoint
@@ -111,17 +116,16 @@ export async function POST(req: NextRequest) {
     if (apiResponse.ok) {
       const cmd: CallbackCmd = await apiResponse.json();
 
-      // build redirect url
-      const callback = new URL(
-        `${cmd.redirect}?client_id=${cmd.client_id}&response_type=${
-          cmd.response_type
-        }&auth_code=${cmd.auth_code}&state=${cmd.state}&nonce=${
-          cmd.nonce
-        }&redirect_url=${encodeURIComponent(cmd.redirect ?? "")}`
-      );
-      console.log("login success, redirecting to: ", cmd.redirect);
-      return NextResponse.redirect(callback.toString(), {
-        status: 307,
+      // session will not be in payload, but check/remove anyway
+      if (cmd.session) {
+        delete cmd.session;
+      }
+
+      // TODO: add validation to the cmd values.
+
+      // return response to the login page: will create redirect ot callback page
+      return NextResponse.json(cmd, {
+        status: apiResponse.status,
         headers: {
           "Content-Type": "application/json",
         },
@@ -137,9 +141,7 @@ export async function POST(req: NextRequest) {
           },
         });
       } else {
-        throw new Error(
-          "An error occurred. Please try again. If the problem persists, please contact me."
-        );
+        throw new Error(ErrMsgGeneric);
       }
     }
   } catch (error: any) {
@@ -220,7 +222,8 @@ function handleLoginErrors(gatewayError: GatewayError) {
       }
     default:
       errors.server = [
-        gatewayError.message || "A login error occurred. Please try again.",
+        gatewayError.message ||
+          "A login error occurred. Please try refreshing the page loggin in again.",
         "If the problem persists, please contact me.",
       ];
       return errors;

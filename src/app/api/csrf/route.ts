@@ -74,7 +74,7 @@ export async function GET(req: NextRequest) {
         }
       );
     }
-  }
+  } // TODO: add error handling for missing/invalid session_id cookie
 }
 
 function handleCsrfErrors(gatewayError: GatewayError) {

@@ -6,6 +6,7 @@ import { Credentials } from "../api";
 import ErrorField from "@/components/error-field";
 import useCsrfToken from "@/components/csrf";
 import useOuathExchange from "@/components/oauth";
+import { useRouter } from "next/navigation";
 
 export default function Login() {
   const [pending, setPending] = useState(false);
@@ -15,12 +16,15 @@ export default function Login() {
   });
   const [fieldErrors, setFieldErrors] = useState<Err>({}); // client side errors
   const [showPassword, setShowPassword] = useState(false);
+  const [callback, setCallback] = useState<string | null>(null);
 
   // Csrf token
   const csrfToken = useCsrfToken();
 
   // oauth state, nonce, client_id, and redirect_url
   const oauth = useOuathExchange();
+
+  const router = useRouter();
 
   const handleFieldChange = (event: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target;
@@ -48,9 +52,6 @@ export default function Login() {
 
       // post to login api
       try {
-        // const authUrl = `/api/login?client_id=${oauthClientId}&response_type=${oauthResponseType}&state=${oauthState}&nonce=${oauthNonce}&redirect_url=${encodeURIComponent(
-        //   oauthRedirect ?? ""
-        // )}`;
         const authUrl = `/api/login?client_id=${
           oauth?.client_id
         }&response_type=${oauth?.response_type}&state=${oauth?.state}&nonce=${
@@ -66,7 +67,19 @@ export default function Login() {
 
         if (response.ok) {
           setPending(false);
-          // TODO: handle redirect to home or restricted url content
+          const success = await response.json();
+
+          // build callback url path
+          setCallback(
+            `/callback?client_id=${success.client_id}&response_type=${
+              success.response_type
+            }&auth_code=${success.auth_code}&state=${success.state}&nonce=${
+              success.nonce
+            }&redirect_url=${encodeURIComponent(success.redirect ?? "")}`
+          );
+
+          // // send to /callback page
+          // window.location.href = callback;
         } else {
           const fail = await response.json();
           setFieldErrors(fail);
@@ -79,6 +92,11 @@ export default function Login() {
       }
     }
   };
+
+  // redirect to callback page
+  if (callback) {
+    router.push(callback);
+  }
 
   const toggleShowPassword = () => {
     setShowPassword(!showPassword);
@@ -103,7 +121,9 @@ export default function Login() {
         {fieldErrors.client_id && (
           <ErrorField errorMsgs={fieldErrors.client_id} />
         )}
-
+        {fieldErrors.callback && (
+          <ErrorField errorMsgs={fieldErrors.callback} />
+        )}
         <div className={styles.row}>
           <div className={styles.field}>
             <label className={styles.label} htmlFor="username">
@@ -182,12 +202,12 @@ function validateLogin(creds: Credentials): Err {
   const errors: { [key: string]: string[] } = {};
 
   // check username for field level errors
-  if (creds.username.trim().length > 254) {
+  if (creds.username && creds.username.trim().length > 254) {
     errors.username = ["Email/username must be less than 254 characters."];
   }
 
   // check password for field level errors
-  if (creds.password.trim().length > 64) {
+  if (creds.password && creds.password.trim().length > 64) {
     errors.password = ["Password must be less than 64 characters."];
   }
 

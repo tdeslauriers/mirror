@@ -368,7 +368,7 @@ function validateRegistration(registration: Registration) {
   const errors: { [key: string]: string[] } = {};
 
   // username
-  if (registration.username.trim().length > 0) {
+  if (registration.username && registration.username.trim().length > 0) {
     const usernameCheck: FieldValidation = checkEmail(registration.username);
     if (!usernameCheck.isValid) {
       errors.username = usernameCheck.messages;
@@ -376,7 +376,7 @@ function validateRegistration(registration: Registration) {
   }
 
   // password
-  if (registration.password.trim().length > 0) {
+  if (registration.password && registration.password.trim().length > 0) {
     const passwordCheck: FieldValidation = checkPassword(registration.password);
     if (!passwordCheck.isValid) {
       errors.password = passwordCheck.messages;
@@ -384,14 +384,17 @@ function validateRegistration(registration: Registration) {
   }
 
   // confirm_password: check if matches password
-  if (registration.confirm_password.trim().length > 0) {
+  if (
+    registration.confirm_password &&
+    registration.confirm_password.trim().length > 0
+  ) {
     if (registration.password !== registration.confirm_password) {
       errors.confirm_password = ["Passwords do not match."];
     }
   }
 
   // check firstname
-  if (registration.firstname.trim().length > 0) {
+  if (registration.firstname && registration.firstname.trim().length > 0) {
     const firstnameCheck: FieldValidation = checkName(registration.firstname);
     if (!firstnameCheck.isValid) {
       errors.firstname = firstnameCheck.messages;
@@ -399,7 +402,7 @@ function validateRegistration(registration: Registration) {
   }
 
   // check lastname
-  if (registration.lastname.trim().length > 0) {
+  if (registration.lastname && registration.lastname.trim().length > 0) {
     const lastnameCheck: FieldValidation = checkName(registration.lastname);
     if (!lastnameCheck.isValid) {
       errors.lastname = lastnameCheck.messages;

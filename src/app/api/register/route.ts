@@ -7,6 +7,7 @@ import {
 } from "@/validation/fields";
 import { NextRequest, NextResponse } from "next/server";
 import {
+  ErrMsgGeneric,
   GatewayError,
   Registration,
   isGatewayError,
@@ -29,8 +30,12 @@ export async function POST(req: NextRequest) {
 
   // get session_id cookie to pass to gateway registration endpoint
   const sessionCookie = req.cookies.get("session_id");
-  if (sessionCookie && isValidSessionId(sessionCookie.value)) {
+  if (sessionCookie?.value && isValidSessionId(sessionCookie?.value)) {
     registration.session = sessionCookie.value;
+  }
+  if (!sessionCookie || !isValidSessionId(sessionCookie.value)) {
+    console.log("session_id cookie is missing or not well formed.");
+    errors.server = [ErrMsgGeneric];
   }
 
   // call gateway registration endpoint
@@ -63,9 +68,7 @@ export async function POST(req: NextRequest) {
           },
         });
       } else {
-        throw new Error(
-          "An error occurred. Please try again. If the problem persists, please contact me."
-        );
+        throw new Error(ErrMsgGeneric);
       }
     }
   } catch (error: any) {
@@ -83,6 +86,7 @@ export async function POST(req: NextRequest) {
 
 function handleRegistrationErrors(gatewayError: GatewayError) {
   const errors: { [key: string]: string[] } = {};
+
   switch (gatewayError.code) {
     case 400:
       errors.badrequest = [gatewayError.message];
@@ -115,10 +119,7 @@ function handleRegistrationErrors(gatewayError: GatewayError) {
           break;
       }
     default:
-      errors.server = [
-        gatewayError.message || "An error occurred. Please try again.",
-        "If the problem persists, please contact me.",
-      ];
+      errors.server = [gatewayError.message || ErrMsgGeneric];
       return errors;
   }
 }
@@ -127,11 +128,11 @@ function validateRegistration(registration: Registration) {
   const errors: { [key: string]: string[] } = {};
 
   // username
-  if (registration.username.length === 0) {
+  if (registration.username && registration.username.length === 0) {
     errors.username = ["Email/username address is required."];
   }
 
-  if (registration.username.length > 0) {
+  if (registration.username && registration.username.length > 0) {
     const usernameCheck: FieldValidation = checkEmail(registration.username);
     if (!usernameCheck.isValid) {
       errors.username = usernameCheck.messages;
@@ -139,11 +140,11 @@ function validateRegistration(registration: Registration) {
   }
 
   // password
-  if (registration.password.length === 0) {
+  if (registration.password && registration.password.length === 0) {
     errors.password = ["Password is required."];
   }
 
-  if (registration.password.length > 0) {
+  if (registration.password && registration.password.length > 0) {
     const passwordCheck: FieldValidation = checkPassword(registration.password);
     if (!passwordCheck.isValid) {
       errors.password = passwordCheck.messages;
@@ -151,22 +152,28 @@ function validateRegistration(registration: Registration) {
   }
 
   // confirm_password: check if matches password
-  if (registration.confirm_password.length === 0) {
+  if (
+    registration.confirm_password &&
+    registration.confirm_password.length === 0
+  ) {
     errors.confirm_password = ["Confirm password is required."];
   }
 
-  if (registration.confirm_password.length > 0) {
+  if (
+    registration.confirm_password &&
+    registration.confirm_password.length > 0
+  ) {
     if (registration.password !== registration.confirm_password) {
       errors.confirm_password = ["Passwords do not match."];
     }
   }
 
   // check firstname
-  if (registration.firstname.length === 0) {
+  if (registration.firstname && registration.firstname.length === 0) {
     errors.firstname = ["First name is required."];
   }
 
-  if (registration.firstname.length > 0) {
+  if (registration.firstname && registration.firstname.length > 0) {
     const firstnameCheck: FieldValidation = checkName(registration.firstname);
     if (!firstnameCheck.isValid) {
       errors.firstname = firstnameCheck.messages;
@@ -174,11 +181,11 @@ function validateRegistration(registration: Registration) {
   }
 
   // check lastname
-  if (registration.lastname.length === 0) {
+  if (registration.lastname && registration.lastname.length === 0) {
     errors.lastname = ["Last name is required."];
   }
 
-  if (registration.lastname.length > 0) {
+  if (registration.lastname && registration.lastname.length > 0) {
     const lastnameCheck: FieldValidation = checkName(registration.lastname);
     if (!lastnameCheck.isValid) {
       errors.lastname = lastnameCheck.messages;
@@ -191,7 +198,8 @@ function validateRegistration(registration: Registration) {
     registration.csrf.length < 16 ||
     registration.csrf.length > 64
   ) {
-    errors.csrf = ["A valid CSRF token is required."];
+    console.log("csrf token missing or not well formed.");
+    errors.csrf = [ErrMsgGeneric];
   }
 
   // check birthdate

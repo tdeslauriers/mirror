@@ -1,5 +1,4 @@
 // api json objects
-
 export type OauthExchange = {
   response_type: string | null;
   nonce: string | null;
@@ -10,11 +9,11 @@ export type OauthExchange = {
 };
 
 export type Registration = {
-  username: string;
-  password: string;
-  confirm_password: string;
-  firstname: string;
-  lastname: string;
+  username: string | null;
+  password: string | null;
+  confirm_password: string | null;
+  firstname: string | null;
+  lastname: string | null;
   birthMonth?: string;
   birthDay?: string;
   birthYear?: string;
@@ -23,14 +22,14 @@ export type Registration = {
 };
 
 export type Credentials = {
-  username: string;
-  password: string;
+  username: string | null;
+  password: string | null;
   csrf?: string;
 };
 
 export type LoginCmd = {
-  username: string;
-  password: string;
+  username: string | null;
+  password: string | null;
   csrf?: string;
   session?: string;
   response_type: string | null;
@@ -41,6 +40,7 @@ export type LoginCmd = {
 };
 
 export type CallbackCmd = {
+  session?: string; // session is not returned by the gateway, it is added later by callback route
   auth_code: string | null;
   response_type: string | null;
   state: string | null;
@@ -49,6 +49,30 @@ export type CallbackCmd = {
   redirect: string | null;
 };
 
+export type CallbackResponse = {
+  session: string;
+
+  authenticated: string;
+  username: string;
+  fullname: string;
+  given_name: string;
+  family_name: string;
+  birthdate?: string;
+};
+
+export type CallbackUrl = {
+  redirect: string | null;
+};
+
+export type IdentityCookie = {
+  username: string | null;
+  fullname: string | null;
+  given_name: string | null;
+  family_name: string | null;
+  birthdate?: string;
+};
+
+// type checked before usage
 export type GatewayError = {
   code: number;
   message: string;
@@ -69,3 +93,6 @@ export function isValidSessionId(sessionId: string) {
   }
   return true;
 }
+
+export const ErrMsgGeneric =
+  "An error occurred. Please try again. If the problem persists, please contact me.";

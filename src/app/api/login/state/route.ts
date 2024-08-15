@@ -7,7 +7,7 @@ import {
 } from "../..";
 import { RequestCookie } from "next/dist/compiled/@edge-runtime/cookies";
 
-export async function POST(req: NextRequest) {
+export async function GET(req: NextRequest) {
   const session: RequestCookie | undefined = req.cookies.get("session_id");
 
   if (session?.value && isValidSessionId(session.value)) {
@@ -19,7 +19,7 @@ export async function POST(req: NextRequest) {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ session: session.value }),
+        body: JSON.stringify({ session_token: session.value }),
       });
 
       if (apiResponse.ok) {
