@@ -18,7 +18,7 @@ export default async function Home() {
             <p>
               Freatures our photo gallery, some art work, and I am adding to it
               all the time! The site itself is a hobby project, sort of. To find
-              out more, checkout the{" "}
+              out more, check out the{" "}
               <Link className={styles.locallink} href={"/about"}>
                 about
               </Link>{" "}

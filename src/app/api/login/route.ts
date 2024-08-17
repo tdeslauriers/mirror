@@ -133,6 +133,7 @@ export async function POST(req: NextRequest) {
     } else {
       const fail = await apiResponse.json();
       if (isGatewayError(fail)) {
+        console.log("API FAIL 1", fail);
         const errors = handleLoginErrors(fail);
         return NextResponse.json(errors, {
           status: apiResponse.status,
@@ -141,10 +142,11 @@ export async function POST(req: NextRequest) {
           },
         });
       } else {
-        throw new Error(ErrMsgGeneric);
+        console.log("API FAIL 2", fail);
       }
     }
   } catch (error: any) {
+    console.log("API CATCH 1", error);
     return NextResponse.json(
       { server: [error.message] },
       {
@@ -158,15 +160,14 @@ export async function POST(req: NextRequest) {
 }
 
 function handleLoginErrors(gatewayError: GatewayError) {
-  console.log("login gateway error: ", gatewayError);
   const errors: { [key: string]: string[] } = {};
   switch (gatewayError.code) {
     case 400:
       errors.badrequest = [gatewayError.message];
       return errors;
     case 401:
-      if (gatewayError.message.includes(",")) {
-        const errMsgs: string[] = gatewayError.message.split(",");
+      if (gatewayError.message.includes(";")) {
+        const errMsgs: string[] = gatewayError.message.split(";");
         errMsgs.forEach((msg) => {
           switch (true) {
             case msg.includes("username or password"):
@@ -189,6 +190,7 @@ function handleLoginErrors(gatewayError: GatewayError) {
         return errors;
       } else {
         errors.server = [gatewayError.message];
+        return errors;
       }
     case 405:
       errors.badrequest = [gatewayError.message];

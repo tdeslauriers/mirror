@@ -82,11 +82,15 @@ export default function Login() {
           // window.location.href = callback;
         } else {
           const fail = await response.json();
+          console.log("FAIL 1");
+          console.log(fail);
           setFieldErrors(fail);
           setPending(false);
         }
       } catch (error) {
         // handle network error
+        console.log("CATCH 1");
+        console.log(error);
         console.error("Login api call failed: ", error);
         setPending(false);
       }

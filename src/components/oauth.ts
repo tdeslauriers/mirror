@@ -13,7 +13,7 @@ const useOuathExchange = () => {
 
   // next navigation
   const router = useRouter();
-  const params = useSearchParams();
+  const searchParams = useSearchParams();
   const path = usePathname();
 
   const fetchOauthExchange = async () => {
@@ -38,11 +38,11 @@ const useOuathExchange = () => {
   };
 
   useEffect(() => {
-    const responseTypeParam = params.get("response_type");
-    const stateParam = params.get("state");
-    const nonceParam = params.get("nonce");
-    const clientIdParam = params.get("client_id");
-    const redirectUrlParam = params.get("redirect_url");
+    const responseTypeParam = searchParams.get("response_type");
+    const stateParam = searchParams.get("state");
+    const nonceParam = searchParams.get("nonce");
+    const clientIdParam = searchParams.get("client_id");
+    const redirectUrlParam = searchParams.get("redirect_url");
 
     if (
       !responseTypeParam ||
@@ -100,7 +100,7 @@ const useOuathExchange = () => {
       };
       setOauthExchange(oauth);
     }
-  }, [router, params, path]);
+  }, [router, searchParams, path]);
 
   return oauthExchange;
 };

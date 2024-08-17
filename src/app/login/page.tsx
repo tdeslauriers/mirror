@@ -1,4 +1,5 @@
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
+import { Suspense } from "react";
 import Login from "./login";
 import styles from "./page.module.css";
 
@@ -12,7 +13,9 @@ export default async function LoginPage() {
         </h1>
       </header>
       <main className={styles.header}>
-        <Login />
+        <Suspense fallback={<div>Loading...</div>}>
+          <Login />
+        </Suspense>
       </main>
     </>
   );
