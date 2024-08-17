@@ -133,7 +133,6 @@ export async function POST(req: NextRequest) {
     } else {
       const fail = await apiResponse.json();
       if (isGatewayError(fail)) {
-        console.log("API FAIL 1", fail);
         const errors = handleLoginErrors(fail);
         return NextResponse.json(errors, {
           status: apiResponse.status,
@@ -142,11 +141,16 @@ export async function POST(req: NextRequest) {
           },
         });
       } else {
-        console.log("API FAIL 2", fail);
+        console.log(fail);
+        return NextResponse.json(fail, {
+          status: 500,
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
       }
     }
   } catch (error: any) {
-    console.log("API CATCH 1", error);
     return NextResponse.json(
       { server: [error.message] },
       {
