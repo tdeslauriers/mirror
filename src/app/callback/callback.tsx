@@ -1,7 +1,7 @@
 "use client";
-import Link from "next/link";
+
 import styles from "./page.module.css";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams, permanentRedirect } from "next/navigation";
 import { useEffect, useState } from "react";
 import AuthError from "@/components/error-Authentication";
 
@@ -10,8 +10,6 @@ type Err = { [key: string]: string[] };
 export default function Callback() {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [callbackSucceeded, setCallbackSucceeded] = useState<boolean>(false);
-
-  const router = useRouter();
 
   const searchParams = useSearchParams();
   const clientId = searchParams.get("client_id");
@@ -52,7 +50,9 @@ export default function Callback() {
     fetchCallback();
   }, []);
   if (callbackSucceeded) {
-    router.push("/");
+    // at the moment, it appears a hard redirect is needed to re-render the layout with the new session cookie.
+    // permanentRedirect("/");
+    window.location.href = "/";
   }
 
   return (

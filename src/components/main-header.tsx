@@ -3,6 +3,8 @@ import Image from "next/image";
 import logo from "@/assets/logo512.png";
 import style from "./main-header.module.css";
 
+import LoginButton from "./login-button";
+
 export default function MainHeader(): React.ReactElement {
   return (
     <header className={style.header}>
@@ -33,22 +35,7 @@ export default function MainHeader(): React.ReactElement {
         </nav>
       </div>
 
-      <div className={style.right}>
-        <div className={style.nav}>
-          <ul>
-            <li>
-              <Link className={style.locallink} href="/register">
-                Register
-              </Link>
-            </li>
-            <li>
-              <Link className={style.locallink} href="/login">
-                Login
-              </Link>
-            </li>
-          </ul>
-        </div>
-      </div>
+      <LoginButton />
     </header>
   );
 }

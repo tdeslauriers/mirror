@@ -1,0 +1,44 @@
+.right {
+  display: flex;
+  align-items: center;
+}
+
+.nav ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  gap: 1rem;
+  font-size: 1.25rem;
+}
+
+.locallink {
+  background: var(--highlight-text);
+  font-weight: bold;
+  text-decoration: none;
+  letter-spacing: 0.15rem;
+  font-size: 1.5rem;
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+}
+
+.locallink:hover,
+.locallink:active,
+.locallink:focus {
+  transition: 0.3s;
+  text-shadow: var(--highlight-text-glow);
+  outline: none;
+}
+
+@keyframes rotate {
+  from {
+    transform: rotate(360deg);
+  }
+  to {
+    transform: rotate(0deg);
+  }
+}
