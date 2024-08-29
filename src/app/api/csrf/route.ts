@@ -38,7 +38,7 @@ export async function GET(req: NextRequest) {
             }
           );
         }
-        // IMPORTANT: do not return session_token to client. XSS risk!
+        // IMPORTANT: do not return session_token to client. XSS!
         return NextResponse.json(
           { csrf_token: success.csrf_token, created_at: success.created_at },
           {

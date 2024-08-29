@@ -34,6 +34,35 @@
   outline: none;
 }
 
+.logoutbutton {
+  background: var(--highlight-text);
+  font-weight: bold;
+  text-decoration: none;
+  letter-spacing: 0.15rem;
+  font-size: 1.5rem;
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+  padding: 0.1rem 1rem;
+
+  border: none;
+  cursor: pointer;
+  vertical-align: middle; /* Adjust this if necessary */
+}
+
+.logoutbutton:hover,
+.logoutbutton:active,
+.logoutbutton:focus {
+  transition: 0.3s;
+  text-shadow: var(--highlight-text-glow);
+  outline: none;
+}
+
+.logoutform {
+  border: none;
+}
+
 @keyframes rotate {
   from {
     transform: rotate(360deg);

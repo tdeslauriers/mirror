@@ -1,7 +1,7 @@
-
 import Link from "next/link";
 import style from "./login-button.module.css";
 import { cookies } from "next/headers";
+import { logout } from "@/actions/logout";
 
 export default function LoginButton() {
   const cookieStore = cookies();
@@ -22,9 +22,9 @@ export default function LoginButton() {
                   </Link>
                 </li>
                 <li>
-                  <Link className={style.locallink} href="/logout">
-                    Logout
-                  </Link>
+                  <form className={style.logoutform} action={logout}>
+                    <button className={style.logoutbutton}>Logout</button>
+                  </form>
                 </li>
               </ul>
             </div>

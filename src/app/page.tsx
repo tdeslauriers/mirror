@@ -23,7 +23,7 @@ export default async function Home() {
               <Link className={styles.locallink} href={"/about"}>
                 about
               </Link>{" "}
-              page.
+              page. 
               {hasAuthenticated && hasAuthenticated.value === "true" ? null : (
                 <>
                   <br />

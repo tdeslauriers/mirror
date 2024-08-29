@@ -123,7 +123,7 @@ export async function POST(req: NextRequest) {
 
       // TODO: add validation to the cmd values.
 
-      // return response to the login page: will create redirect ot callback page
+      // return response to the login page: will create redirect to callback page
       return NextResponse.json(cmd, {
         status: apiResponse.status,
         headers: {
