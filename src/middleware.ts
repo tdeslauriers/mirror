@@ -6,7 +6,8 @@ export default async function middleware(request: NextRequest) {
   const response: NextResponse = NextResponse.next();
 
   // check for session cookie
-  const sessionId = cookies().get("session_id");
+  const cookieStore = await cookies();
+  const sessionId = cookieStore.get("session_id");
   if (!sessionId || sessionId.value === "") {
     // process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0"; // must be at top of page that calls this middleware
     try {

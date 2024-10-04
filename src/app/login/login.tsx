@@ -78,8 +78,6 @@ export default function Login() {
             }&redirect_url=${encodeURIComponent(success.redirect ?? "")}`
           );
 
-          // // send to /callback page
-          // window.location.href = callback;
         } else {
           const fail = await response.json();
           setFieldErrors(fail);

@@ -74,7 +74,7 @@ export async function logout() {
     // redirect to login page
     redirect("/login");
   } else {
-    throw new Error("Session cookie not found.");
+    redirect("/login");
   }
 }
 

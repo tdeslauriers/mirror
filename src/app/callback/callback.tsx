@@ -50,8 +50,6 @@ export default function Callback() {
     fetchCallback();
   }, []);
   if (callbackSucceeded) {
-    // at the moment, it appears a hard redirect is needed to re-render the layout with the new session cookie.
-    // permanentRedirect("/");
     window.location.href = "/";
   }
 

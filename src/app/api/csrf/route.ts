@@ -6,7 +6,8 @@ export async function GET(req: NextRequest) {
   // get session_id cookie to be url param for gateway csrf endpoint
   // session_id will have been set by middleware on render of csrf-sourcing page
   // TODO: add error handling for missing session_id cookie
-  const sessionCookie = cookies().get("session_id");
+  const cookieStore = await cookies();
+  const sessionCookie = cookieStore.get("session_id");
 
   // call gateway csrf endpoint
   if (sessionCookie && isValidSessionId(sessionCookie.value)) {
