@@ -87,13 +87,3 @@ function handleProfileErrors(gatewayError: GatewayError) {
       return errors;
   }
 }
-
-async function tester() {
-  const butt: GatewayError = {
-    code: 401,
-    status: "Monkey Wrenches",
-    message: "Bad Request",
-  };
-
-  return butt;
-}
