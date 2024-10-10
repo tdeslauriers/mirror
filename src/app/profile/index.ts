@@ -1,4 +1,9 @@
-import { checkName, FieldValidation } from "@/validation/fields";
+import {
+  allNumbersValid,
+  checkBirthdate,
+  checkName,
+  FieldValidation,
+} from "@/validation/fields";
 
 export type Profile = {
   id?: string;
@@ -10,6 +15,9 @@ export type Profile = {
   enabled?: boolean;
   account_expired?: boolean;
   account_locked?: boolean;
+  birthMonth?: number;
+  birthDay?: number;
+  birthYear?: number;
 };
 
 export type ProfileActionCmd = {
@@ -39,10 +47,50 @@ export function validateUpdateProfile(profile: Profile) {
   }
 
   if (profile.lastname && profile.lastname.trim().length > 0) {
-    console.log("lastname is firing");
     const lastnameCheck: FieldValidation = checkName(profile.lastname);
     if (!lastnameCheck.isValid) {
       errors.lastname = lastnameCheck.messages;
+    }
+  }
+
+  // check birthdate fields
+  // Note: dob does not always exist, so empty is not an error
+  // first need to check if all fields are filled out
+  if (
+    (profile.birthMonth &&
+      !isNaN(profile.birthMonth) &&
+      !allNumbersValid(profile.birthDay, profile.birthYear)) ||
+    (profile.birthDay &&
+      !isNaN(profile.birthDay) &&
+      !allNumbersValid(profile.birthMonth, profile.birthYear)) ||
+    (profile.birthYear &&
+      !isNaN(profile.birthYear) &&
+      !allNumbersValid(profile.birthMonth, profile.birthDay))
+  ) {
+    errors.birthdate = [
+      "Date of birth is optional, but if added, please fill out all date fields.",
+    ];
+    if (!profile.birthMonth) {
+      errors.birthdate.push("Month is required.");
+    }
+    if (!profile.birthDay) {
+      errors.birthdate.push("Day is required.");
+    }
+    if (!profile.birthYear) {
+      errors.birthdate.push("Year is required.");
+    }
+  }
+
+  // only check if all birthdate fields are filled out
+  if (profile.birthMonth && profile.birthDay && profile.birthYear) {
+    // check if birthdate is valid
+    const birthdate: FieldValidation = checkBirthdate(
+      profile.birthYear,
+      profile.birthMonth,
+      profile.birthDay
+    );
+    if (!birthdate.isValid) {
+      errors.birthdate = birthdate.messages;
     }
   }
 

@@ -3,8 +3,8 @@ import style from "./login-button.module.css";
 import { cookies } from "next/headers";
 import { logout } from "@/actions/logout";
 
-export default function LoginButton() {
-  const cookieStore = cookies();
+export default async function LoginButton() {
+  const cookieStore = await cookies();
   const hasAuthenticated = cookieStore.has("authenticated")
     ? cookieStore.get("authenticated")
     : null;

@@ -1,5 +1,3 @@
-
-
 // regex's that for input validation of profile  type data
 const EMAIL_MIN_LENGTH = 6;
 const EMAIL_MAX_LENGTH = 254; // RFC 5321
@@ -146,9 +144,9 @@ export function checkName(name: string) {
     );
   }
 
-  if (!NAME_REGEX.test(name)) {
+  if (!NAME_REGEX.test(name.trim())) {
     errors.push(
-      "Name must only contain letters, hyphens, apostrophes, and/or underscores."
+      "Name may only contain letters, hyphens, apostrophes, and underscores."
     );
   }
 
@@ -162,25 +160,31 @@ export function checkName(name: string) {
 // checks if a birthdate is valid
 // server-side only.  Not needed for client-side form
 // no need to check for null/undefined values
-export function checkBirthdate(year: string, month: string, day: string) {
+export function checkBirthdate(year: number, month: number, day: number) {
   let errors: string[] = [];
 
-  // check if all fields are numbers
-  const birthYear = parseInt(year);
-  const birthMonth = parseInt(month);
-  const birthDay = parseInt(day);
-
-  // Check if the values are numbers
-  if (isNaN(birthYear) || isNaN(birthMonth) || isNaN(birthDay)) {
+  // // Check if the values are numbers
+  if (!allNumbersValid(year, month, day)) {
     errors.push("Year, month, and day must be numbers.");
   }
 
-  // Create a Date object from the birth date
-  const birthDate = new Date(birthYear, birthMonth - 1, birthDay);
+  if (year < 1901 || year > 10000) {
+    errors.push("Year must be reasonable year.");
+  }
 
+  if (month < 1 || month > 12) {
+    errors.push("Month must be between 1 and 12.");
+  }
+
+  if (day < 1 || day > 31) {
+    errors.push("Day must be between 1 and 31.");
+  }
+
+  // Create a Date object from the birth date
+  const birthDate = new Date(year, month - 1, day);
   // Check if the date is valid
   if (isNaN(birthDate.getTime())) {
-    errors.push("Birth date must be a valid date.");
+    errors.push("Date of birth must be a valid date.");
   }
 
   // Create Date objects for today and the start date
@@ -189,7 +193,20 @@ export function checkBirthdate(year: string, month: string, day: string) {
 
   // Check if the birth date is before today and after the start date
   if (birthDate >= today || birthDate < startDate) {
-    errors.push("Birth date must be before today and after 1901-01-01.");
+    errors.push(
+      `Date of birth must be between ${
+        new Date().getFullYear() - 120
+      } and ${new Date().getFullYear()}`
+    );
+  }
+
+  // check of the birthdate is a real date, eg., 2021-02-31 is not a valid date
+  if (
+    birthDate.getFullYear() !== year ||
+    birthDate.getMonth() !== month - 1 ||
+    birthDate.getDate() !== day
+  ) {
+    errors.push("Date of birth must be a valid date.");
   }
 
   if (errors.length > 0) {
@@ -197,6 +214,10 @@ export function checkBirthdate(year: string, month: string, day: string) {
   }
 
   return { isValid: true, messages: [] };
+}
+
+export function allNumbersValid(...numbers: (number | undefined)[]): boolean {
+  return numbers.every((num) => num != undefined && !isNaN(num));
 }
 
 // checks if a UUID is valid

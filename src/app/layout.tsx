@@ -13,15 +13,16 @@ export const metadata: Metadata = {
   description: "Our family website, including gallery and other projects",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const cookieStore = cookies();
+  const cookieStore = await cookies();
   const hasAuthenticated = cookieStore.has("authenticated")
     ? cookieStore.get("authenticated")
     : null;
+
   return (
     <html lang="en">
       <body className={inter.className}>

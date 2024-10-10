@@ -5,7 +5,7 @@ import style from "./main-header.module.css";
 
 import LoginButton from "./login-button";
 
-export default function MainHeader(): React.ReactElement {
+export default async function MainHeader() {
   return (
     <header className={style.header}>
       <div className={style.left}>

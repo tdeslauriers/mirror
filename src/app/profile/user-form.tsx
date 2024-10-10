@@ -33,9 +33,14 @@ export default function UserForm({
             )}
             <input
               className={styles.form}
-              type="text"
               name="firstname"
+              type="text"
+              title="Only letters, hyphens, apostrophes, underscores, and spaces allowed"
+              minLength={1}
+              maxLength={32}
+              pattern={`^[a-zA-Z\\-\'\_\ ]+`}
               defaultValue={profileState.profile?.firstname}
+              placeholder="Firstname"
               required
             />
           </div>
@@ -50,11 +55,75 @@ export default function UserForm({
             )}
             <input
               className={styles.form}
-              type="text"
               name="lastname"
+              type="text"
+              title="Only letters, hyphens, apostrophes, underscores, and spaces allowed"
+              minLength={1}
+              maxLength={32}
+              pattern={`^[a-zA-Z\\-\'\_\ ]+`}
               defaultValue={profileState.profile?.lastname}
+              placeholder="Lastname"
               required
             />
+          </div>
+        </div>
+        <div className={styles.row}>
+          <div className={styles.date}>
+            <label
+              className={styles.label}
+              htmlFor="birthdate"
+              title="only required for allowance app"
+            >
+              Birth date{" "}
+              <sup>
+                <span
+                  className={styles.highlight}
+                  style={{ textTransform: "lowercase" }}
+                >
+                  optional
+                </span>
+              </sup>
+            </label>
+            {profileState.errors.birthdate && (
+              <ErrorField errorMsgs={profileState.errors.birthdate} />
+            )}
+
+            <div className={styles.daterow}>
+              <input
+                className={styles.birthdate}
+                name="birthMonth"
+                title="Enter a month number between 1 and 12"
+                type="number"
+                min={1}
+                max={12}
+                defaultValue={profileState.profile?.birthMonth}
+                placeholder="Month"
+              />
+
+              <input
+                className={styles.birthdate}
+                name="birthDay"
+                title="Enter a day number between 1 and 31"
+                type="number"
+                min={1}
+                max={31}
+                defaultValue={profileState.profile?.birthDay}
+                placeholder="Day"
+              />
+
+              <input
+                className={styles.birthdate}
+                name="birthYear"
+                title={`Enter a year number between ${
+                  new Date().getFullYear() - 120
+                } and ${new Date().getFullYear()}`}
+                type="number"
+                min={new Date().getFullYear() - 120}
+                max={new Date().getFullYear()}
+                defaultValue={profileState.profile?.birthYear}
+                placeholder="Year"
+              />
+            </div>
           </div>
         </div>
         <div className={styles.row}>

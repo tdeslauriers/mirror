@@ -75,6 +75,7 @@ export type IdentityCookie = {
 // type checked before usage
 export type GatewayError = {
   code: number;
+  status: string;
   message: string;
 };
 

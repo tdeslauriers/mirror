@@ -5,7 +5,7 @@ import { cookies } from "next/headers";
 import Welcome from "@/components/welcome";
 
 export default async function Home() {
-  const cookieStore = cookies();
+  const cookieStore = await cookies();
   const hasAuthenticated = cookieStore.has("authenticated")
     ? cookieStore.get("authenticated")
     : null;
@@ -23,7 +23,7 @@ export default async function Home() {
               <Link className={styles.locallink} href={"/about"}>
                 about
               </Link>{" "}
-              page. 
+              page.
               {hasAuthenticated && hasAuthenticated.value === "true" ? null : (
                 <>
                   <br />

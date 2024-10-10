@@ -12,10 +12,10 @@ export default async function ProfilePage() {
 
   // quick for redirect if auth'd cookies not present
   const cookieStore = await cookies();
-  const hasAuthenticated = cookieStore.has("authenticated")
+  const hasAuthenticated = (await cookieStore.has("authenticated"))
     ? cookieStore.get("authenticated")
     : null;
-  const hasIdentity = (await cookieStore.has("identity"))
+  const hasIdentity = cookieStore.has("identity")
     ? cookieStore.get("identity")
     : null;
   const hasSession = cookieStore.has("session_id")

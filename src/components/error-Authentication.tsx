@@ -11,7 +11,7 @@ export default function AuthError() {
           </h2>
           <div className={styles.center}>
             <p>
-              There was an error with the authentication process. Honestly,
+              There was an error with the authentication process Honestly,
               I&apos;m not surprised. You would not believe all that goes into
               this.
               <br />

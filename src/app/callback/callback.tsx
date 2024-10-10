@@ -5,8 +5,6 @@ import { useSearchParams, permanentRedirect } from "next/navigation";
 import { useEffect, useState } from "react";
 import AuthError from "@/components/error-Authentication";
 
-type Err = { [key: string]: string[] };
-
 export default function Callback() {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [callbackSucceeded, setCallbackSucceeded] = useState<boolean>(false);

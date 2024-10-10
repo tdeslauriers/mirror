@@ -1,8 +1,8 @@
 import styles from "./welcome.module.css";
 import { cookies } from "next/headers";
 
-export default function Welcome() {
-  const cookieStore = cookies();
+export default async function Welcome() {
+  const cookieStore = await cookies();
   const hasAuthenticated = cookieStore.has("authenticated")
     ? cookieStore.get("authenticated")
     : null;
