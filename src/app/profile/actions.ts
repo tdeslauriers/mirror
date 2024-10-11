@@ -12,11 +12,12 @@ export async function handleUserEdit(
   // any fields that are not allowed to be changed by user will not be submitted
   // likewise, gateway/identity will dump any fields that are not allowed to be changed
   let updated: Profile = {
+    csrf: formData.get("csrfToken") as string,
     firstname: formData.get("firstname") as string,
     lastname: formData.get("lastname") as string,
-    birthMonth: parseInt(formData.get("birthMonth") as string),
-    birthDay: parseInt(formData.get("birthDay") as string),
-    birthYear: parseInt(formData.get("birthYear") as string),
+    birth_month: parseInt(formData.get("birthMonth") as string),
+    birth_day: parseInt(formData.get("birthDay") as string),
+    birth_year: parseInt(formData.get("birthYear") as string),
   };
 
   // field validation

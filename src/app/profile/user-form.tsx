@@ -23,6 +23,11 @@ export default function UserForm({
   return (
     <>
       <form className={styles.form} action={formAction}>
+        <input
+          type="hidden"
+          name="csrfToken"
+          value={profileState.profile?.csrf}
+        />
         <div className={styles.row}>
           <div className={styles.field}>
             <label className={styles.label} htmlFor="firstname">
@@ -96,7 +101,7 @@ export default function UserForm({
                 type="number"
                 min={1}
                 max={12}
-                defaultValue={profileState.profile?.birthMonth}
+                defaultValue={profileState.profile?.birth_month}
                 placeholder="Month"
               />
 
@@ -107,7 +112,7 @@ export default function UserForm({
                 type="number"
                 min={1}
                 max={31}
-                defaultValue={profileState.profile?.birthDay}
+                defaultValue={profileState.profile?.birth_day}
                 placeholder="Day"
               />
 
@@ -120,7 +125,7 @@ export default function UserForm({
                 type="number"
                 min={new Date().getFullYear() - 120}
                 max={new Date().getFullYear()}
-                defaultValue={profileState.profile?.birthYear}
+                defaultValue={profileState.profile?.birth_year}
                 placeholder="Year"
               />
             </div>

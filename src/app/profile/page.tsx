@@ -26,6 +26,7 @@ export default async function ProfilePage() {
     redirect("/login");
   }
 
+  // get profile data from gateway
   const response = await fetch("https://localhost:8443/profile", {
     headers: {
       Authorization: `${hasSession?.value}`,
@@ -33,10 +34,24 @@ export default async function ProfilePage() {
   });
 
   if (!response.ok) {
-    redirect("/login");
+    if (response.status === 401 || response.status === 403) {
+      redirect("/login");
+    } else {
+      const fail = await response.json();
+      throw new Error(fail.message);
+    }
   }
 
+  // parse profile data from response
   const profile: Profile = await response.json();
+
+  // create the 'registered since' date
+  const createdAt = profile.created_at ? profile.created_at : "";
+  const regDate = new Date(createdAt).toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
 
   return (
     <>
@@ -47,6 +62,7 @@ export default async function ProfilePage() {
             <span className={styles.highlight}>{profile?.username}</span>
           </>
         </h1>
+        {createdAt.length > 0 && <p>Registered since {regDate}</p>}
       </header>
       <main className={styles.main}>
         <div className={styles.card}>

@@ -6,6 +6,9 @@ import {
 } from "@/validation/fields";
 
 export type Profile = {
+  session?: string;
+  csrf?: string;
+
   id?: string;
   username?: string;
   firstname?: string;
@@ -15,9 +18,9 @@ export type Profile = {
   enabled?: boolean;
   account_expired?: boolean;
   account_locked?: boolean;
-  birthMonth?: number;
-  birthDay?: number;
-  birthYear?: number;
+  birth_month?: number;
+  birth_day?: number;
+  birth_year?: number;
 };
 
 export type ProfileActionCmd = {
@@ -57,37 +60,37 @@ export function validateUpdateProfile(profile: Profile) {
   // Note: dob does not always exist, so empty is not an error
   // first need to check if all fields are filled out
   if (
-    (profile.birthMonth &&
-      !isNaN(profile.birthMonth) &&
-      !allNumbersValid(profile.birthDay, profile.birthYear)) ||
-    (profile.birthDay &&
-      !isNaN(profile.birthDay) &&
-      !allNumbersValid(profile.birthMonth, profile.birthYear)) ||
-    (profile.birthYear &&
-      !isNaN(profile.birthYear) &&
-      !allNumbersValid(profile.birthMonth, profile.birthDay))
+    (profile.birth_month &&
+      !isNaN(profile.birth_month) &&
+      !allNumbersValid(profile.birth_day, profile.birth_year)) ||
+    (profile.birth_day &&
+      !isNaN(profile.birth_day) &&
+      !allNumbersValid(profile.birth_month, profile.birth_year)) ||
+    (profile.birth_year &&
+      !isNaN(profile.birth_year) &&
+      !allNumbersValid(profile.birth_month, profile.birth_day))
   ) {
     errors.birthdate = [
       "Date of birth is optional, but if added, please fill out all date fields.",
     ];
-    if (!profile.birthMonth) {
+    if (!profile.birth_month) {
       errors.birthdate.push("Month is required.");
     }
-    if (!profile.birthDay) {
+    if (!profile.birth_day) {
       errors.birthdate.push("Day is required.");
     }
-    if (!profile.birthYear) {
+    if (!profile.birth_year) {
       errors.birthdate.push("Year is required.");
     }
   }
 
   // only check if all birthdate fields are filled out
-  if (profile.birthMonth && profile.birthDay && profile.birthYear) {
+  if (profile.birth_month && profile.birth_day && profile.birth_year) {
     // check if birthdate is valid
     const birthdate: FieldValidation = checkBirthdate(
-      profile.birthYear,
-      profile.birthMonth,
-      profile.birthDay
+      profile.birth_year,
+      profile.birth_month,
+      profile.birth_day
     );
     if (!birthdate.isValid) {
       errors.birthdate = birthdate.messages;
