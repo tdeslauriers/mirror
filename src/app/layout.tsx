@@ -3,7 +3,7 @@ export const dyanmic = "force dynamic";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
-import MainHeader from "@/components/main-header";
+import MainHeader from "@/components/nav-main-header";
 import { cookies } from "next/headers";
 
 const inter = Inter({ subsets: ["latin"] });

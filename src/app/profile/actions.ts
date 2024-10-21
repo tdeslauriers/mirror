@@ -1,5 +1,6 @@
 "use server";
 
+import { cookies } from "next/headers";
 import { Profile, validateUpdateProfile } from ".";
 import { ProfileActionCmd as ProfileActionCmd } from "."; // Assuming ProfileAction is defined in types.ts
 import { ErrMsgGeneric, GatewayError, isGatewayError } from "../api";
@@ -26,13 +27,20 @@ export async function handleUserEdit(
     return { profile: updated, errors: errors } as ProfileActionCmd;
   }
 
+  // get session token
+  const cookieStore = await cookies();
+  const hasSession = cookieStore.has("session_id")
+    ? cookieStore.get("session_id")
+    : null;
+
   // call gateway profile endpoint
   process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
   try {
     const apiResponse = await fetch("https://localhost:8443/profile", {
       method: "PUT",
       headers: {
-        "Content-Type": "application/json",
+        Content_Type: "application/json",
+        Authorization: `${hasSession?.value}`,
       },
       body: JSON.stringify(updated),
     });

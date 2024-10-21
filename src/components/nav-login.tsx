@@ -1,9 +1,9 @@
 import Link from "next/link";
-import style from "./login-button.module.css";
+import style from "./nav-login.module.css";
 import { cookies } from "next/headers";
 import { logout } from "@/actions/logout";
 
-export default async function LoginButton() {
+export default async function NavLogin() {
   const cookieStore = await cookies();
   const hasAuthenticated = cookieStore.has("authenticated")
     ? cookieStore.get("authenticated")

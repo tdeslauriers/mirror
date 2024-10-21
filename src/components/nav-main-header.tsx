@@ -1,11 +1,10 @@
 import Link from "next/link";
 import Image from "next/image";
 import logo from "@/assets/logo512.png";
-import style from "./main-header.module.css";
+import style from "./nav-main-header.module.css";
+import NavLogin from "./nav-login";
 
-import LoginButton from "./login-button";
-
-export default async function MainHeader() {
+export default async function NavMainHeader() {
   return (
     <header className={style.header}>
       <div className={style.left}>
@@ -35,7 +34,7 @@ export default async function MainHeader() {
         </nav>
       </div>
 
-      <LoginButton />
+      <NavLogin />
     </header>
   );
 }

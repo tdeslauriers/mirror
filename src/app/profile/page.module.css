@@ -144,49 +144,7 @@ span.info {
   margin-right: 1rem;
 }
 
-.actions {
-  width: 100%;
-}
 
-.actions button {
-  margin-top: 1rem;
-  border: 0;
-  border: none;
-  border-radius: 2px;
-  padding: 0.75rem 2rem;
-  background: linear-gradient(
-    90deg,
-    var(--primary-site-fade),
-    var(--primary-site-color)
-  );
-  width: 100%;
-  cursor: pointer;
-  font: inherit;
-  font-size: 1.25rem;
-  text-transform: uppercase;
-}
-
-.actions button:hover,
-.actions button:focus {
-  transition: 0.3s;
-  outline-style: none;
-  /* box-shadow: 0 0 40px var(--primary-site-color); */
-  animation: glow-input 5s ease-in-out infinite alternate;
-}
-
-.actions button:disabled {
-  background: #ccc;
-  color: #979797;
-  cursor: not-allowed;
-}
-
-.actions button:hover:disabled,
-.actions button:focus:disabled {
-  box-shadow: 0 0 40px #60635f;
-  animation: glow-input-fix 3s ease-in-out infinite alternate;
-  transform: translateZ(0); /* trigger GPU acceleration */
-  will-change: transform; /* inform the browser that this element will be animated */
-}
 
 
 .center {

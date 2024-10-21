@@ -1,9 +1,10 @@
 "use client";
 
 import styles from "./page.module.css";
-import { useActionState } from "react";
+import { MouseEvent, useActionState, useState } from "react";
 import { Profile, ProfileActionCmd } from ".";
 import ErrorField from "@/components/error-field";
+import FormSubmit from "@/components/form-submit";
 
 export default function UserForm({
   profile,
@@ -132,9 +133,7 @@ export default function UserForm({
           </div>
         </div>
         <div className={styles.row}>
-          <div className={styles.actions}>
-            <button type="submit">Update</button>
-          </div>
+          <FormSubmit buttonLabel="update" pendingLabel="updating record..." />
         </div>
       </form>
     </>
