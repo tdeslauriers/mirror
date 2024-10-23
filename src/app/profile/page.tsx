@@ -8,7 +8,6 @@ import { Profile } from ".";
 import { handleUserEdit } from "./actions";
 
 export default async function ProfilePage() {
-  // get session cookie for api call for additional data needed from silohuette
 
   // quick for redirect if auth'd cookies not present
   const cookieStore = await cookies();
