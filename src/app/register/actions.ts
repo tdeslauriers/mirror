@@ -32,7 +32,7 @@ export async function handleRegistration(
   const errors = validateRegistration(registration);
   if (errors && Object.keys(errors).length > 0) {
     return {
-      registrationComplete: false,
+      complete: false,
       registration: registration,
       errors: errors,
     } as RegistrationActionCmd;
@@ -88,7 +88,7 @@ export async function handleRegistration(
       const success = await apiResponse.json();
       console.log("Registration successful: ", success);
       return {
-        registrationComplete: true,
+        complete: true,
         registration: success,
         errors: errors,
       } as RegistrationActionCmd;
@@ -99,7 +99,7 @@ export async function handleRegistration(
         console.log("Gateway error: ", errors);
         console.log("Registration in gateway error: ", registration);
         return {
-          registrationComplete: false,
+          complete: false,
           registration: registration,
           errors: errors,
         } as RegistrationActionCmd;

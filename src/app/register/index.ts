@@ -27,6 +27,7 @@ export type Registration = {
 };
 
 export type RegistrationActionCmd = {
+  complete: boolean;
   registration: Registration | null;
   errors: { [key: string]: string[] };
 };

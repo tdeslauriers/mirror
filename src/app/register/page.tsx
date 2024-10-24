@@ -48,13 +48,10 @@ export default async function Registration() {
         </h1>
       </header>
       <main className={styles.main}>
-        <div className={styles.card}>
-          <Register
-            registrationComplete={false}
-            registration={registration}
-            handleRegistration={handleRegistration}
-          />
-        </div>
+        <Register
+          registration={registration}
+          handleRegistration={handleRegistration}
+        />
       </main>
     </>
   );

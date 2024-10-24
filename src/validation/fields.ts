@@ -1,7 +1,7 @@
 // regex's that for input validation of profile  type data
 export const EMAIL_MIN_LENGTH = 6;
 export const EMAIL_MAX_LENGTH = 254; // RFC 5321
-export const EMAIL_REGEX: RegExp = /^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z]+$/;
+const EMAIL_REGEX: RegExp = /^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z]+$/;
 
 export const PASSWORD_MIN_LENGTH = 16;
 export const PASSWORD_MAX_LENGTH = 64;

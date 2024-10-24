@@ -79,6 +79,22 @@ span.info {
   width: 100%;
 }
 
+.showpassword {
+  transform: scale(2);
+  margin-bottom: 0.75rem;
+  margin-left: 0.5rem;
+}
+
+.showpassword:focus {
+  transition: 0.3s;
+  outline-style: solid;
+  outline-color: var(--primary-site-color);
+  box-shadow: 0 0 40px var(--primary-site-color);
+  animation: glow-input 3s ease-in-out infinite alternate;
+  transform: scale(2) translateZ(0); /* trigger GPU acceleration */
+  will-change: transform; /* inform the browser that this element will be animated */
+}
+
 .form label {
   display: block;
   margin-bottom: 0.5rem;
@@ -88,8 +104,9 @@ span.info {
 
   font-weight: bold;
 }
-
-.form input {
+.form input[type="number"],
+.form input[type="text"],
+.form input[type="password"] {
   display: block;
   width: 100%;
   padding: 0.5rem 1rem;
@@ -100,11 +117,14 @@ span.info {
   font-family: "Montserrat", sans-serif;
 }
 
-.form input:focus {
+.form input:focus[type="number"],
+.form input:focus[type="text"],
+.form input:focus[type="password"] {
   transition: 0.3s;
   outline-style: solid;
   outline-color: var(--primary-site-color);
   background-color: rgb(9, 9, 9);
+  box-shadow: 0 0 40px var(--primary-site-color);
   animation: glow-input 3s ease-in-out infinite alternate;
   transform: translateZ(0); /* trigger GPU acceleration */
   will-change: transform; /* inform the browser that this element will be animated */
@@ -144,8 +164,20 @@ span.info {
   margin-right: 1rem;
 }
 
-.actions {
-  width: 100%;
+.center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  padding: 2rem 0;
+}
+
+span.highlightError {
+  background: var(--highlight-error);
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
 }
 
 .error {
@@ -162,6 +194,50 @@ span.info {
   animation: glow-error 2s ease-in-out infinite alternate;
   transform: translateZ(0); /* trigger GPU acceleration */
   will-change: transform; /* inform the browser that this element will be animated */
+}
+
+.actionsError button {
+  margin-top: 1rem;
+  border: 0;
+  border: none;
+  border-radius: 2px;
+  padding: 0.75rem 2rem;
+  background: linear-gradient(
+    90deg,
+    var(--error-site-fade),
+    var(--error-site-color)
+  );
+  width: 100%;
+  cursor: pointer;
+  font: inherit;
+  font-size: 1.25rem;
+  text-transform: uppercase;
+}
+
+.actionsError button:hover,
+.actionsError button:focus {
+  transition: 0.3s;
+  outline-style: none;
+  /* box-shadow: 0 0 40px var(--primary-site-color); */
+  animation: glow-error 5s ease-in-out infinite alternate;
+}
+
+.actionsError button:disabled {
+  background: #ccc;
+  color: #979797;
+  cursor: not-allowed;
+}
+
+.actionsError button:hover:disabled,
+.actionsError button:focus:disabled {
+  box-shadow: 0 0 40px #60635f;
+  animation: glow-input-fix 3s ease-in-out infinite alternate;
+  transform: translateZ(0); /* trigger GPU acceleration */
+  will-change: transform; /* inform the browser that this element will be animated */
+}
+
+.actions {
+  width: 100%;
 }
 
 .actions button {
@@ -225,5 +301,17 @@ span.info {
   100% {
     box-shadow: 0 0 10px var(--info-site-color), 0 0 20px var(--info-site-color),
       0 0 30px var(--info-site-color), 0 0 40px var(--info-site-color);
+  }
+}
+
+@keyframes glow-error {
+  0% {
+    box-shadow: 0 0 5px var(--error-site-color), 0 0 5px var(--error-site-color),
+      0 0 15px var(--error-site-color), 0 0 20px var(--error-site-color);
+  }
+  100% {
+    box-shadow: 0 0 10px var(--error-site-color),
+      0 0 20px var(--error-site-color), 0 0 30px var(--error-site-color),
+      0 0 40px var(--error-site-color);
   }
 }

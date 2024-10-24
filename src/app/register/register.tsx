@@ -12,7 +12,6 @@ import {
   PASSWORD_MIN_LENGTH,
 } from "@/validation/fields";
 import Link from "next/link";
-
 import {
   PasswordEntries,
   Registration,
@@ -24,11 +23,9 @@ import FormSubmit from "@/components/form-submit";
 type Err = { [key: string]: string[] };
 
 export default function Register({
-  registrationComplete: isRegistrationComplete,
   registration,
   handleRegistration,
 }: {
-  registrationComplete: boolean;
   registration: Registration;
   handleRegistration: (
     prevState: RegistrationActionCmd,
@@ -36,6 +33,7 @@ export default function Register({
   ) => RegistrationActionCmd | Promise<RegistrationActionCmd>;
 }) {
   const [passwords, setPasswords] = useState<PasswordEntries>({});
+  const [showPassword, setShowPassword] = useState(false);
   const [fieldErrors, setFieldErrors] = useState<Err>({}); // client side errors
 
   // needed to validate password fields meet requirements
@@ -50,6 +48,10 @@ export default function Register({
     }));
   };
 
+  const toggleShowPassword = () => {
+    setShowPassword(!showPassword);
+  };
+
   // needed to validate password fields meet requirements
   // because regexes are too complex for html pattern attribute
   const handleOnBlur = () => {
@@ -58,13 +60,14 @@ export default function Register({
   };
 
   const [registrationState, formAction] = useActionState(handleRegistration, {
+    complete: false,
     registration: registration,
     errors: {},
   });
 
   return (
     <>
-      {!isRegistrationComplete && (
+      {!registrationState.complete && (
         <form className={styles.form} action={formAction}>
           {registrationState.errors.server && (
             <ErrorField errorMsgs={fieldErrors.server} />
@@ -112,7 +115,7 @@ export default function Register({
               )}
               <input
                 className={styles.form}
-                type="password"
+                type={showPassword ? "text" : "password"}
                 name="password"
                 title={`Password must be between ${PASSWORD_MIN_LENGTH} and ${PASSWORD_MAX_LENGTH} characters long.`}
                 minLength={PASSWORD_MIN_LENGTH}
@@ -140,7 +143,7 @@ export default function Register({
               )}
               <input
                 className={styles.form}
-                type="password"
+                type={showPassword ? "text" : "password"}
                 name="confirm_password"
                 title="Passwords must match"
                 minLength={PASSWORD_MIN_LENGTH}
@@ -153,6 +156,23 @@ export default function Register({
               />
             </div>
           </div>
+          <div className={styles.row}>
+            <div className={styles.field}>
+              <input
+                className={styles.showpassword}
+                type="checkbox"
+                checked={showPassword}
+                name="show"
+                onChange={toggleShowPassword}
+              />
+              <label className={styles.label} htmlFor="password">
+                Show Password
+              </label>
+            </div>
+          </div>
+
+          <br />
+
           <div className={styles.row}>
             <div className={styles.field}>
               <label className={styles.label} htmlFor="firstname">
@@ -256,22 +276,23 @@ export default function Register({
               </div>
             </div>
           </div>
+
           <div className={styles.row}>
             <FormSubmit buttonLabel="register" pendingLabel="registering..." />
           </div>
         </form>
       )}
 
-      {isRegistrationComplete && (
+      {registrationState.complete && (
         <>
           <div className={styles.card}>
             <h2>
               <span className={styles.highlight}>Registration successful!</span>
             </h2>
             <p>
-              Thanks for signing up,{" "}
+              Thanks for signing up!{" "}
               <span className={styles.highlight}>{registration.firstname}</span>
-              . Proceed to the{" "}
+              Proceed to the{" "}
               <Link className={styles.locallink} href="/login">
                 login
               </Link>{" "}

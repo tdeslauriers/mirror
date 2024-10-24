@@ -34,7 +34,7 @@ export default async function GetCsrf(session: string) {
         }
       }
     } catch (error) {
-      console.log(error);
+      console.log("Error fetching csrf token");
       throw new Error(errMsg);
     }
   } else {
