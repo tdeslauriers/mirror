@@ -11,7 +11,7 @@ import { GatewayError, isGatewayError } from "@/app/api";
 // or not, the gateway will destroy the session.  If not found, the gateway will return an error for logging here.
 // Once the gateway returns, the cookies will be removed from the client and the user will be redirected to login page.
 export async function logout() {
-  const cookieStore = cookies();
+  const cookieStore = await cookies();
   const session: RequestCookie | undefined = cookieStore.get("session_id");
 
   if (session) {
@@ -33,19 +33,19 @@ export async function logout() {
         console.log("Session destroyed");
         // remove cookies: set values to blank and age to the past to prompt browser to delete it
         // on reload, client will request new anonymous session
-        cookies().set("session_id", "", {
+        cookieStore.set("session_id", "", {
           httpOnly: true,
           sameSite: "strict",
           secure: true,
           maxAge: 0,
         });
-        cookies().set("authenticated", "", {
+        cookieStore.set("authenticated", "", {
           httpOnly: false,
           sameSite: "strict",
           secure: true,
           maxAge: 0,
         });
-        cookies().set("identity", "", {
+        cookieStore.set("identity", "", {
           httpOnly: false,
           sameSite: "strict",
           secure: true,
