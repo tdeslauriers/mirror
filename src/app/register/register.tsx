@@ -290,14 +290,18 @@ export default function Register({
               <span className={styles.highlight}>Registration successful!</span>
             </h2>
             <p>
-              Thanks for signing up!{" "}
-              <span className={styles.highlight}>{registration.firstname}</span>
-              Proceed to the{" "}
+              Thanks for signing up,{" "}
+              <span className={styles.highlight}>
+                {registrationState.registration?.firstname}
+              </span>
+              . Proceed to the{" "}
               <Link className={styles.locallink} href="/login">
                 login
               </Link>{" "}
               page, use{" "}
-              <span className={styles.highlight}>{registration.username}</span>{" "}
+              <span className={styles.highlight}>
+                {registrationState.registration?.username}
+              </span>{" "}
               as your username, and enter your password.
             </p>
             <h3>
