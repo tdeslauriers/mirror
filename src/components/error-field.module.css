@@ -6,6 +6,7 @@
   width: 100%;
   padding: 0.5rem 1rem;
   border-radius: 4px;
+  border-color: var(--error-site-color);
   font-size: 1.25rem;
   font-family: "Montserrat", sans-serif;
   animation: glow-error 2s ease-in-out infinite alternate;

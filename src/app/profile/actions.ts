@@ -9,7 +9,6 @@ export async function handleUserEdit(
   previousState: ProfileActionCmd,
   formData: FormData
 ) {
-  console.log("formData: ", formData.get("birthYear") as string);
   // any fields that are not allowed to be changed by user will not be submitted
   // likewise, gateway/identity will dump any fields that are not allowed to be changed
   let updated: Profile = {

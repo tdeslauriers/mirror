@@ -1,10 +1,10 @@
 // regex's that for input validation of profile  type data
-const EMAIL_MIN_LENGTH = 6;
-const EMAIL_MAX_LENGTH = 254; // RFC 5321
-const EMAIL_REGEX: RegExp = /^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z]+$/;
+export const EMAIL_MIN_LENGTH = 6;
+export const EMAIL_MAX_LENGTH = 254; // RFC 5321
+export const EMAIL_REGEX: RegExp = /^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z]+$/;
 
-const PASSWORD_MIN_LENGTH = 16;
-const PASSWORD_MAX_LENGTH = 64;
+export const PASSWORD_MIN_LENGTH = 16;
+export const PASSWORD_MAX_LENGTH = 64;
 const PASSWORD_UPPERCASE_REGEX: RegExp = /[A-Z]/;
 const PASSWORD_LOWERCASE_REGEX: RegExp = /[a-z]/;
 const PASSWORD_DIGIT_REGEX: RegExp = /\d/;
@@ -26,8 +26,8 @@ const PASSWORD_KEYBOARD_SEQUENCES: string[] = [
   "abcdefghijklmnopqrstuvwxyz",
 ];
 
-const NAME_MIN_LENGTH = 1;
-const NAME_MAX_LENGTH = 32;
+export const NAME_MIN_LENGTH = 1;
+export const NAME_MAX_LENGTH = 32;
 const NAME_REGEX: RegExp = /^[a-zA-Z_'-\s]+$/;
 
 const UUID_REGEX =

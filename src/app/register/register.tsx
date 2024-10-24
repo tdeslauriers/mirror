@@ -1,414 +1,301 @@
 "use client";
 
-import { ChangeEvent, useState } from "react";
+import { ChangeEvent, useActionState, useState } from "react";
 import styles from "./page.module.css";
 import ErrorField from "@/components/error-field";
 import {
-  FieldValidation,
-  checkEmail,
-  checkName,
-  checkPassword,
+  EMAIL_MAX_LENGTH,
+  EMAIL_MIN_LENGTH,
+  NAME_MAX_LENGTH,
+  NAME_MIN_LENGTH,
+  PASSWORD_MAX_LENGTH,
+  PASSWORD_MIN_LENGTH,
 } from "@/validation/fields";
 import Link from "next/link";
-import { Registration } from "../api";
-import useCsrfToken from "@/components/csrf";
+
+import {
+  PasswordEntries,
+  Registration,
+  RegistrationActionCmd,
+  validatePasswords,
+} from ".";
+import FormSubmit from "@/components/form-submit";
 
 type Err = { [key: string]: string[] };
 
-const months: string[] = [
-  "January",
-  "February",
-  "March",
-  "April",
-  "May",
-  "June",
-  "July",
-  "August",
-  "September",
-  "October",
-  "November",
-  "December",
-];
-
-export default function Register() {
-  const [registrationSuccess, setRegistrationSuccess] =
-    useState<boolean>(false);
-  const [pending, setPending] = useState<boolean>(false);
-  const [registration, setRegistration] = useState<Registration>({
-    username: "",
-    password: "",
-    confirm_password: "",
-    firstname: "",
-    lastname: "",
-  });
+export default function Register({
+  registrationComplete: isRegistrationComplete,
+  registration,
+  handleRegistration,
+}: {
+  registrationComplete: boolean;
+  registration: Registration;
+  handleRegistration: (
+    prevState: RegistrationActionCmd,
+    formData: FormData
+  ) => RegistrationActionCmd | Promise<RegistrationActionCmd>;
+}) {
+  const [passwords, setPasswords] = useState<PasswordEntries>({});
   const [fieldErrors, setFieldErrors] = useState<Err>({}); // client side errors
 
-  const csrfToken = useCsrfToken();
-
-  // data entry
-  const handleFieldChange = (
+  // needed to validate password fields meet requirements
+  const handlePwChange = (
     event: ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
     const { name, value } = event.target;
-    setRegistration((prevRegistration) => ({
-      ...prevRegistration,
+
+    setPasswords((prevData) => ({
+      ...prevData,
       [name]: value,
     }));
   };
 
+  // needed to validate password fields meet requirements
+  // because regexes are too complex for html pattern attribute
   const handleOnBlur = () => {
-    let errors = validateRegistration(registration);
-
-    if (
-      (fieldErrors.dobIncomplete?.length > 0 &&
-        !registration.birthMonth &&
-        !registration.birthDay &&
-        !registration.birthYear) ||
-      (fieldErrors.dobIncomplete?.length > 0 &&
-        registration.birthMonth &&
-        registration.birthDay &&
-        registration.birthYear)
-    ) {
-      delete errors.dobIncomplete;
-    }
+    let errors = validatePasswords(passwords);
     setFieldErrors(errors);
   };
 
-  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    // check for errors
-    let errors = validateRegistration(registration);
-    setFieldErrors(errors);
-    if (
-      (registration.birthMonth &&
-        (!registration.birthDay || !registration.birthYear)) ||
-      (registration.birthDay &&
-        (!registration.birthMonth || !registration.birthYear)) ||
-      (registration.birthYear &&
-        (!registration.birthMonth || !registration.birthDay))
-    ) {
-      errors.dobIncomplete = ["Please fill out all birthdate fields."];
-    }
-
-    if (Object.keys(errors).length === 0) {
-      setPending(true);
-
-      // append csrf token to registration object
-      if (csrfToken) {
-        registration.csrf = csrfToken;
-      }
-
-      // make api call
-      try {
-        const response = await fetch("/api/register", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(registration),
-        });
-
-        if (response.ok) {
-          const success = await response.json();
-          setPending(false);
-          setRegistration(success);
-          setRegistrationSuccess(true);
-        } else {
-          const fail = await response.json();
-          setFieldErrors(fail);
-          setPending(false);
-        }
-      } catch (error) {
-        // handle network error
-        console.error("Registration api call failed: ", error);
-        setPending(false);
-      }
-    }
-  };
+  const [registrationState, formAction] = useActionState(handleRegistration, {
+    registration: registration,
+    errors: {},
+  });
 
   return (
     <>
-      <main className={styles.main}>
-        {!registrationSuccess && (
-          <form className={styles.form} onSubmit={handleSubmit}>
-            {fieldErrors.server && (
-              <ErrorField errorMsgs={fieldErrors.server} />
-            )}
-            {fieldErrors.badrequest && (
-              <ErrorField errorMsgs={fieldErrors.badrequest} />
-            )}
-            <div className={styles.row}>
-              <div className={styles.field}>
-                <label className={styles.label} htmlFor="username">
-                  email
-                </label>
-                {fieldErrors.username && (
-                  <ErrorField errorMsgs={fieldErrors.username} />
-                )}
-                <input
-                  className={styles.form}
-                  type="text"
-                  id="username"
-                  name="username"
-                  required
-                  onChange={handleFieldChange}
-                  onBlur={handleOnBlur}
-                />
-              </div>
+      {!isRegistrationComplete && (
+        <form className={styles.form} action={formAction}>
+          {registrationState.errors.server && (
+            <ErrorField errorMsgs={fieldErrors.server} />
+          )}
+          {registrationState.errors.badrequest && (
+            <ErrorField errorMsgs={fieldErrors.badrequest} />
+          )}
+          <input
+            type="hidden"
+            name="csrfToken"
+            value={registrationState.registration?.csrf}
+          />
+          <div className={styles.row}>
+            <div className={styles.field}>
+              <label className={styles.label} htmlFor="username">
+                email
+              </label>
+              {registrationState.errors.username && (
+                <ErrorField errorMsgs={registrationState.errors.username} />
+              )}
+              <input
+                className={styles.form}
+                type="text"
+                name="username"
+                title="Must be a valid email address"
+                minLength={EMAIL_MIN_LENGTH}
+                maxLength={EMAIL_MAX_LENGTH}
+                pattern={`^[a-zA-Z0-9\_\.\+\\-]+@[a-zA-Z0-9\\-]+\\.[a-zA-Z]+`}
+                defaultValue={registrationState.registration?.username}
+                placeholder="Email"
+                required
+              />
             </div>
-            <div className={styles.row}>
-              <div className={styles.field}>
-                <label className={styles.label} htmlFor="password">
-                  Password
-                </label>
-                {fieldErrors.password && (
-                  <ErrorField errorMsgs={fieldErrors.password} />
-                )}
-                <input
-                  className={styles.form}
-                  type="password"
-                  id="password"
-                  name="password"
-                  required
-                  onChange={handleFieldChange}
-                  onBlur={handleOnBlur}
-                />
-              </div>
+          </div>
+          <div className={styles.row}>
+            <div className={styles.field}>
+              <label className={styles.label} htmlFor="password">
+                Password
+              </label>
+              {fieldErrors.password && (
+                <ErrorField errorMsgs={fieldErrors.password} />
+              )}
+              {registrationState.errors.password && (
+                <ErrorField errorMsgs={registrationState.errors.password} />
+              )}
+              <input
+                className={styles.form}
+                type="password"
+                name="password"
+                title={`Password must be between ${PASSWORD_MIN_LENGTH} and ${PASSWORD_MAX_LENGTH} characters long.`}
+                minLength={PASSWORD_MIN_LENGTH}
+                maxLength={PASSWORD_MAX_LENGTH}
+                defaultValue={registrationState.registration?.password}
+                placeholder="Password"
+                onChange={handlePwChange}
+                onBlur={handleOnBlur}
+                required
+              />
             </div>
-            <div className={styles.row}>
-              <div className={styles.field}>
-                <label className={styles.label} htmlFor="confirm_password">
-                  Confirm Password
-                </label>
-                {fieldErrors.confirm_password && (
-                  <ErrorField errorMsgs={fieldErrors.confirm_password} />
-                )}
-                <input
-                  className={styles.form}
-                  type="password"
-                  id="confirm_password"
-                  name="confirm_password"
-                  required
-                  onChange={handleFieldChange}
-                  onBlur={handleOnBlur}
+          </div>
+          <div className={styles.row}>
+            <div className={styles.field}>
+              <label className={styles.label} htmlFor="confirm_password">
+                Confirm Password
+              </label>
+              {fieldErrors.confirm_password && (
+                <ErrorField errorMsgs={fieldErrors.confirm_password} />
+              )}
+              {registrationState.errors.confirm_password && (
+                <ErrorField
+                  errorMsgs={registrationState.errors.confirm_password}
                 />
-              </div>
+              )}
+              <input
+                className={styles.form}
+                type="password"
+                name="confirm_password"
+                title="Passwords must match"
+                minLength={PASSWORD_MIN_LENGTH}
+                maxLength={PASSWORD_MAX_LENGTH}
+                defaultValue={registrationState.registration?.confirm_password}
+                placeholder="Confirm Password"
+                onChange={handlePwChange}
+                onBlur={handleOnBlur}
+                required
+              />
             </div>
-            <div className={styles.row}>
-              <div className={styles.field}>
-                <label className={styles.label} htmlFor="firstname">
-                  Firstname
-                </label>
-                {fieldErrors.firstname && (
-                  <ErrorField errorMsgs={fieldErrors.firstname} />
-                )}
-                <input
-                  className={styles.form}
-                  type="text"
-                  id="firstname"
-                  name="firstname"
-                  required
-                  onChange={handleFieldChange}
-                  onBlur={handleOnBlur}
-                />
-              </div>
+          </div>
+          <div className={styles.row}>
+            <div className={styles.field}>
+              <label className={styles.label} htmlFor="firstname">
+                Firstname
+              </label>
+              {registrationState.errors.firstname && (
+                <ErrorField errorMsgs={registrationState.errors.firstname} />
+              )}
+              <input
+                className={styles.form}
+                name="firstname"
+                type="text"
+                title="Only letters, hyphens, apostrophes, underscores, and spaces allowed"
+                minLength={NAME_MIN_LENGTH}
+                maxLength={NAME_MAX_LENGTH}
+                pattern={`^[a-zA-Z\\-\'\_\ ]+`}
+                defaultValue={registrationState.registration?.firstname}
+                placeholder="Firstname"
+                required
+              />
             </div>
-            <div className={styles.row}>
-              <div className={styles.field}>
-                <label className={styles.label} htmlFor="lastname">
-                  Lastname
-                </label>
-                {fieldErrors.lastname && (
-                  <ErrorField errorMsgs={fieldErrors.lastname} />
-                )}
-                <input
-                  className={styles.form}
-                  type="text"
-                  id="lastname"
-                  name="lastname"
-                  required
-                  onChange={handleFieldChange}
-                  onBlur={handleOnBlur}
-                />
-              </div>
+          </div>
+          <div className={styles.row}>
+            <div className={styles.field}>
+              <label className={styles.label} htmlFor="lastname">
+                Lastname
+              </label>
+              {registrationState.errors.lastname && (
+                <ErrorField errorMsgs={registrationState.errors.lastname} />
+              )}
+              <input
+                className={styles.form}
+                name="lastname"
+                type="text"
+                title="Only letters, hyphens, apostrophes, underscores, and spaces allowed"
+                minLength={NAME_MIN_LENGTH}
+                maxLength={NAME_MAX_LENGTH}
+                pattern={`^[a-zA-Z\\-\'\_\ ]+`}
+                defaultValue={registrationState.registration?.lastname}
+                placeholder="Lastname"
+                required
+              />
             </div>
-            <div className={styles.row}>
-              <div className={styles.date}>
-                <label
-                  className={styles.label}
-                  htmlFor="birthdate"
-                  title="only required for allowance app"
-                >
-                  Birth date{" "}
-                  <sup>
-                    <span
-                      className={styles.highlight}
-                      style={{ textTransform: "lowercase" }}
-                    >
-                      optional
-                    </span>
-                  </sup>
-                </label>
-                {fieldErrors.dobIncomplete && (
-                  <ErrorField errorMsgs={fieldErrors.dobIncomplete} />
-                )}
+          </div>
+          <div className={styles.row}>
+            <div className={styles.date}>
+              <label
+                className={styles.label}
+                htmlFor="birthdate"
+                title="only required for allowance app"
+              >
+                Birth date{" "}
+                <sup>
+                  <span
+                    className={styles.highlight}
+                    style={{ textTransform: "lowercase" }}
+                  >
+                    optional
+                  </span>
+                </sup>
+              </label>
+              {registrationState.errors.birthdate && (
+                <ErrorField errorMsgs={registrationState.errors.birthdate} />
+              )}
 
-                <div className={styles.daterow}>
-                  <select
-                    className={styles.birthdate}
-                    id="birthMonth"
-                    name="birthMonth"
-                    onChange={handleFieldChange}
-                    onBlur={handleOnBlur}
-                  >
-                    <option value="">Month</option>
-                    {[...Array(12)].map((_, i) => (
-                      <option key={i} value={i + 1}>
-                        {months[i]}
-                      </option>
-                    ))}
-                  </select>
-                  <select
-                    className={styles.birthdate}
-                    id="birthDay"
-                    name="birthDay"
-                    onChange={handleFieldChange}
-                    onBlur={handleOnBlur}
-                  >
-                    <option value="">Day</option>
-                    {[...Array(31)].map((_, i) => (
-                      <option key={i} value={i + 1}>
-                        {i + 1}
-                      </option>
-                    ))}
-                  </select>
-                  <select
-                    className={styles.birthdate}
-                    id="birthYear"
-                    name="birthYear"
-                    onChange={handleFieldChange}
-                    onBlur={handleOnBlur}
-                  >
-                    <option value="">Year</option>
-                    {Array.from(
-                      { length: new Date().getFullYear() - 1900 + 1 },
-                      (_, i) => new Date().getFullYear() - i
-                    ).map((year) => (
-                      <option key={year} value={year}>
-                        {year}
-                      </option>
-                    ))}
-                  </select>
-                </div>
+              <div className={styles.daterow}>
+                <input
+                  className={styles.birthdate}
+                  name="birthMonth"
+                  title="Enter a month number between 1 and 12"
+                  type="number"
+                  min={1}
+                  max={12}
+                  defaultValue={registrationState.registration?.birthMonth}
+                  placeholder="Month"
+                />
+
+                <input
+                  className={styles.birthdate}
+                  name="birthDay"
+                  title="Enter a day number between 1 and 31"
+                  type="number"
+                  min={1}
+                  max={31}
+                  defaultValue={registrationState.registration?.birthDay}
+                  placeholder="Day"
+                />
+
+                <input
+                  className={styles.birthdate}
+                  name="birthYear"
+                  title={`Enter a year number between ${
+                    new Date().getFullYear() - 120
+                  } and ${new Date().getFullYear()}`}
+                  type="number"
+                  min={new Date().getFullYear() - 120}
+                  max={new Date().getFullYear()}
+                  defaultValue={registrationState.registration?.birthYear}
+                  placeholder="Year"
+                />
               </div>
             </div>
-            <div className={styles.row}>
-              <div className={styles.actions}>
-                <button type="submit" disabled={pending}>
-                  {pending ? (
-                    <>
-                      <strong>Registering...</strong>
-                    </>
-                  ) : (
-                    <>
-                      <strong>Register</strong>
-                    </>
-                  )}
-                </button>
-              </div>
-            </div>
-          </form>
-        )}
-        {registrationSuccess && (
-          <>
-            <div className={styles.card}>
-              <h2>
-                <span className={styles.highlight}>
-                  Registration successful!
-                </span>
-              </h2>
-              <p>
-                Thanks for signing up,{" "}
-                <span className={styles.highlight}>
-                  {registration.firstname}
-                </span>
-                . Proceed to the{" "}
-                <Link className={styles.locallink} href="/login">
-                  login
-                </Link>{" "}
-                page, use{" "}
-                <span className={styles.highlight}>
-                  {registration.username}
-                </span>{" "}
-                as your username, and enter your password.
-              </p>
-              <h3>
-                <span className={styles.highlight}>Note:</span>
-              </h3>
-              <ul>
-                <li>
-                  While you have an account and will be able to view your
-                  profile and other less sensitive content, you will not be able
-                  to view restricted content immediately.
-                </li>
-                <li>
-                  I still need to provision you access to various resources. I
-                  will send you an email when you have been granted access.
-                </li>
-              </ul>
-            </div>
-          </>
-        )}
-      </main>
+          </div>
+          <div className={styles.row}>
+            <FormSubmit buttonLabel="register" pendingLabel="registering..." />
+          </div>
+        </form>
+      )}
+
+      {isRegistrationComplete && (
+        <>
+          <div className={styles.card}>
+            <h2>
+              <span className={styles.highlight}>Registration successful!</span>
+            </h2>
+            <p>
+              Thanks for signing up,{" "}
+              <span className={styles.highlight}>{registration.firstname}</span>
+              . Proceed to the{" "}
+              <Link className={styles.locallink} href="/login">
+                login
+              </Link>{" "}
+              page, use{" "}
+              <span className={styles.highlight}>{registration.username}</span>{" "}
+              as your username, and enter your password.
+            </p>
+            <h3>
+              <span className={styles.highlight}>Note:</span>
+            </h3>
+            <ul>
+              <li>
+                While you have an account and will be able to view your profile
+                and other less sensitive content, you will not be able to view
+                restricted content immediately.
+              </li>
+              <li>
+                I still need to provision you access to various resources. I
+                will send you an email when you have been granted access.
+              </li>
+            </ul>
+          </div>
+        </>
+      )}
     </>
   );
-}
-
-function validateRegistration(registration: Registration) {
-  const errors: { [key: string]: string[] } = {};
-
-  // username
-  if (registration.username && registration.username.trim().length > 0) {
-    const usernameCheck: FieldValidation = checkEmail(registration.username);
-    if (!usernameCheck.isValid) {
-      errors.username = usernameCheck.messages;
-    }
-  }
-
-  // password
-  if (registration.password && registration.password.trim().length > 0) {
-    const passwordCheck: FieldValidation = checkPassword(registration.password);
-    if (!passwordCheck.isValid) {
-      errors.password = passwordCheck.messages;
-    }
-  }
-
-  // confirm_password: check if matches password
-  if (
-    registration.confirm_password &&
-    registration.confirm_password.trim().length > 0
-  ) {
-    if (registration.password !== registration.confirm_password) {
-      errors.confirm_password = ["Passwords do not match."];
-    }
-  }
-
-  // check firstname
-  if (registration.firstname && registration.firstname.trim().length > 0) {
-    const firstnameCheck: FieldValidation = checkName(registration.firstname);
-    if (!firstnameCheck.isValid) {
-      errors.firstname = firstnameCheck.messages;
-    }
-  }
-
-  // check lastname
-  if (registration.lastname && registration.lastname.trim().length > 0) {
-    const lastnameCheck: FieldValidation = checkName(registration.lastname);
-    if (!lastnameCheck.isValid) {
-      errors.lastname = lastnameCheck.messages;
-    }
-  }
-
-  // only check if all birthdate fields are filled on submit
-  return errors;
 }

@@ -1,10 +1,11 @@
 "use client";
 
 import styles from "./page.module.css";
-import { MouseEvent, useActionState, useState } from "react";
+import { useActionState } from "react";
 import { Profile, ProfileActionCmd } from ".";
 import ErrorField from "@/components/error-field";
 import FormSubmit from "@/components/form-submit";
+import { NAME_MAX_LENGTH, NAME_MIN_LENGTH } from "@/validation/fields";
 
 export default function UserForm({
   profile,
@@ -42,8 +43,8 @@ export default function UserForm({
               name="firstname"
               type="text"
               title="Only letters, hyphens, apostrophes, underscores, and spaces allowed"
-              minLength={1}
-              maxLength={32}
+              minLength={NAME_MIN_LENGTH}
+              maxLength={NAME_MAX_LENGTH}
               pattern={`^[a-zA-Z\\-\'\_\ ]+`}
               defaultValue={profileState.profile?.firstname}
               placeholder="Firstname"
@@ -64,8 +65,8 @@ export default function UserForm({
               name="lastname"
               type="text"
               title="Only letters, hyphens, apostrophes, underscores, and spaces allowed"
-              minLength={1}
-              maxLength={32}
+              minLength={NAME_MIN_LENGTH}
+              maxLength={NAME_MAX_LENGTH}
               pattern={`^[a-zA-Z\\-\'\_\ ]+`}
               defaultValue={profileState.profile?.lastname}
               placeholder="Lastname"
