@@ -82,7 +82,6 @@ export function validateLogin(login: LoginData) {
 
 // logs and throws error if oauth data element is not valid
 export function validateOauth(oauth: OauthExchange) {
-  console.log("OAUTH PRESENT", oauth);
   if (
     !oauth.client_id ||
     oauth.client_id.trim().length <= 0 ||
