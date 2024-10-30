@@ -5,39 +5,37 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 type Err = { [key: string]: string[] };
 
 const useOuathExchange = () => {
+  const [isLoading, setIsLoading] = useState<boolean>(true);
   const [oauthExchange, setOauthExchange] = useState<OauthExchange | null>(
     null
   );
-
-  const [fieldErrors, setFieldErrors] = useState<Err>({}); // client side errors
 
   // next navigation
   const router = useRouter();
   const searchParams = useSearchParams();
   const path = usePathname();
 
-  const fetchOauthExchange = async () => {
-    try {
-      const response = await fetch("/api/login/state", {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
+  useEffect(() => {
+    const fetchOauthExchange = async () => {
+      try {
+        const response = await fetch("/api/login/state", {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
 
-      if (response.ok) {
-        return response.json();
-      } else {
-        const error = await response.json();
-        setFieldErrors(error);
+        if (response.ok) {
+          return response.json();
+        } else {
+          const error = await response.json();
+          return Promise.reject(error);
+        }
+      } catch (error) {
         return Promise.reject(error);
       }
-    } catch (error) {
-      return Promise.reject(error);
-    }
-  };
+    };
 
-  useEffect(() => {
     const responseTypeParam = searchParams.get("response_type");
     const stateParam = searchParams.get("state");
     const nonceParam = searchParams.get("nonce");
@@ -51,6 +49,7 @@ const useOuathExchange = () => {
       !clientIdParam ||
       !redirectUrlParam
     ) {
+      
       fetchOauthExchange()
         .then((exchange) => {
           if (
@@ -78,16 +77,12 @@ const useOuathExchange = () => {
                 exchange.nonce
               }&redirect_url=${encodeURIComponent(exchange.redirect_url)}`
             );
+
+            setIsLoading(false);
           }
         })
         .catch((error) => {
-          console.error("state-nonce api call failed 2: ", error);
-          const errMsg = error.server
-            ? error.server
-            : "Failed to get state, nonce, and default redirect url.";
-          setFieldErrors({
-            server: [errMsg, "If error continues, please contact me."],
-          });
+          console.error("state-nonce api call failed: ", error);
         });
     } else {
       const oauth: OauthExchange = {
@@ -99,10 +94,11 @@ const useOuathExchange = () => {
         created_at: null,
       };
       setOauthExchange(oauth);
+      setIsLoading(false);
     }
-  }, [router, searchParams, path]);
+  }, [searchParams, router]);
 
-  return oauthExchange;
+  return { isLoading, oauthExchange };
 };
 
 export default useOuathExchange;

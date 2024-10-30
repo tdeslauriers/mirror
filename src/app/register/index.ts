@@ -8,12 +8,12 @@ import {
 } from "@/validation/fields";
 
 export const pageError =
-  "Failed to load registration page.  Please try again.  If the fplroblem persists, please contact me.";
+  "Failed to load registration page.  Please try again.  If the problem persists, please contact me.";
 
 export const ErrMsgGeneric =
   "An error occurred processing your registration. Please try again. If the problem persists, please contact me.";
 
-export type Registration = {
+export type RegistrationData = {
   csrf?: string;
 
   username?: string;
@@ -28,7 +28,7 @@ export type Registration = {
 
 export type RegistrationActionCmd = {
   complete: boolean;
-  registration: Registration | null;
+  registration: RegistrationData | null;
   errors: { [key: string]: string[] };
 };
 
@@ -45,7 +45,7 @@ export type RegistrationCmd = {
   birthdate?: string;
 };
 
-export function validateRegistration(registration: Registration) {
+export function validateRegistration(registration: RegistrationData) {
   const errors: { [key: string]: string[] } = {};
 
   // check csrf token: super light-weight, just check for absurd tampering

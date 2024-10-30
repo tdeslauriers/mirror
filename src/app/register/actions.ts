@@ -3,7 +3,7 @@
 import { cookies } from "next/headers";
 import {
   ErrMsgGeneric,
-  Registration,
+  RegistrationData,
   RegistrationActionCmd,
   RegistrationCmd,
   validateRegistration,
@@ -16,7 +16,7 @@ export async function handleRegistration(
 ) {
   // any fields that are not allowed to be changed by user will not be submitted
   // likewise, gateway/identity will dump any fields that are not allowed to be changed
-  let registration: Registration = {
+  let registration: RegistrationData = {
     csrf: formData.get("csrfToken") as string,
     username: formData.get("username") as string,
     password: formData.get("password") as string,
@@ -45,7 +45,9 @@ export async function handleRegistration(
     : null;
 
   if (!hasSession) {
-    console.log("Session cookie is missing");
+    console.log(
+      `Session cookie is missing for a registration attempt, proposed username: ${registration.username}.`
+    );
     throw new Error(ErrMsgGeneric);
   }
 
@@ -97,7 +99,6 @@ export async function handleRegistration(
       if (isGatewayError(fail)) {
         const errors = handleRegistrationErrors(fail);
         console.log("Gateway error: ", errors);
-        console.log("Registration in gateway error: ", registration);
         return {
           complete: false,
           registration: registration,

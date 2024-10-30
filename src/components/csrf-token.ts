@@ -6,6 +6,7 @@ const errMsg: string =
 export default async function GetCsrf(session: string) {
   // check for session (should never happen)
   if (!session || session.length <= 0) {
+    console.log("No session token provided to get csrf fucntion.");
     throw new Error("Session token required to get csrf token.");
   }
 
@@ -54,4 +55,5 @@ function handleCsrfErrors(gatewayError: GatewayError) {
   console.log(
     `A gateway error occurred calling csrf endpoint ( ${gatewayError.code}: ${gatewayError.message}`
   );
+  throw new Error(errMsg);
 }

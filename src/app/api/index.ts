@@ -1,11 +1,11 @@
 // api json objects
-export type OauthExchange = {
-  response_type: string | null;
-  nonce: string | null;
-  state: string | null;
-  client_id: string | null;
-  redirect_url: string | null;
-  created_at: string | null;
+export type OauthExchange  = {
+  response_type?: string | null;
+  nonce?: string | null;
+  state?: string | null;
+  client_id?: string | null;
+  redirect_url?: string | null;
+  created_at?: string | null;
 };
 
 export type Registration = {
@@ -25,18 +25,6 @@ export type Credentials = {
   username: string | null;
   password: string | null;
   csrf?: string;
-};
-
-export type LoginCmd = {
-  username: string | null;
-  password: string | null;
-  csrf?: string;
-  session?: string;
-  response_type: string | null;
-  state: string | null;
-  nonce: string | null;
-  client_id: string | null;
-  redirect: string | null;
 };
 
 export type CallbackCmd = {

@@ -14,7 +14,7 @@ import {
 import Link from "next/link";
 import {
   PasswordEntries,
-  Registration,
+  RegistrationData,
   RegistrationActionCmd,
   validatePasswords,
 } from ".";
@@ -22,11 +22,11 @@ import FormSubmit from "@/components/form-submit";
 
 type Err = { [key: string]: string[] };
 
-export default function Register({
+export default function RegistrationForm({
   registration,
   handleRegistration,
 }: {
-  registration: Registration;
+  registration: RegistrationData;
   handleRegistration: (
     prevState: RegistrationActionCmd,
     formData: FormData
