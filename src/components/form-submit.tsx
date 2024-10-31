@@ -21,7 +21,9 @@ export default function FormSubmit({
     <>
       <div className={styles.actions}>
         <button type="submit" disabled={status.pending}>
-          {status.pending ? pending.toUpperCase() : buttonLabel.toUpperCase()}
+          <strong>
+            {status.pending ? pending.toUpperCase() : buttonLabel.toUpperCase()}
+          </strong>
         </button>
       </div>
     </>

@@ -11,6 +11,8 @@ import {
 } from "@/validation/fields";
 import { handleLogin } from "./actions";
 import { OauthExchange } from "../api";
+import FormSubmit from "@/components/form-submit";
+import ErrorField from "@/components/error-field";
 
 export default function LoginForm({
   csrf,
@@ -64,7 +66,7 @@ export default function LoginForm({
   return (
     <>
       <form className={styles.form} action={formAction}>
-        {/* {loginState.errors.server && (
+        {loginState.errors.server && (
           <ErrorField errorMsgs={loginState.errors.server} />
         )}
         {loginState.errors.badrequest && (
@@ -86,23 +88,23 @@ export default function LoginForm({
           <ErrorField errorMsgs={loginState.errors.nonse} />
         )}
         {loginState.errors.redirect && (
-          <ErrorField errorMsgs={loginState.errors.nonse} />
+          <ErrorField errorMsgs={loginState.errors.redirect} />
         )}
         {loginState.errors.client_id && (
           <ErrorField errorMsgs={loginState.errors.client_id} />
         )}
         {loginState.errors.callback && (
           <ErrorField errorMsgs={loginState.errors.callback} />
-        )} */}
+        )}
 
         <div className={styles.row}>
           <div className={styles.field}>
             <label className={styles.label} htmlFor="username">
               email
             </label>
-            {/* {loginState.errors.username && (
+            {loginState.errors.username && (
               <ErrorField errorMsgs={loginState.errors.username} />
-            )} */}
+            )}
             <input
               className={styles.form}
               type="text"
@@ -121,9 +123,9 @@ export default function LoginForm({
             <label className={styles.label} htmlFor="password">
               Password
             </label>
-            {/* {loginState.errors.password && (
+            {loginState.errors.password && (
               <ErrorField errorMsgs={loginState.errors.password} />
-            )} */}
+            )}
             <input
               className={styles.form}
               type={showPassword ? "text" : "password"}
@@ -151,20 +153,9 @@ export default function LoginForm({
             </label>
           </div>
         </div>
+
         <div className={styles.row}>
-          <div className={styles.actions}>
-            <button type="submit" disabled={pending}>
-              {pending ? (
-                <>
-                  <strong>Logging in...</strong>
-                </>
-              ) : (
-                <>
-                  <strong>Login</strong>
-                </>
-              )}
-            </button>
-          </div>
+          <FormSubmit buttonLabel="login" pendingLabel="logging in..." />
         </div>
       </form>
     </>

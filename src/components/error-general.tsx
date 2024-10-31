@@ -1,8 +1,6 @@
 "use client";
 
-import ErrorGeneral from "@/components/error-general";
-
-export default function Error({
+export default function ErrorGeneral({
   error,
   reset,
 }: {
