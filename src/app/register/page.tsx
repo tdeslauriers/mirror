@@ -39,7 +39,7 @@ export default async function Registration() {
     throw new Error(pageError);
   }
 
-  const registration: RegistrationData = { csrf: csrf };
+
 
   return (
     <>
@@ -51,7 +51,7 @@ export default async function Registration() {
       <main className={styles.main}>
         <Suspense fallback={<div>Loading...</div>}>
           <RegistrationForm
-            registration={registration}
+            csrf={csrf}
             handleRegistration={handleRegistration}
           />
         </Suspense>

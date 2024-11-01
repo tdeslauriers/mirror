@@ -2,7 +2,7 @@
 
 import { LogoutCmd } from "./index";
 import { RequestCookie } from "next/dist/compiled/@edge-runtime/cookies";
-import { redirect } from "next/navigation";
+import { permanentRedirect } from "next/navigation";
 import { cookies } from "next/headers";
 import { GatewayError, isGatewayError } from "@/app/api";
 
@@ -21,6 +21,7 @@ export async function logout() {
       };
 
       // send session to gateway to remove
+      process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
       const apiResponse = await fetch("https://localhost:8443/logout", {
         method: "POST",
         headers: {
@@ -72,9 +73,9 @@ export async function logout() {
     }
 
     // redirect to login page
-    redirect("/login");
+    permanentRedirect("/login");
   } else {
-    redirect("/login");
+    permanentRedirect("/login");
   }
 }
 

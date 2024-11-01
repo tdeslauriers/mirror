@@ -27,6 +27,7 @@ export type RegistrationData = {
 };
 
 export type RegistrationActionCmd = {
+  csrf?: string;
   complete: boolean;
   registration: RegistrationData | null;
   errors: { [key: string]: string[] };
@@ -47,16 +48,6 @@ export type RegistrationCmd = {
 
 export function validateRegistration(registration: RegistrationData) {
   const errors: { [key: string]: string[] } = {};
-
-  // check csrf token: super light-weight, just check for absurd tampering
-  if (
-    !registration.csrf ||
-    registration.csrf.trim().length < 16 ||
-    registration.csrf.trim().length > 64
-  ) {
-    console.log("csrf token missing or not well formed.");
-    throw new Error(ErrMsgGeneric);
-  }
 
   // username
   if (!registration.username || registration.username.trim().length === 0) {

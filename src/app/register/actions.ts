@@ -17,7 +17,6 @@ export async function handleRegistration(
   // any fields that are not allowed to be changed by user will not be submitted
   // likewise, gateway/identity will dump any fields that are not allowed to be changed
   let registration: RegistrationData = {
-    csrf: formData.get("csrfToken") as string,
     username: formData.get("username") as string,
     password: formData.get("password") as string,
     confirm_password: formData.get("confirm_password") as string,
@@ -32,10 +31,21 @@ export async function handleRegistration(
   const errors = validateRegistration(registration);
   if (errors && Object.keys(errors).length > 0) {
     return {
+      csrf: previousState.csrf,
       complete: false,
       registration: registration,
       errors: errors,
     } as RegistrationActionCmd;
+  }
+
+  // check csrf token: super light-weight, just check for absurd tampering
+  if (
+    !previousState.csrf ||
+    previousState.csrf.trim().length < 16 ||
+    previousState.csrf.trim().length > 64
+  ) {
+    console.log("csrf token missing or not well formed.");
+    throw new Error(ErrMsgGeneric);
   }
 
   // get session token
@@ -53,8 +63,9 @@ export async function handleRegistration(
 
   // if any of the fields are missing, the gateway will return a 400
   const registrationCmd: RegistrationCmd = {
-    csrf: registration.csrf,
+    csrf: previousState.csrf,
     session: hasSession.value,
+
     username: registration.username,
     password: registration.password,
     confirm_password: registration.confirm_password,

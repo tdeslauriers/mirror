@@ -23,10 +23,10 @@ import FormSubmit from "@/components/form-submit";
 type Err = { [key: string]: string[] };
 
 export default function RegistrationForm({
-  registration,
+  csrf,
   handleRegistration,
 }: {
-  registration: RegistrationData;
+  csrf: string;
   handleRegistration: (
     prevState: RegistrationActionCmd,
     formData: FormData
@@ -60,8 +60,9 @@ export default function RegistrationForm({
   };
 
   const [registrationState, formAction] = useActionState(handleRegistration, {
+    csrf: csrf,
     complete: false,
-    registration: registration,
+    registration: {},
     errors: {},
   });
 
