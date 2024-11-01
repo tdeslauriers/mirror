@@ -33,41 +33,47 @@ export async function POST(req: NextRequest) {
         "response type url query param missing,too short, or too long."
       );
       errors.oauth.push(
-        "response_type url query param missing,too short, or too long."
+        "'response_type' callback url query param missing,too short, or too long."
       );
     }
 
     const state = searchParams.get("state");
     if (!state || !checkUuid(state).isValid) {
       console.log(
-        "state url query param either missing or not well formed uuid"
+        "state callback url query param either missing or not well formed."
       );
-      errors.oauth.push("State url query param must be a valid UUID.");
+      errors.oauth.push(
+        "'state' callback url query param either missing or not well formed."
+      );
     }
     const nonce = searchParams.get("nonce");
     if (!nonce || !checkUuid(nonce).isValid) {
       console.log(
-        "nonce url query param either missing or not well formed uuid"
+        "nonce callback url query param either missing or not well formed."
       );
-      errors.oauth.push("Nonce url query param must be a valid UUID.");
+      errors.oauth.push(
+        "'nonce' callback url query param either missing or not well formed."
+      );
     }
 
     const client_id = searchParams.get("client_id");
     if (!client_id || !checkUuid(client_id).isValid) {
       console.log(
-        "client_id url query param either missing or not well formed uuid"
+        "client_id url query param either missing or not well formed."
       );
-      errors.oauth.push("Client_id url query param must be a valid UUID.");
+      errors.oauth.push(
+        "Client_id url query param either missing or not well formed."
+      );
     }
 
     // redirect check is simple because will be checked against registered redirect urls by auth service
     const redirectUrl = searchParams.get("redirect_url");
     if (!redirectUrl || redirectUrl.trim().length < 11) {
       console.log(
-        "redirect url query param missing or too short for a valid url."
+        "redirect_url callback url query param missing or too short for a valid url."
       );
       errors.oauth.push(
-        "Redirect url query param missing or too short for a valid url."
+        "redirect_url' callback query param missing or too short for a valid url."
       );
     }
 
@@ -76,9 +82,11 @@ export async function POST(req: NextRequest) {
 
     if (!auth_code || !checkUuid(auth_code).isValid) {
       console.log(
-        "auth url query param either missing or not well formed uuid"
+        "auth_code callback url query param either missing or not well formed."
       );
-      errors.oauth.push("State url query param must be a valid UUID.");
+      errors.oauth.push(
+        "'auth_code' callback url query param either missing or not well formed."
+      );
     }
 
     // return field level errors to error page

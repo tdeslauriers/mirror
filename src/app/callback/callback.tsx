@@ -1,7 +1,7 @@
 "use client";
 
 import styles from "./page.module.css";
-import { useSearchParams, permanentRedirect } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import AuthError from "@/components/error-Authentication";
 import { pageError } from ".";
