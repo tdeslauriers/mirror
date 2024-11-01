@@ -16,7 +16,9 @@ export async function POST(req: NextRequest) {
   // field validation
   const errors: { [key: string]: string[] } = {};
 
-  const session_id = cookies().get("session_id");
+  const cookieStore = await cookies();
+
+  const session_id = cookieStore.get("session_id");
   if (session_id && isValidSessionId(session_id.value)) {
     // check oauth query params
     const { searchParams } = req.nextUrl;
@@ -109,7 +111,7 @@ export async function POST(req: NextRequest) {
 
         // set cookies
         if (callback.session && callback.session.length > 0) {
-          cookies().set("session_id", callback.session, {
+          cookieStore.set("session_id", callback.session, {
             httpOnly: true,
             sameSite: "strict",
             secure: true,
@@ -122,7 +124,7 @@ export async function POST(req: NextRequest) {
         // auth status cookie --> convenience for UI rendering, not used for actual auth logic
         // '/session/anonymous' endpoint called by this middleware ALWAYS returns authenticated: false
         if (callback.authenticated) {
-          cookies().set("authenticated", callback.authenticated, {
+          cookieStore.set("authenticated", callback.authenticated, {
             httpOnly: false,
             sameSite: "strict",
             secure: true,
@@ -143,7 +145,7 @@ export async function POST(req: NextRequest) {
           user.birthdate = callback.birthdate;
         }
 
-        cookies().set("identity", JSON.stringify(user), {
+        cookieStore.set("identity", JSON.stringify(user), {
           httpOnly: false,
           sameSite: "strict",
           secure: true,

@@ -4,6 +4,7 @@ import styles from "./page.module.css";
 import { useSearchParams, permanentRedirect } from "next/navigation";
 import { useEffect, useState } from "react";
 import AuthError from "@/components/error-Authentication";
+import { pageError } from ".";
 
 export default function Callback() {
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -39,16 +40,24 @@ export default function Callback() {
           const fail = await response.json();
           console.log("failed to call oauth 2 redirect", fail);
           setIsLoading(false);
+          throw new Error(pageError);
         }
       } catch (error) {
         console.log(error);
+        throw new Error(pageError);
       }
     };
 
     fetchCallback();
   }, []);
   if (callbackSucceeded) {
-    window.location.href = "/";
+    const redirect = sessionStorage.getItem("redirect");
+    if (redirect) {
+      sessionStorage.removeItem("redirect");
+      window.location.href = redirect;
+    } else {
+      window.location.href = "/";
+    }
   }
 
   return (

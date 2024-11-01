@@ -1,7 +1,7 @@
 import { GatewayError, isGatewayError } from "@/app/api";
 
 const errMsg: string =
-  "An error occurred. Please try again. If the problem persists, please contact me.";
+  "Failed to retrieve CSRF token.  Please try again by either clicking 'Try Again' or refreshing the page. If the problem persists, please contact me.";
 
 export default async function GetCsrf(session: string) {
   // check for session (should never happen)

@@ -1,6 +1,6 @@
 "use client";
 
-import ErrorGeneral from "@/components/error-general";
+import ErrorForm from "@/components/error-form";
 
 export default function Error({
   error,
@@ -11,7 +11,7 @@ export default function Error({
 }) {
   return (
     <>
-      <ErrorGeneral error={error} reset={reset} />
+      <ErrorForm error={error} reset={reset} />
     </>
   );
 }

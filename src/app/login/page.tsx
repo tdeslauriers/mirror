@@ -11,7 +11,7 @@ import { OauthExchange } from "../api";
 import GetOauthExchange from "@/components/oauth-exchange";
 import { pageError } from ".";
 
-interface SearchParams {
+interface LoginParams {
   response_type?: string;
   state?: string;
   nonce?: string;
@@ -22,7 +22,7 @@ interface SearchParams {
 export default async function LoginPage({
   searchParams,
 }: {
-  searchParams: SearchParams;
+  searchParams: LoginParams;
 }) {
   // light weight cookie check if the user has authenticated cookies and redirect to "/" if true
   // quick redirect if auth'd cookies are present:
@@ -52,7 +52,9 @@ export default async function LoginPage({
 
   if (!csrf) {
     console.log("CSRF token could not be retrieved.");
-    throw new Error(pageError);
+    throw new Error(
+      "Failed to load login page: CSRF token could not be retrieved."
+    );
   }
 
   // get oauth exchange from gateway for login form
