@@ -6,9 +6,10 @@ import UserForm from "./user-form";
 
 import { Profile } from ".";
 import { handleUserEdit } from "./actions";
+import { pageError } from "../login";
+import GetCsrf from "@/components/csrf-token";
 
 export default async function ProfilePage() {
-
   // quick for redirect if auth'd cookies not present
   const cookieStore = await cookies();
   const hasAuthenticated = (await cookieStore.has("authenticated"))
@@ -23,6 +24,20 @@ export default async function ProfilePage() {
 
   if (!hasAuthenticated || !hasIdentity || hasAuthenticated.value === "false") {
     redirect("/login");
+  }
+
+  // check session cookie exists for api calls
+  if (!hasSession) {
+    console.log("Session cookie is missing");
+    throw new Error(pageError);
+  }
+
+  // get csrf token from gateway for registration form
+  const csrf = await GetCsrf(hasSession.value);
+
+  if (!csrf) {
+    console.log("CSRF token could not be retrieved.");
+    throw new Error(pageError);
   }
 
   // get profile data from gateway
@@ -65,7 +80,7 @@ export default async function ProfilePage() {
       </header>
       <main className={styles.main}>
         <div className={styles.card}>
-          <UserForm profile={profile} userEdit={handleUserEdit} />
+          <UserForm csrf={csrf} profile={profile} userEdit={handleUserEdit} />
         </div>
       </main>
     </>

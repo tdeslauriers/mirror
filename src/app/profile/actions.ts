@@ -9,10 +9,20 @@ export async function handleUserEdit(
   previousState: ProfileActionCmd,
   formData: FormData
 ) {
+  // light-weight validation of csrf token
+  // true validation happpens in the gateway
+  const csrf = previousState.csrf;
+  if (!csrf || csrf.trim().length < 16 || csrf.trim().length > 64) {
+    throw new Error(
+      "CSRF token missing or not well formed.  This value is required and cannot be tampered with."
+    );
+  }
+
   // any fields that are not allowed to be changed by user will not be submitted
   // likewise, gateway/identity will dump any fields that are not allowed to be changed
   let updated: Profile = {
-    csrf: formData.get("csrfToken") as string,
+    csrf: csrf,
+
     firstname: formData.get("firstname") as string,
     lastname: formData.get("lastname") as string,
     birth_month: parseInt(formData.get("birthMonth") as string),
@@ -23,7 +33,7 @@ export async function handleUserEdit(
   // field validation
   const errors = validateUpdateProfile(updated);
   if (errors && Object.keys(errors).length > 0) {
-    return { profile: updated, errors: errors } as ProfileActionCmd;
+    return { csrf: csrf, profile: updated, errors: errors } as ProfileActionCmd;
   }
 
   // get session token
@@ -46,19 +56,27 @@ export async function handleUserEdit(
 
     if (apiResponse.ok) {
       const success = await apiResponse.json();
-      return { profile: success, errors: errors } as ProfileActionCmd;
+      return {
+        csrf: csrf,
+        profile: success,
+        errors: errors,
+      } as ProfileActionCmd;
     } else {
       const fail = await apiResponse.json();
       if (isGatewayError(fail)) {
         const errors = handleProfileErrors(fail);
-        return { profile: updated, errors: errors } as ProfileActionCmd;
+        return {
+          csrf: csrf,
+          profile: updated,
+          errors: errors,
+        } as ProfileActionCmd;
       }
     }
   } catch (error) {
     throw new Error(ErrMsgGeneric);
   }
 
-  return { profile: updated, errors: errors } as ProfileActionCmd;
+  return { csrf: csrf, profile: updated, errors: errors } as ProfileActionCmd;
 }
 
 function handleProfileErrors(gatewayError: GatewayError) {

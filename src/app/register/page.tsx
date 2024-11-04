@@ -32,14 +32,13 @@ export default async function Registration() {
     console.log("Session cookie is missing");
     throw new Error(pageError);
   }
+
   const csrf = await GetCsrf(hasSession.value);
 
   if (!csrf) {
     console.log("CSRF token could not be retrieved.");
     throw new Error(pageError);
   }
-
-
 
   return (
     <>

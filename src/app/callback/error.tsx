@@ -1,6 +1,5 @@
 "use client";
 
-import AuthError from "@/components/error-Authentication";
 import ErrorLoadPage from "@/components/error-load-page";
 
 export default function Error({

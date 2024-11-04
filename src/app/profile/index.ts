@@ -6,7 +6,6 @@ import {
 } from "@/validation/fields";
 
 export type Profile = {
-  session?: string;
   csrf?: string;
 
   id?: string;
@@ -24,6 +23,7 @@ export type Profile = {
 };
 
 export type ProfileActionCmd = {
+  csrf?: string;
   profile: Profile | null;
   errors: { [key: string]: string[] };
 };

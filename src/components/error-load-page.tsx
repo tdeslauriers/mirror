@@ -14,7 +14,6 @@ export default function ErrorLoadPage({
       "An unknown error occurred.  Please try again. If the problem persists, please contact me.";
   }
   const handleRedirect = () => {
-    console.log("redirectUrl", redirectUrl);
     if (redirectUrl) {
       window.location.href = redirectUrl;
     } else {

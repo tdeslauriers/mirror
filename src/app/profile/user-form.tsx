@@ -8,9 +8,11 @@ import FormSubmit from "@/components/form-submit";
 import { NAME_MAX_LENGTH, NAME_MIN_LENGTH } from "@/validation/fields";
 
 export default function UserForm({
+  csrf,
   profile,
   userEdit,
 }: {
+  csrf: string;
   profile: Profile;
   userEdit: (
     prevState: ProfileActionCmd,
@@ -18,6 +20,7 @@ export default function UserForm({
   ) => ProfileActionCmd | Promise<ProfileActionCmd>;
 }) {
   const [profileState, formAction] = useActionState(userEdit, {
+    csrf: csrf,
     profile: profile,
     errors: {},
   });
@@ -25,11 +28,6 @@ export default function UserForm({
   return (
     <>
       <form className={styles.form} action={formAction}>
-        <input
-          type="hidden"
-          name="csrfToken"
-          value={profileState.profile?.csrf}
-        />
         <div className={styles.row}>
           <div className={styles.field}>
             <label className={styles.label} htmlFor="firstname">
