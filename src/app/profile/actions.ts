@@ -1,8 +1,13 @@
 "use server";
 
 import { cookies } from "next/headers";
-import { Profile, validateUpdateProfile } from ".";
-import { ProfileActionCmd as ProfileActionCmd } from "."; // Assuming ProfileAction is defined in types.ts
+import {
+  Profile,
+  ProfileActionCmd,
+  ResetData,
+  ResetPwActionCmd,
+  validateUpdateProfile,
+} from ".";
 import { ErrMsgGeneric, GatewayError, isGatewayError } from "../api";
 
 export async function handleUserEdit(
@@ -77,6 +82,82 @@ export async function handleUserEdit(
   }
 
   return { csrf: csrf, profile: updated, errors: errors } as ProfileActionCmd;
+}
+
+export async function handleReset(
+  previousState: ResetPwActionCmd,
+  formData: FormData
+) {
+  // light-weight validation of csrf token
+  // true validation happpens in the gateway
+  const csrf = previousState.csrf;
+  if (!csrf || csrf.trim().length < 16 || csrf.trim().length > 64) {
+    throw new Error(
+      "CSRF token missing or not well formed.  This value is required and cannot be tampered with."
+    );
+  }
+
+  const resetted: ResetData = {
+    csrf: csrf,
+
+    current_password: formData.get("current_password") as string,
+    new_password: formData.get("new_password") as string,
+    confirm_password: formData.get("confirm_password") as string,
+  };
+
+  // field validation
+  const errors = validateUpdateProfile(resetted);
+  if (errors && Object.keys(errors).length > 0) {
+    return { csrf: csrf, reset: resetted, errors: errors } as ResetPwActionCmd;
+  }
+
+  // get session token
+  const cookieStore = await cookies();
+  const hasSession = cookieStore.has("session_id")
+    ? cookieStore.get("session_id")
+    : null;
+
+  // call gateway reset endpoint
+  process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
+  try {
+    const apiResponse = await fetch("https://localhost:8443/reset", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `${hasSession?.value}`,
+      },
+      body: JSON.stringify(resetted),
+    });
+
+    if (apiResponse.ok) {
+      console.log("Password reset successful.");
+      return {
+        csrf: csrf,
+        reset: {},
+        errors: {},
+      } as ResetPwActionCmd;
+    } else {
+      const fail = await apiResponse.json();
+      if (isGatewayError(fail)) {
+        const errors = handleProfileErrors(fail);
+        console.log("Gateway error: ", errors);
+        return {
+          csrf: csrf,
+          reset: resetted,
+          errors: errors,
+        } as ResetPwActionCmd;
+      } else {
+        console.log(
+          "Unhandled error calling the gateway reset service: ",
+          fail
+        );
+        throw new Error(ErrMsgGeneric);
+      }
+    }
+  } catch (error) {
+    console.log("Attempt to call gateway service failed.");
+    throw new Error(ErrMsgGeneric);
+  }
 }
 
 function handleProfileErrors(gatewayError: GatewayError) {

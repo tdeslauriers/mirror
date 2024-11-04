@@ -12,12 +12,7 @@ import {
   PASSWORD_MIN_LENGTH,
 } from "@/validation/fields";
 import Link from "next/link";
-import {
-  PasswordEntries,
-  RegistrationData,
-  RegistrationActionCmd,
-  validatePasswords,
-} from ".";
+import { PasswordEntries, RegistrationActionCmd, validatePasswords } from ".";
 import FormSubmit from "@/components/form-submit";
 
 type Err = { [key: string]: string[] };
@@ -36,7 +31,7 @@ export default function RegistrationForm({
   const [showPassword, setShowPassword] = useState(false);
   const [fieldErrors, setFieldErrors] = useState<Err>({}); // client side errors
 
-  // needed to validate password fields meet requirements
+  // validate password fields meet requirements
   const handlePwChange = (
     event: ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {

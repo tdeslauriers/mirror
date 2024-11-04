@@ -2,8 +2,12 @@ import {
   allNumbersValid,
   checkBirthdate,
   checkName,
+  checkPassword,
   FieldValidation,
+  PASSWORD_MAX_LENGTH,
+  PASSWORD_MIN_LENGTH,
 } from "@/validation/fields";
+import { error } from "console";
 
 export type Profile = {
   csrf?: string;
@@ -95,6 +99,88 @@ export function validateUpdateProfile(profile: Profile) {
     if (!birthdate.isValid) {
       errors.birthdate = birthdate.messages;
     }
+  }
+
+  return errors;
+}
+
+// username will come from the access token downstream
+export type ResetData = {
+  csrf?: string;
+
+  current_password?: string;
+  new_password?: string;
+  confirm_password?: string;
+};
+
+export type ResetPwActionCmd = {
+  csrf?: string;
+  reset: ResetData | null;
+  errors: { [key: string]: string[] };
+};
+
+export function validatePasswords(reset: ResetData) {
+  const errors: { [key: string]: string[] } = {};
+
+  // check current password
+  // light-weight validation, just check for length, etc.,
+  if (!reset.current_password || reset.current_password.trim().length === 0) {
+    errors.current_passord = ["Current passord is required."];
+  }
+
+  // check length of current password
+  if (
+    reset.current_password &&
+    (reset.current_password.length < PASSWORD_MIN_LENGTH ||
+      reset.current_password.length > PASSWORD_MAX_LENGTH)
+  ) {
+    errors.current_password = [
+      `Current password must be between ${PASSWORD_MIN_LENGTH} and ${PASSWORD_MAX_LENGTH} characters.`,
+    ];
+  }
+
+  // new password => full input validation checks similar to registration
+  if (!reset.new_password || reset.new_password.trim().length === 0) {
+    errors.new_password = ["New password is required."];
+  }
+
+  if (
+    reset.new_password &&
+    (reset.new_password.trim().length < PASSWORD_MIN_LENGTH ||
+      reset.new_password.trim().length > PASSWORD_MAX_LENGTH)
+  ) {
+    errors.new_password = [
+      `New password must be between ${PASSWORD_MIN_LENGTH} and ${PASSWORD_MAX_LENGTH} characters.`,
+    ];
+  }
+
+  if (reset.new_password) {
+    const passwordCheck: FieldValidation = checkPassword(reset.new_password);
+    if (!passwordCheck.isValid) {
+      errors.password = passwordCheck.messages;
+    }
+  }
+
+  // confirm_password: check if matches password
+  if (!reset.confirm_password || reset.confirm_password.trim().length === 0) {
+    errors.confirm_password = ["Confirm password is required."];
+  }
+
+  if (
+    reset.confirm_password &&
+    (reset.confirm_password.trim().length < PASSWORD_MIN_LENGTH ||
+      reset.confirm_password.trim().length > PASSWORD_MAX_LENGTH)
+  ) {
+    errors.confirm_password = [
+      `Confirm password must be between ${PASSWORD_MIN_LENGTH} and ${PASSWORD_MAX_LENGTH} characters.`,
+    ];
+  }
+
+  if (reset.new_password !== reset.confirm_password) {
+    console.log("New password and confirmation password do not match.");
+    errors.confirm_password = [
+      "New password and confirmation password do not match.",
+    ];
   }
 
   return errors;

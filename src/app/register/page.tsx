@@ -7,6 +7,8 @@ import GetCsrf from "@/components/csrf-token";
 import { pageError, RegistrationData } from ".";
 import { handleRegistration } from "./actions";
 import { Suspense } from "react";
+import ResetForm from "../profile/reset-form";
+import { handleReset } from "../profile/actions";
 
 export default async function Registration() {
   // quick redirect if auth'd cookies are present:

@@ -5,9 +5,10 @@ import { redirect } from "next/navigation";
 import UserForm from "./user-form";
 
 import { Profile } from ".";
-import { handleUserEdit } from "./actions";
+import { handleReset, handleUserEdit } from "./actions";
 import { pageError } from "../login";
 import GetCsrf from "@/components/csrf-token";
+import ResetForm from "./reset-form";
 
 export default async function ProfilePage() {
   // quick for redirect if auth'd cookies not present
@@ -81,6 +82,10 @@ export default async function ProfilePage() {
       <main className={styles.main}>
         <div className={styles.card}>
           <UserForm csrf={csrf} profile={profile} userEdit={handleUserEdit} />
+        </div>
+        <br />
+        <div className={styles.card}>
+          <ResetForm csrf={csrf} handleReset={handleReset} />
         </div>
       </main>
     </>

@@ -79,6 +79,22 @@ span.info {
   width: 100%;
 }
 
+.showpassword {
+  transform: scale(2);
+  margin-bottom: 0.75rem;
+  margin-left: 0.5rem;
+}
+
+.showpassword:focus {
+  transition: 0.3s;
+  outline-style: solid;
+  outline-color: var(--primary-site-color);
+  box-shadow: 0 0 40px var(--primary-site-color);
+  animation: glow-input 3s ease-in-out infinite alternate;
+  transform: scale(2) translateZ(0); /* trigger GPU acceleration */
+  will-change: transform; /* inform the browser that this element will be animated */
+}
+
 .form label {
   display: block;
   margin-bottom: 0.5rem;
@@ -89,7 +105,8 @@ span.info {
   font-weight: bold;
 }
 
-.form input {
+.form input[type="text"],
+.form input[type="password"] {
   display: block;
   width: 100%;
   padding: 0.5rem 1rem;
@@ -100,11 +117,13 @@ span.info {
   font-family: "Montserrat", sans-serif;
 }
 
-.form input:focus {
+.form input:focus[type="text"],
+.form input:focus[type="password"] {
   transition: 0.3s;
   outline-style: solid;
   outline-color: var(--primary-site-color);
   background-color: rgb(9, 9, 9);
+  box-shadow: 0 0 40px var(--primary-site-color);
   animation: glow-input 3s ease-in-out infinite alternate;
   transform: translateZ(0); /* trigger GPU acceleration */
   will-change: transform; /* inform the browser that this element will be animated */
@@ -143,9 +162,6 @@ span.info {
 .birthdate:not(:last-child) {
   margin-right: 1rem;
 }
-
-
-
 
 .center {
   display: flex;
