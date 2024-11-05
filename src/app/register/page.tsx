@@ -4,11 +4,9 @@ import styles from "./page.module.css";
 import RegistrationForm from "./registration-form";
 import { redirect } from "next/navigation";
 import GetCsrf from "@/components/csrf-token";
-import { pageError, RegistrationData } from ".";
+import { pageError } from ".";
 import { handleRegistration } from "./actions";
 import { Suspense } from "react";
-import ResetForm from "../profile/reset-form";
-import { handleReset } from "../profile/actions";
 
 export default async function Registration() {
   // quick redirect if auth'd cookies are present:

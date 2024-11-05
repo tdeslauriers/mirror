@@ -80,10 +80,12 @@ export default async function ProfilePage() {
         {createdAt.length > 0 && <p>Registered since {regDate}</p>}
       </header>
       <main className={styles.main}>
+        <h2>Identity</h2>
         <div className={styles.card}>
           <UserForm csrf={csrf} profile={profile} userEdit={handleUserEdit} />
         </div>
         <br />
+        <h2>Reset Password</h2>
         <div className={styles.card}>
           <ResetForm csrf={csrf} handleReset={handleReset} />
         </div>

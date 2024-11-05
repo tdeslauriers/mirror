@@ -6,6 +6,7 @@ import {
   ProfileActionCmd,
   ResetData,
   ResetPwActionCmd,
+  validatePasswords,
   validateUpdateProfile,
 } from ".";
 import { ErrMsgGeneric, GatewayError, isGatewayError } from "../api";
@@ -97,7 +98,7 @@ export async function handleReset(
     );
   }
 
-  const resetted: ResetData = {
+  const resetCmd: ResetData = {
     csrf: csrf,
 
     current_password: formData.get("current_password") as string,
@@ -106,9 +107,9 @@ export async function handleReset(
   };
 
   // field validation
-  const errors = validateUpdateProfile(resetted);
+  const errors = validatePasswords(resetCmd);
   if (errors && Object.keys(errors).length > 0) {
-    return { csrf: csrf, reset: resetted, errors: errors } as ResetPwActionCmd;
+    return { csrf: csrf, reset: resetCmd, errors: errors } as ResetPwActionCmd;
   }
 
   // get session token
@@ -126,14 +127,14 @@ export async function handleReset(
         "Content-Type": "application/json",
         Authorization: `${hasSession?.value}`,
       },
-      body: JSON.stringify(resetted),
+      body: JSON.stringify(resetCmd),
     });
 
     if (apiResponse.ok) {
       console.log("Password reset successful.");
       return {
         csrf: csrf,
-        reset: {},
+        reset: {}, // cannot return password values, obviously
         errors: {},
       } as ResetPwActionCmd;
     } else {
@@ -143,7 +144,7 @@ export async function handleReset(
         console.log("Gateway error: ", errors);
         return {
           csrf: csrf,
-          reset: resetted,
+          reset: resetCmd,
           errors: errors,
         } as ResetPwActionCmd;
       } else {

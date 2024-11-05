@@ -47,7 +47,6 @@ export default function ResetForm({
   // needed to validate password fields meet requirements
   // because regexes are too complex for html pattern attribute
   const handleOnBlur = () => {
-    console.log("PASSWORD", passwords);
     let errors = validatePwClientForm(passwords);
     setFieldErrors(errors);
   };

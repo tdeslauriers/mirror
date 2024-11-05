@@ -132,7 +132,10 @@ export default function UserForm({
           </div>
         </div>
         <div className={styles.row}>
-          <FormSubmit buttonLabel="update" pendingLabel="updating record..." />
+          <FormSubmit
+            buttonLabel="update user data"
+            pendingLabel="updating user record..."
+          />
         </div>
       </form>
     </>
