@@ -60,6 +60,9 @@ export default function ResetForm({
   return (
     <>
       <form className={styles.form} action={formAction}>
+        {resetState.errors.server && (
+          <ErrorField errorMsgs={resetState.errors.server} />
+        )}
         <div className={styles.row}>
           <div className={styles.field}>
             <label className={styles.label} htmlFor="current_password">

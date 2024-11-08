@@ -155,11 +155,15 @@ export async function handleReset(
         throw new Error(ErrMsgGeneric);
       }
     }
-  } catch (error) {
-    console.log("Attempt to call gateway service failed.");
-    throw new Error(ErrMsgGeneric);
+  } catch (error: any) {
+    console.log("Attempt to call gateway service failed.", error);
+    throw new Error(error.message || ErrMsgGeneric);
   }
 }
+
+const ErrPasswordUsedPreviously = "password has been used previously";
+const ErrNewConfirmPwMismatch =
+  "new password and confirmation password do not match";
 
 function handleProfileErrors(gatewayError: GatewayError) {
   const errors: { [key: string]: string[] } = {};
@@ -171,7 +175,7 @@ function handleProfileErrors(gatewayError: GatewayError) {
     case 401:
     case 403:
     case 404:
-      throw new Error(gatewayError.message);
+      errors.server = [gatewayError.message];
     case 405:
       errors.badrequest = [gatewayError.message];
       return errors;
@@ -186,6 +190,12 @@ function handleProfileErrors(gatewayError: GatewayError) {
           return errors;
         case gatewayError.message.includes("birthdate"):
           errors.birthdate = [gatewayError.message];
+          return errors;
+        case gatewayError.message.includes(ErrPasswordUsedPreviously):
+          errors.new_password = [gatewayError.message];
+          return errors;
+        case gatewayError.message.includes(ErrNewConfirmPwMismatch):
+          errors.confirm_password = [gatewayError.message];
           return errors;
         default:
           break;

@@ -1,5 +1,5 @@
 // api json objects
-export type OauthExchange  = {
+export type OauthExchange = {
   response_type?: string | null;
   nonce?: string | null;
   state?: string | null;

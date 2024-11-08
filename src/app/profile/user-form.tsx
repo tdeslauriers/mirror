@@ -28,6 +28,9 @@ export default function UserForm({
   return (
     <>
       <form className={styles.form} action={formAction}>
+        {profileState.errors.server && (
+          <ErrorField errorMsgs={profileState.errors.server} />
+        )}
         <div className={styles.row}>
           <div className={styles.field}>
             <label className={styles.label} htmlFor="firstname">
