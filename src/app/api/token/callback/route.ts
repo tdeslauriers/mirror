@@ -147,6 +147,7 @@ export async function POST(req: NextRequest) {
           fullname: callback.fullname,
           given_name: callback.given_name,
           family_name: callback.family_name,
+          ux_render: callback.ux_render,
         };
 
         if (callback.birthdate) {

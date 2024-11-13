@@ -49,8 +49,8 @@ export default function Callback() {
     };
 
     fetchCallback();
-  }, []);
-  
+  });
+
   if (callbackSucceeded) {
     const redirect = sessionStorage.getItem("redirect");
     if (redirect) {
@@ -65,7 +65,6 @@ export default function Callback() {
     <>
       <div className={styles.header}>
         {isLoading && <h1>Placeholder for Loading...</h1>}
-
       </div>
     </>
   );

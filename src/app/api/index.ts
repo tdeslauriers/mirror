@@ -1,3 +1,4 @@
+import { useRouter } from "next/navigation";
 // api json objects
 export type OauthExchange = {
   response_type?: string | null;
@@ -46,6 +47,7 @@ export type CallbackResponse = {
   given_name: string;
   family_name: string;
   birthdate?: string;
+  ux_render?: UxRender;
 };
 
 export type CallbackUrl = {
@@ -58,6 +60,38 @@ export type IdentityCookie = {
   given_name: string | null;
   family_name: string | null;
   birthdate?: string;
+  ux_render?: UxRender;
+};
+
+export type UxRender = {
+  profile_read?: boolean;
+  profile_write?: boolean;
+
+  user_list?: boolean;
+  user_read?: boolean;
+  user_write?: boolean;
+  user_delete?: boolean;
+
+  blog_read?: boolean;
+  blog_write?: boolean;
+
+  task_list?: boolean;
+  task_read?: boolean;
+  task_write?: boolean;
+  task_delete?: boolean;
+  payroll_list?: boolean;
+  payroll_read?: boolean;
+  payroll_write?: boolean;
+  payroll_delete?: boolean;
+
+  gallery_read?: boolean;
+  gallery_write?: boolean;
+
+  judo_read?: boolean;
+  judo_write?: boolean;
+
+  familytree_read?: boolean;
+  familytree_write?: boolean;
 };
 
 // type checked before usage
