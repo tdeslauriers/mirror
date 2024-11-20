@@ -25,6 +25,10 @@ export default function UserForm({
     errors: {},
   });
 
+  const age: number | null = profileState.profile?.birth_year
+    ? getAge(profileState.profile.birth_year)
+    : null;
+
   return (
     <>
       <form className={styles.form} action={formAction}>
@@ -75,6 +79,15 @@ export default function UserForm({
             />
           </div>
         </div>
+
+        {age && (
+          <>
+            <h2 style={{ paddingBottom: "0.5rem", paddingTop: "0.5rem" }}>
+              Age: <span className={styles.highlight}>{age}</span>
+            </h2>
+          </>
+        )}
+
         <div className={styles.row}>
           <div className={styles.date}>
             <label
@@ -143,4 +156,9 @@ export default function UserForm({
       </form>
     </>
   );
+}
+
+function getAge(birthyear: number): number {
+  const currentYear = new Date().getFullYear();
+  return currentYear - birthyear;
 }

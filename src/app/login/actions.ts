@@ -109,6 +109,7 @@ export async function handleLogin(
       if (success.session) {
         delete success.session;
       }
+
       // build callback url
       callback = `/callback?client_id=${success.client_id}&response_type=${
         success.response_type
@@ -218,3 +219,5 @@ function handleLoginErrors(gatewayError: GatewayError) {
       throw new Error(ErrLoginSumbit);
   }
 }
+
+

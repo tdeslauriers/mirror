@@ -5,6 +5,7 @@ import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import AuthError from "@/components/error-Authentication";
 import { pageError } from ".";
+import { State } from "../api";
 
 export default function Callback() {
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -52,10 +53,15 @@ export default function Callback() {
   });
 
   if (callbackSucceeded) {
-    const redirect = sessionStorage.getItem("redirect");
-    if (redirect) {
-      sessionStorage.removeItem("redirect");
-      window.location.href = redirect;
+    if (state && state.length >= 36 && state.length <= 256) {
+      const oauthState: State = JSON.parse(atob(state));
+      if (
+        oauthState.nav_endpoint &&
+        oauthState.nav_endpoint.length > 0 &&
+        oauthState.nav_endpoint.length <= 256
+      ) {
+        window.location.href = oauthState.nav_endpoint;
+      }
     } else {
       window.location.href = "/";
     }

@@ -30,7 +30,7 @@ export async function POST(req: NextRequest) {
       response_type.trim().length > 10
     ) {
       console.log(
-        "response type url query param missing,too short, or too long."
+        "'response type' url query param missing,too short, or too long."
       );
       errors.oauth.push(
         "'response_type' callback url query param missing,too short, or too long."
@@ -38,9 +38,9 @@ export async function POST(req: NextRequest) {
     }
 
     const state = searchParams.get("state");
-    if (!state || !checkUuid(state).isValid) {
+    if (!state || state.trim().length <= 0 || state.trim().length > 256) {
       console.log(
-        "state callback url query param either missing or not well formed."
+        "'state' callback url query param either missing or not well formed."
       );
       errors.oauth.push(
         "'state' callback url query param either missing or not well formed."
@@ -49,7 +49,7 @@ export async function POST(req: NextRequest) {
     const nonce = searchParams.get("nonce");
     if (!nonce || !checkUuid(nonce).isValid) {
       console.log(
-        "nonce callback url query param either missing or not well formed."
+        "'nonce' callback url query param either missing or not well formed."
       );
       errors.oauth.push(
         "'nonce' callback url query param either missing or not well formed."
@@ -59,7 +59,7 @@ export async function POST(req: NextRequest) {
     const client_id = searchParams.get("client_id");
     if (!client_id || !checkUuid(client_id).isValid) {
       console.log(
-        "client_id url query param either missing or not well formed."
+        "'client_id' url query param either missing or not well formed."
       );
       errors.oauth.push(
         "Client_id url query param either missing or not well formed."
@@ -70,7 +70,7 @@ export async function POST(req: NextRequest) {
     const redirectUrl = searchParams.get("redirect_url");
     if (!redirectUrl || redirectUrl.trim().length < 11) {
       console.log(
-        "redirect_url callback url query param missing or too short for a valid url."
+        "'redirect_url' callback url query param missing or too short for a valid url."
       );
       errors.oauth.push(
         "redirect_url' callback query param missing or too short for a valid url."
@@ -82,7 +82,7 @@ export async function POST(req: NextRequest) {
 
     if (!auth_code || !checkUuid(auth_code).isValid) {
       console.log(
-        "auth_code callback url query param either missing or not well formed."
+        "'auth_code' callback url query param either missing or not well formed."
       );
       errors.oauth.push(
         "'auth_code' callback url query param either missing or not well formed."

@@ -108,10 +108,9 @@ export function validateOauth(oauth: OauthExchange) {
   if (
     !oauth.state ||
     oauth.state.trim().length <= 0 ||
-    oauth.state.trim().length > 36 ||
-    !checkUuid(oauth.state).isValid
+    oauth.state.trim().length > 256
   ) {
-    console.log("state url query param either missing or not well formed uuid");
+    console.log("state url query param either missing or not well formed");
     throw new Error(ErrLoginSumbit);
   }
 

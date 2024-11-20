@@ -9,6 +9,7 @@ import { handleReset, handleUserEdit } from "./actions";
 import { pageError } from "../login";
 import GetCsrf from "@/components/csrf-token";
 import ResetForm from "./reset-form";
+import GetOauthExchange from "@/components/oauth-exchange";
 
 export default async function ProfilePage() {
   // quick for redirect if auth'd cookies not present
@@ -24,7 +25,14 @@ export default async function ProfilePage() {
     : null;
 
   if (!hasAuthenticated || !hasIdentity || hasAuthenticated.value === "false") {
-    redirect("/login");
+    const oauth = await GetOauthExchange(hasSession?.value, "/profile");
+    if (oauth) {
+      redirect(
+        `/login?client_id=${oauth.client_id}&response_type=${oauth.response_type}&state=${oauth.state}&nonce=${oauth.nonce}&redirect_url=${oauth.redirect_url}`
+      );
+    } else {
+      redirect("/login");
+    }
   }
 
   // check session cookie exists for api calls
@@ -50,7 +58,14 @@ export default async function ProfilePage() {
 
   if (!response.ok) {
     if (response.status === 401 || response.status === 403) {
-      redirect("/login");
+      const oauth = await GetOauthExchange(hasSession?.value, "/profile");
+      if (oauth) {
+        redirect(
+          `/login?client_id=${oauth.client_id}&response_type=${oauth.response_type}&state=${oauth.state}&nonce=${oauth.nonce}&redirect_url=${oauth.redirect_url}`
+        );
+      } else {
+        redirect("/login");
+      }
     } else {
       const fail = await response.json();
       throw new Error(fail.message);

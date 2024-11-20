@@ -4,15 +4,33 @@ import {
   isValidSessionId,
   OauthExchange,
 } from "@/app/api";
+import { cookies } from "next/headers";
 
 const errMsg: string =
   "An error occurred setting up the oauth 2 variables for the login page. Please try again. If the problem persists, please contact me.";
 
-export default async function GetOauthExchange(session: string) {
-  // check for session (should never happen)
+export default async function GetOauthExchange(
+  session?: string,
+  endpoint?: string
+) {
+  // check for session and try to retrieve if not present
   if (!session || session.length <= 0) {
-    console.log("No session token provided to get oauth fucntion.");
-    throw new Error("Session token required to get csrf token.");
+    const cookieStore = await cookies();
+    const hasSession = cookieStore.has("session_id")
+      ? cookieStore.get("session_id")
+      : null;
+    if (hasSession) {
+      session = hasSession.value;
+    } else {
+      console.log("No session token provided to get oauth fucntion.");
+      throw new Error("Session token required to get csrf token.");
+    }
+  }
+
+  // check for endpoint: if not provided, use default
+  // note: endpoint is not user provided.  Should be provided by the applicable server-side page => "trusted"
+  if (!endpoint || endpoint.length <= 0) {
+    endpoint = "/";
   }
 
   if (isValidSessionId(session)) {
@@ -24,7 +42,10 @@ export default async function GetOauthExchange(session: string) {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ session_token: session }),
+        body: JSON.stringify({
+          session_token: session,
+          nav_endpoint: endpoint,
+        }),
       });
 
       if (apiResponse.ok) {

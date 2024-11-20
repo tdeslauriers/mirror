@@ -9,6 +9,11 @@ export type OauthExchange = {
   created_at?: string | null;
 };
 
+export type State = {
+  state_csrf?: string | null;
+  nav_endpoint?: string | null;
+};
+
 export type Registration = {
   username: string | null;
   password: string | null;
@@ -64,25 +69,21 @@ export type IdentityCookie = {
 };
 
 export type UxRender = {
+  // users
   profile_read?: boolean;
-  profile_write?: boolean;
-
-  user_list?: boolean;
   user_read?: boolean;
   user_write?: boolean;
-  user_delete?: boolean;
+  scope_read?: boolean;
+  scope_write?: boolean;
 
   blog_read?: boolean;
   blog_write?: boolean;
 
-  task_list?: boolean;
+  // allowance
   task_read?: boolean;
   task_write?: boolean;
-  task_delete?: boolean;
-  payroll_list?: boolean;
   payroll_read?: boolean;
   payroll_write?: boolean;
-  payroll_delete?: boolean;
 
   gallery_read?: boolean;
   gallery_write?: boolean;
