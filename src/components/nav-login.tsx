@@ -5,13 +5,11 @@ import { logout } from "@/actions/logout";
 
 export default async function NavLogin() {
   const cookieStore = await cookies();
-  const hasAuthenticated = cookieStore.has("authenticated")
-    ? cookieStore.get("authenticated")
-    : null;
+  const hasIdentity = cookieStore.has("identity");
 
   return (
     <>
-      {hasAuthenticated && hasAuthenticated.value === "true" ? (
+      {hasIdentity ? (
         <>
           <div className={style.right}>
             <div className={style.nav}>

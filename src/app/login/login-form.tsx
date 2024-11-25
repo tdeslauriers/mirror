@@ -1,6 +1,5 @@
 "use client";
 
-import styles from "./page.module.css";
 import { useActionState, useEffect, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import {
@@ -65,7 +64,7 @@ export default function LoginForm({
 
   return (
     <>
-      <form className={styles.form} action={formAction}>
+      <form className={`form`} action={formAction}>
         {loginState.errors.server && (
           <ErrorField errorMsgs={loginState.errors.server} />
         )}
@@ -97,16 +96,16 @@ export default function LoginForm({
           <ErrorField errorMsgs={loginState.errors.callback} />
         )}
 
-        <div className={styles.row}>
-          <div className={styles.field}>
-            <label className={styles.label} htmlFor="username">
+        <div className={"row"}>
+          <div className={`field`}>
+            <label className={`label`} htmlFor="username">
               email
             </label>
             {loginState.errors.username && (
               <ErrorField errorMsgs={loginState.errors.username} />
             )}
             <input
-              className={styles.form}
+              className={`form`}
               type="text"
               name="username"
               title={`Email must be between ${EMAIL_MIN_LENGTH} and ${EMAIL_MAX_LENGTH} characters long.`}
@@ -118,16 +117,16 @@ export default function LoginForm({
             />
           </div>
         </div>
-        <div className={styles.row}>
-          <div className={styles.field}>
-            <label className={styles.label} htmlFor="password">
+        <div className={`row`}>
+          <div className={`field`}>
+            <label className={`label`} htmlFor="password">
               Password
             </label>
             {loginState.errors.password && (
               <ErrorField errorMsgs={loginState.errors.password} />
             )}
             <input
-              className={styles.form}
+              className={`form`}
               type={showPassword ? "text" : "password"}
               name="password"
               title={`Password must be between ${PASSWORD_MIN_LENGTH} and ${PASSWORD_MAX_LENGTH} characters long.`}
@@ -139,22 +138,22 @@ export default function LoginForm({
             />
           </div>
         </div>
-        <div className={styles.row}>
-          <div className={styles.field}>
+        <div className={`row`}>
+          <div className={`field`}>
             <input
-              className={styles.showpassword}
+              className={`showpassword`}
               type="checkbox"
               checked={showPassword}
               name="show"
               onChange={toggleShowPassword}
             />
-            <label className={styles.label} htmlFor="password">
+            <label className={`label`} htmlFor="password">
               Show Password
             </label>
           </div>
         </div>
 
-        <div className={styles.row}>
+        <div className={`row`}>
           <FormSubmit buttonLabel="login" pendingLabel="logging in..." />
         </div>
       </form>

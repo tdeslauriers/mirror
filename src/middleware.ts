@@ -33,15 +33,6 @@ export default async function middleware(request: NextRequest) {
           maxAge: 60 * 60,
         });
 
-        // auth status cookie --> convenience for UI rendering, not used for actual auth logic
-        // '/session/anonymous' endpoint called by this middleware ALWAYS returns authenticated: false
-        response.cookies.set("authenticated", success.authenticated, {
-          httpOnly: false,
-          sameSite: "strict",
-          secure: true,
-          maxAge: 60 * 60,
-        });
-
         return response;
       } else {
         const fail = await apiResponse.json();

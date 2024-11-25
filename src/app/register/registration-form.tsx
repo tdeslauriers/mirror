@@ -1,7 +1,6 @@
 "use client";
 
 import { ChangeEvent, useActionState, useState } from "react";
-import styles from "./page.module.css";
 import ErrorField from "@/components/error-field";
 import {
   EMAIL_MAX_LENGTH,
@@ -64,7 +63,7 @@ export default function RegistrationForm({
   return (
     <>
       {!registrationState.complete && (
-        <form className={styles.form} action={formAction}>
+        <form className={`form`} action={formAction}>
           {registrationState.errors.server && (
             <ErrorField errorMsgs={fieldErrors.server} />
           )}
@@ -76,16 +75,16 @@ export default function RegistrationForm({
             name="csrfToken"
             value={registrationState.registration?.csrf}
           />
-          <div className={styles.row}>
-            <div className={styles.field}>
-              <label className={styles.label} htmlFor="username">
+          <div className={`row`}>
+            <div className={`field`}>
+              <label className={`label`} htmlFor="username">
                 email
               </label>
               {registrationState.errors.username && (
                 <ErrorField errorMsgs={registrationState.errors.username} />
               )}
               <input
-                className={styles.form}
+                className={`form`}
                 type="text"
                 name="username"
                 title="Must be a valid email address"
@@ -98,9 +97,9 @@ export default function RegistrationForm({
               />
             </div>
           </div>
-          <div className={styles.row}>
-            <div className={styles.field}>
-              <label className={styles.label} htmlFor="password">
+          <div className={`row`}>
+            <div className={`field`}>
+              <label className={`label`} htmlFor="password">
                 Password
               </label>
               {fieldErrors.password && (
@@ -110,7 +109,7 @@ export default function RegistrationForm({
                 <ErrorField errorMsgs={registrationState.errors.password} />
               )}
               <input
-                className={styles.form}
+                className={`form`}
                 type={showPassword ? "text" : "password"}
                 name="password"
                 title={`Password must be between ${PASSWORD_MIN_LENGTH} and ${PASSWORD_MAX_LENGTH} characters long.`}
@@ -124,9 +123,9 @@ export default function RegistrationForm({
               />
             </div>
           </div>
-          <div className={styles.row}>
-            <div className={styles.field}>
-              <label className={styles.label} htmlFor="confirm_password">
+          <div className={`row`}>
+            <div className={`field`}>
+              <label className={`label`} htmlFor="confirm_password">
                 Confirm Password
               </label>
               {fieldErrors.confirm_password && (
@@ -138,7 +137,7 @@ export default function RegistrationForm({
                 />
               )}
               <input
-                className={styles.form}
+                className={`form`}
                 type={showPassword ? "text" : "password"}
                 name="confirm_password"
                 title="Passwords must match"
@@ -152,16 +151,16 @@ export default function RegistrationForm({
               />
             </div>
           </div>
-          <div className={styles.row}>
-            <div className={styles.field}>
+          <div className={`row`}>
+            <div className={`field`}>
               <input
-                className={styles.showpassword}
+                className={`showpassword`}
                 type="checkbox"
                 checked={showPassword}
                 name="show"
                 onChange={toggleShowPassword}
               />
-              <label className={styles.label} htmlFor="password">
+              <label className={`label`} htmlFor="password">
                 Show Password
               </label>
             </div>
@@ -169,16 +168,16 @@ export default function RegistrationForm({
 
           <br />
 
-          <div className={styles.row}>
-            <div className={styles.field}>
-              <label className={styles.label} htmlFor="firstname">
+          <div className={`row`}>
+            <div className={`field`}>
+              <label className={`label`} htmlFor="firstname">
                 Firstname
               </label>
               {registrationState.errors.firstname && (
                 <ErrorField errorMsgs={registrationState.errors.firstname} />
               )}
               <input
-                className={styles.form}
+                className={`form`}
                 name="firstname"
                 type="text"
                 title="Only letters, hyphens, apostrophes, underscores, and spaces allowed"
@@ -191,16 +190,16 @@ export default function RegistrationForm({
               />
             </div>
           </div>
-          <div className={styles.row}>
-            <div className={styles.field}>
-              <label className={styles.label} htmlFor="lastname">
+          <div className={`row`}>
+            <div className={`field`}>
+              <label className={`label`} htmlFor="lastname">
                 Lastname
               </label>
               {registrationState.errors.lastname && (
                 <ErrorField errorMsgs={registrationState.errors.lastname} />
               )}
               <input
-                className={styles.form}
+                className={`form`}
                 name="lastname"
                 type="text"
                 title="Only letters, hyphens, apostrophes, underscores, and spaces allowed"
@@ -213,17 +212,17 @@ export default function RegistrationForm({
               />
             </div>
           </div>
-          <div className={styles.row}>
-            <div className={styles.date}>
+          <div className={`row`}>
+            <div className={`date`}>
               <label
-                className={styles.label}
+                className={`label`}
                 htmlFor="birthdate"
                 title="only required for allowance app"
               >
                 Birth date{" "}
                 <sup>
                   <span
-                    className={styles.highlight}
+                    className={`highlight`}
                     style={{ textTransform: "lowercase" }}
                   >
                     optional
@@ -234,9 +233,9 @@ export default function RegistrationForm({
                 <ErrorField errorMsgs={registrationState.errors.birthdate} />
               )}
 
-              <div className={styles.daterow}>
+              <div className={`daterow`}>
                 <input
-                  className={styles.birthdate}
+                  className={`birthdate`}
                   name="birthMonth"
                   title="Enter a month number between 1 and 12"
                   type="number"
@@ -247,7 +246,7 @@ export default function RegistrationForm({
                 />
 
                 <input
-                  className={styles.birthdate}
+                  className={`birthdate`}
                   name="birthDay"
                   title="Enter a day number between 1 and 31"
                   type="number"
@@ -258,7 +257,7 @@ export default function RegistrationForm({
                 />
 
                 <input
-                  className={styles.birthdate}
+                  className={`birthdate`}
                   name="birthYear"
                   title={`Enter a year number between ${
                     new Date().getFullYear() - 120
@@ -273,7 +272,7 @@ export default function RegistrationForm({
             </div>
           </div>
 
-          <div className={styles.row}>
+          <div className={`row`}>
             <FormSubmit buttonLabel="register" pendingLabel="registering..." />
           </div>
         </form>
@@ -281,27 +280,27 @@ export default function RegistrationForm({
 
       {registrationState.complete && (
         <>
-          <div className={styles.card}>
+          <div className={`card`}>
             <h2>
-              <span className={styles.highlight}>Registration successful!</span>
+              <span className={`highlight`}>Registration successful!</span>
             </h2>
             <p>
               Thanks for signing up,{" "}
-              <span className={styles.highlight}>
+              <span className={`highlight`}>
                 {registrationState.registration?.firstname}
               </span>
               . Proceed to the{" "}
-              <Link className={styles.locallink} href="/login">
+              <Link className={`locallink`} href="/login">
                 login
               </Link>{" "}
               page, use{" "}
-              <span className={styles.highlight}>
+              <span className={`highlight`}>
                 {registrationState.registration?.username}
               </span>{" "}
               as your username, and enter your password.
             </p>
             <h3>
-              <span className={styles.highlight}>Note:</span>
+              <span className={`highlight`}>Note:</span>
             </h3>
             <ul>
               <li>

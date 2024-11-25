@@ -1,6 +1,5 @@
 "use client";
 
-import styles from "./page.module.css";
 import { useActionState } from "react";
 import { Profile, ProfileActionCmd } from ".";
 import ErrorField from "@/components/error-field";
@@ -31,20 +30,20 @@ export default function UserForm({
 
   return (
     <>
-      <form className={styles.form} action={formAction}>
+      <form className={`form`} action={formAction}>
         {profileState.errors.server && (
           <ErrorField errorMsgs={profileState.errors.server} />
         )}
-        <div className={styles.row}>
-          <div className={styles.field}>
-            <label className={styles.label} htmlFor="firstname">
+        <div className={`row`}>
+          <div className={`field`}>
+            <label className={`label`} htmlFor="firstname">
               Firstname
             </label>
             {profileState.errors.firstname && (
               <ErrorField errorMsgs={profileState.errors.firstname} />
             )}
             <input
-              className={styles.form}
+              className={`form`}
               name="firstname"
               type="text"
               title="Only letters, hyphens, apostrophes, underscores, and spaces allowed"
@@ -57,16 +56,16 @@ export default function UserForm({
             />
           </div>
         </div>
-        <div className={styles.row}>
-          <div className={styles.field}>
-            <label className={styles.label} htmlFor="lastname">
+        <div className={`row`}>
+          <div className={`field`}>
+            <label className={`label`} htmlFor="lastname">
               Lastname
             </label>
             {profileState.errors.lastname && (
               <ErrorField errorMsgs={profileState.errors.lastname} />
             )}
             <input
-              className={styles.form}
+              className={`form`}
               name="lastname"
               type="text"
               title="Only letters, hyphens, apostrophes, underscores, and spaces allowed"
@@ -82,23 +81,23 @@ export default function UserForm({
 
         {age && (
           <>
-            <h2 style={{ paddingBottom: "0.5rem", paddingTop: "0.5rem" }}>
-              Age: <span className={styles.highlight}>{age}</span>
+            <h2 style={{ paddingBottom: "0.5rem", paddingTop: "rem" }}>
+              Age: <span className={`highlight`}>{age}</span>
             </h2>
           </>
         )}
 
-        <div className={styles.row}>
-          <div className={styles.date}>
+        <div className={`row`}>
+          <div className={`date`}>
             <label
-              className={styles.label}
+              className={`label`}
               htmlFor="birthdate"
               title="only required for allowance app"
             >
               Birth date{" "}
               <sup>
                 <span
-                  className={styles.highlight}
+                  className={`highlight`}
                   style={{ textTransform: "lowercase" }}
                 >
                   optional
@@ -109,9 +108,9 @@ export default function UserForm({
               <ErrorField errorMsgs={profileState.errors.birthdate} />
             )}
 
-            <div className={styles.daterow}>
+            <div className={`daterow`}>
               <input
-                className={styles.birthdate}
+                className={`birthdate`}
                 name="birthMonth"
                 title="Enter a month number between 1 and 12"
                 type="number"
@@ -122,7 +121,7 @@ export default function UserForm({
               />
 
               <input
-                className={styles.birthdate}
+                className={`birthdate`}
                 name="birthDay"
                 title="Enter a day number between 1 and 31"
                 type="number"
@@ -133,7 +132,7 @@ export default function UserForm({
               />
 
               <input
-                className={styles.birthdate}
+                className={`birthdate`}
                 name="birthYear"
                 title={`Enter a year number between ${
                   new Date().getFullYear() - 120
@@ -147,7 +146,7 @@ export default function UserForm({
             </div>
           </div>
         </div>
-        <div className={styles.row}>
+        <div className={`row`}>
           <FormSubmit
             buttonLabel="update user data"
             pendingLabel="updating user record..."

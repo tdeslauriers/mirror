@@ -14,9 +14,6 @@ import GetOauthExchange from "@/components/oauth-exchange";
 export default async function ProfilePage() {
   // quick for redirect if auth'd cookies not present
   const cookieStore = await cookies();
-  const hasAuthenticated = (await cookieStore.has("authenticated"))
-    ? cookieStore.get("authenticated")
-    : null;
   const hasIdentity = cookieStore.has("identity")
     ? cookieStore.get("identity")
     : null;
@@ -24,7 +21,7 @@ export default async function ProfilePage() {
     ? cookieStore.get("session_id")
     : null;
 
-  if (!hasAuthenticated || !hasIdentity || hasAuthenticated.value === "false") {
+  if (!hasIdentity) {
     const oauth = await GetOauthExchange(hasSession?.value, "/profile");
     if (oauth) {
       redirect(
@@ -85,23 +82,28 @@ export default async function ProfilePage() {
 
   return (
     <>
-      <header className={styles.header}>
-        <h1>
-          <>
-            Username:{" "}
-            <span className={styles.highlight}>{profile?.username}</span>
-          </>
-        </h1>
-        {createdAt.length > 0 && <p>Registered since {regDate}</p>}
-      </header>
-      <main className={styles.main}>
+      <main className={`main`}>
+        <div className={`center`}>
+          <h1>
+            Username: <span className={`highlight`}>{profile?.username}</span>
+          </h1>
+
+          {createdAt.length > 0 && (
+            <p style={{ marginTop: ".5rem", fontStyle: "italic" }}>
+              Registered since {regDate}
+            </p>
+          )}
+        </div>
+
         <h2>Identity</h2>
-        <div className={styles.card}>
+        <div className={`card`}>
           <UserForm csrf={csrf} profile={profile} userEdit={handleUserEdit} />
         </div>
+
         <br />
+
         <h2>Reset Password</h2>
-        <div className={styles.card}>
+        <div className={`card`}>
           <ResetForm csrf={csrf} handleReset={handleReset} />
         </div>
       </main>

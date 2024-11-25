@@ -1,17 +1,14 @@
-import styles from "./welcome.module.css";
 import { cookies } from "next/headers";
 
 export default async function Welcome() {
   const cookieStore = await cookies();
-  const hasAuthenticated = cookieStore.has("authenticated")
-    ? cookieStore.get("authenticated")
-    : null;
+
   const hasIdenity = cookieStore.has("identity")
     ? cookieStore.get("identity")
     : null;
 
   let bannerName: string = "";
-  if (hasAuthenticated && hasAuthenticated.value === "true" && hasIdenity) {
+  if (hasIdenity) {
     const user = JSON.parse(hasIdenity.value);
     if (user) {
       if (user.given_name) {
@@ -28,7 +25,7 @@ export default async function Welcome() {
     <>
       <h2>
         Welcome to{" "}
-        <span className={styles.highlight}>
+        <span className={`highlight`}>
           <strong>des Lauriers</strong>
         </span>
         {bannerName.length > 0 ? ` world, ${bannerName}!` : " world!"}

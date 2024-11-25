@@ -12,14 +12,12 @@ export default async function Registration() {
   // quick redirect if auth'd cookies are present:
   // only unauthenticated users should be able to register
   const cookieStore = await cookies();
-  const hasAuthenticated = (await cookieStore.has("authenticated"))
-    ? cookieStore.get("authenticated")
-    : null;
+
   const hasIdentity = cookieStore.has("identity")
     ? cookieStore.get("identity")
     : null;
 
-  if (hasAuthenticated?.value === "true" || hasIdentity) {
+  if (hasIdentity) {
     console.log("User has authenticated cookies. Redirecting to home.");
     redirect("/");
   }
@@ -42,17 +40,19 @@ export default async function Registration() {
 
   return (
     <>
-      <header className={styles.header}>
-        <h1>
-          <span className={styles.highlight}>Sign up</span> for an account.
-        </h1>
-      </header>
-      <main className={styles.main}>
+      <main className={`main`}>
+        <div className={`center`}>
+          <h1>
+            <span className={`highlight`}>Sign up</span> for an account.
+          </h1>
+        </div>
         <Suspense fallback={<div>Loading...</div>}>
-          <RegistrationForm
-            csrf={csrf}
-            handleRegistration={handleRegistration}
-          />
+          <div className={`card`}>
+            <RegistrationForm
+              csrf={csrf}
+              handleRegistration={handleRegistration}
+            />
+          </div>
         </Suspense>
       </main>
     </>

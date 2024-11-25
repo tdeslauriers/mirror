@@ -1,9 +1,7 @@
 "use client";
 
-import styles from "./page.module.css";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
-import AuthError from "@/components/error-Authentication";
 import { pageError } from ".";
 import { State } from "../api";
 
@@ -69,7 +67,7 @@ export default function Callback() {
 
   return (
     <>
-      <div className={styles.header}>
+      <div className={`center`}>
         {isLoading && <h1>Placeholder for Loading...</h1>}
       </div>
     </>

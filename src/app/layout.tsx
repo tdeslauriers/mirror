@@ -2,7 +2,9 @@ export const dyanmic = "force dynamic";
 
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
-import "./globals.css";
+import "./styles/globals.css";
+import "./styles/page.css";
+import "./styles/form.css";
 import MainHeader from "@/components/nav-main-header";
 import { cookies } from "next/headers";
 
@@ -19,8 +21,8 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   const cookieStore = await cookies();
-  const hasAuthenticated = cookieStore.has("authenticated")
-    ? cookieStore.get("authenticated")
+  const hasIdentity = cookieStore.has("identity")
+    ? cookieStore.get("identity")
     : null;
 
   return (

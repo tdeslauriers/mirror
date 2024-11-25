@@ -117,7 +117,7 @@ export async function POST(req: NextRequest) {
         // handle redirect to home or restricted url content
         const callback: CallbackResponse = await apiResponse.json();
 
-        // set cookies
+        // set session cookies
         if (callback.session && callback.session.length > 0) {
           cookieStore.set("session_id", callback.session, {
             httpOnly: true,
@@ -129,19 +129,7 @@ export async function POST(req: NextRequest) {
           console.log("failed to upgrade session cookie");
         }
 
-        // auth status cookie --> convenience for UI rendering, not used for actual auth logic
-        // '/session/anonymous' endpoint called by this middleware ALWAYS returns authenticated: false
-        if (callback.authenticated) {
-          cookieStore.set("authenticated", callback.authenticated, {
-            httpOnly: false,
-            sameSite: "strict",
-            secure: true,
-            maxAge: 60 * 60,
-          });
-        } else {
-          console.log("failed to set authentication cookie");
-        }
-
+        // set identity cookie
         const user: IdentityCookie = {
           username: callback.username,
           fullname: callback.fullname,

@@ -1,18 +1,22 @@
 .main {
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  justify-content: left;
   align-items: center;
   padding: 2rem 6rem;
   min-height: 100vh;
+  width: 75vw;
+  margin: auto;
 }
 
 .center {
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
   position: relative;
   padding: 2rem 0;
+  width: 75vw;
 }
 
 .center::before {
@@ -40,28 +44,13 @@
   transform: translateZ(0);
 }
 
-span.highlightError {
-  background: var(--highlight-error);
+span.highlight {
+  background: var(--highlight-text);
   background-clip: text;
   -webkit-background-clip: text;
   color: transparent;
   -webkit-text-fill-color: transparent;
-}
-
-.error {
-
-  font-size: 0.9rem;
-  margin-bottom: 0.5rem;
-  display: block;
-  width: 100%;
-  padding: 0.5rem 1rem;
-  border-radius: 4px;
-    border-color: var(--highlight-error);
-  font-size: 1.25rem;
-  font-family: "Montserrat", sans-serif;
-  animation: glow-error 2s ease-in-out infinite alternate;
-  transform: translateZ(0); /* trigger GPU acceleration */
-  will-change: transform; /* inform the browser that this element will be animated */
+  font-weight: bold;
 }
 
 .locallink {
@@ -99,17 +88,3 @@ span.highlightError {
     transform: rotate(0deg);
   }
 }
-
-
-@keyframes glow-error {
-    0% {
-      box-shadow: 0 0 5px var(--error-site-color), 0 0 5px var(--error-site-color),
-        0 0 15px var(--error-site-color), 0 0 20px var(--error-site-color);
-    }
-    100% {
-      box-shadow: 0 0 10px var(--error-site-color),
-        0 0 20px var(--error-site-color), 0 0 30px var(--error-site-color),
-        0 0 40px var(--error-site-color);
-    }
-  }
-  

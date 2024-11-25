@@ -1,13 +1,10 @@
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 import { Suspense } from "react";
-import styles from "./page.module.css";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
-
 import GetCsrf from "@/components/csrf-token";
 import LoginForm from "./login-form";
 import { OauthExchange } from "../api";
-
 import GetOauthExchange from "@/components/oauth-exchange";
 import { pageError } from ".";
 
@@ -28,14 +25,12 @@ export default async function LoginPage({
   // quick redirect if auth'd cookies are present:
   // only unauthenticated users should be able to register
   const cookieStore = await cookies();
-  const hasAuthenticated = (await cookieStore.has("authenticated"))
-    ? cookieStore.get("authenticated")
-    : null;
+
   const hasIdentity = cookieStore.has("identity")
     ? cookieStore.get("identity")
     : null;
 
-  if (hasAuthenticated?.value === "true" || hasIdentity) {
+  if (hasIdentity) {
     console.log("User has authenticated cookies. Redirecting to home.");
     redirect("/");
   }
@@ -79,15 +74,17 @@ export default async function LoginPage({
 
   return (
     <>
-      <header className={styles.header}>
-        <h1>
-          <span className={styles.highlight}>Login</span> to view restricted
-          content.
-        </h1>
-      </header>
-      <main className={styles.header}>
+      <main className={`main`}>
+        <div className={`center`}>
+          <h1>
+            <span className={`highlight`}>Login</span> to view restricted
+            content.
+          </h1>
+        </div>
         <Suspense fallback={<div>Loading...</div>}>
-          <LoginForm csrf={csrf} oauth={oauth} />
+          <div className={`card`}>
+            <LoginForm csrf={csrf} oauth={oauth} />
+          </div>
         </Suspense>
       </main>
     </>

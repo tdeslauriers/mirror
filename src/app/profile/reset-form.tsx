@@ -59,13 +59,13 @@ export default function ResetForm({
 
   return (
     <>
-      <form className={styles.form} action={formAction}>
+      <form className={`form`} action={formAction}>
         {resetState.errors.server && (
           <ErrorField errorMsgs={resetState.errors.server} />
         )}
-        <div className={styles.row}>
-          <div className={styles.field}>
-            <label className={styles.label} htmlFor="current_password">
+        <div className={`row`}>
+          <div className={`field`}>
+            <label className={`label`} htmlFor="current_password">
               Current Password
             </label>
             {fieldErrors.current_password && (
@@ -75,7 +75,7 @@ export default function ResetForm({
               <ErrorField errorMsgs={resetState.errors.current_password} />
             )}
             <input
-              className={styles.form}
+              className={`form`}
               type={showPassword ? "text" : "password"}
               name="current_password"
               title={`Password must be between ${PASSWORD_MIN_LENGTH} and ${PASSWORD_MAX_LENGTH} characters long.`}
@@ -89,8 +89,8 @@ export default function ResetForm({
             />
           </div>
         </div>
-        <div className={styles.row}>
-          <div className={styles.field}>
+        <div className={`row`}>
+          <div className={`field`}>
             <label className={styles.label} htmlFor="new_password">
               New Password
             </label>
@@ -101,7 +101,7 @@ export default function ResetForm({
               <ErrorField errorMsgs={resetState.errors.new_password} />
             )}
             <input
-              className={styles.form}
+              className={`form`}
               type={showPassword ? "text" : "password"}
               name="new_password"
               title={`Password must be between ${PASSWORD_MIN_LENGTH} and ${PASSWORD_MAX_LENGTH} characters long.`}
@@ -115,9 +115,9 @@ export default function ResetForm({
             />
           </div>
         </div>
-        <div className={styles.row}>
-          <div className={styles.field}>
-            <label className={styles.label} htmlFor="confirm_password">
+        <div className={`row`}>
+          <div className={`field`}>
+            <label className={`label`} htmlFor="confirm_password">
               Confirm Password
             </label>
             {fieldErrors.confirm_password && (
@@ -127,7 +127,7 @@ export default function ResetForm({
               <ErrorField errorMsgs={resetState.errors.confirm_password} />
             )}
             <input
-              className={styles.form}
+              className={`form`}
               type={showPassword ? "text" : "password"}
               name="confirm_password"
               title="Passwords must match"
@@ -141,22 +141,22 @@ export default function ResetForm({
             />
           </div>
         </div>
-        <div className={styles.row}>
-          <div className={styles.field}>
+        <div className={`row`}>
+          <div className={`field`}>
             <input
-              className={styles.showpassword}
+              className={`showpassword`}
               type="checkbox"
               checked={showPassword}
               name="show"
               onChange={toggleShowPassword}
             />
-            <label className={styles.label} htmlFor="password">
+            <label className={`label`} htmlFor="password">
               Show Password
             </label>
           </div>
         </div>
 
-        <div className={styles.row}>
+        <div className={`row`}>
           <FormSubmit
             buttonLabel="update password"
             pendingLabel="updating password..."
