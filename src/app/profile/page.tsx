@@ -1,6 +1,5 @@
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 import { cookies } from "next/headers";
-import styles from "./page.module.css";
 import { redirect } from "next/navigation";
 import UserForm from "./user-form";
 
@@ -47,11 +46,14 @@ export default async function ProfilePage() {
   }
 
   // get profile data from gateway
-  const response = await fetch("https://localhost:8443/profile", {
-    headers: {
-      Authorization: `${hasSession?.value}`,
-    },
-  });
+  const response = await fetch(
+    `${process.env.GATEWAY_SERVICE_URL}:${process.env.GATEWAY_SERVICE_PORT}/profile`,
+    {
+      headers: {
+        Authorization: `${hasSession?.value}`,
+      },
+    }
+  );
 
   if (!response.ok) {
     if (response.status === 401 || response.status === 403) {
@@ -82,7 +84,7 @@ export default async function ProfilePage() {
 
   return (
     <>
-      <main className={`main`}>
+      <main className={`main main-drawer`}>
         <div className={`center`}>
           <h1>
             Username: <span className={`highlight`}>{profile?.username}</span>

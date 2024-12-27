@@ -1,0 +1,42 @@
+# Node modules (to avoid re-copying; should be installed in the container)
+node_modules
+
+# Local build output
+.next
+
+# Logs and temporary files
+npm-debug.log
+yarn-debug.log
+yarn-error.log
+pnpm-debug.log
+*.log
+
+# Environment files (for security; pass env vars via Docker or orchestration tools)
+.env
+.env.local
+.env.development
+.env.test
+.env.production
+
+# System files
+.DS_Store
+Thumbs.db
+
+# Git and version control
+.git
+.gitignore
+
+# Editor configuration and settings
+.vscode
+.idea
+
+# Local testing files
+coverage
+test-results
+
+# scripts folder
+sh/
+
+# Exclude any other temporary or unnecessary files
+*.swp
+*.swo

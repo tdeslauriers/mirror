@@ -51,14 +51,17 @@ export async function handleUserEdit(
   // call gateway profile endpoint
   process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
   try {
-    const apiResponse = await fetch("https://localhost:8443/profile", {
-      method: "PUT",
-      headers: {
-        Content_Type: "application/json",
-        Authorization: `${hasSession?.value}`,
-      },
-      body: JSON.stringify(updated),
-    });
+    const apiResponse = await fetch(
+      `${process.env.GATEWAY_SERVICE_URL}:${process.env.GATEWAY_SERVICE_PORT}/profile`,
+      {
+        method: "PUT",
+        headers: {
+          Content_Type: "application/json",
+          Authorization: `${hasSession?.value}`,
+        },
+        body: JSON.stringify(updated),
+      }
+    );
 
     if (apiResponse.ok) {
       const success = await apiResponse.json();
@@ -121,14 +124,17 @@ export async function handleReset(
   // call gateway reset endpoint
   process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
   try {
-    const apiResponse = await fetch("https://localhost:8443/reset", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `${hasSession?.value}`,
-      },
-      body: JSON.stringify(resetCmd),
-    });
+    const apiResponse = await fetch(
+      `${process.env.GATEWAY_SERVICE_URL}:${process.env.GATEWAY_SERVICE_PORT}/reset`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `${hasSession?.value}`,
+        },
+        body: JSON.stringify(resetCmd),
+      }
+    );
 
     if (apiResponse.ok) {
       console.log("Password reset successful.");

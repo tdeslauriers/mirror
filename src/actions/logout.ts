@@ -2,7 +2,7 @@
 
 import { LogoutCmd } from "./index";
 import { RequestCookie } from "next/dist/compiled/@edge-runtime/cookies";
-import { permanentRedirect } from "next/navigation";
+import { permanentRedirect, redirect } from "next/navigation";
 import { cookies } from "next/headers";
 import { GatewayError, isGatewayError } from "@/app/api";
 
@@ -22,26 +22,22 @@ export async function logout() {
 
       // send session to gateway to remove
       process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
-      const apiResponse = await fetch("https://localhost:8443/logout", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(cmd),
-      });
+      const apiResponse = await fetch(
+        `${process.env.GATEWAY_SERVICE_URL}:${process.env.GATEWAY_SERVICE_PORT}/logout`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(cmd),
+        }
+      );
 
       if (apiResponse.ok) {
-        console.log("Session destroyed");
         // remove cookies: set values to blank and age to the past to prompt browser to delete it
         // on reload, client will request new anonymous session
         cookieStore.set("session_id", "", {
           httpOnly: true,
-          sameSite: "strict",
-          secure: true,
-          maxAge: 0,
-        });
-        cookieStore.set("authenticated", "", {
-          httpOnly: false,
           sameSite: "strict",
           secure: true,
           maxAge: 0,
@@ -73,9 +69,9 @@ export async function logout() {
     }
 
     // redirect to login page
-    permanentRedirect("/login");
+    redirect("/login");
   } else {
-    permanentRedirect("/login");
+    redirect("/login");
   }
 }
 

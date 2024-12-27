@@ -5,11 +5,12 @@
     "Roboto Mono", "Oxygen Mono", "Ubuntu Monospace", "Source Code Pro",
     "Fira Mono", "Droid Sans Mono", "Courier New", monospace;
 
-    
-
   --foreground-rgb: 0, 0, 0;
   --background-start-rgb: 214, 219, 220;
   --background-end-rgb: 255, 255, 255;
+
+  --primary-border-color: rgb(76, 79, 76);
+  --primary-border-fade: rgb(23, 24, 23);
 
   --primary-site-color: rgb(21, 255, 0);
   --primary-site-fade: rgb(144, 250, 144);
@@ -80,11 +81,20 @@
   --card-border-rgb: 131, 134, 135;
 }
 
+/* * {
+  border: 1px solid red;
+} */
+
 @media (prefers-color-scheme: dark) {
   :root {
     --foreground-rgb: 255, 255, 255;
     --background-start-rgb: 0, 0, 0;
     --background-end-rgb: 44, 43, 43;
+
+    --drawer-width: 15vw;
+
+    --primary-border-color: rgb(76, 79, 76);
+    --primary-border-fade: rgb(23, 24, 23);
 
     --primary-site-color: rgb(21, 255, 0);
     --primary-site-fade: rgb(144, 250, 144);
@@ -154,6 +164,19 @@ body {
 a {
   color: inherit;
   text-decoration: none;
+}
+
+span.highlight {
+  background: var(--highlight-text);
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+  font-weight: bold;
+}
+
+footer {
+  margin-left: 2%;
 }
 
 @media (prefers-color-scheme: dark) {

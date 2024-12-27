@@ -29,7 +29,15 @@ export default async function RootLayout({
     <html lang="en">
       <body className={inter.className}>
         <MainHeader />
+
         {children}
+
+        <footer>
+          <div style={{ fontStyle: "italic" }}>
+            Designed, deployed, and administered by{" "}
+            <span className={"highlight"}>Tom des Lauriers</span>.
+          </div>
+        </footer>
       </body>
     </html>
   );

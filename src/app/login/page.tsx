@@ -19,7 +19,7 @@ interface LoginParams {
 export default async function LoginPage({
   searchParams,
 }: {
-  searchParams: LoginParams;
+  searchParams: LoginParams | any;
 }) {
   // light weight cookie check if the user has authenticated cookies and redirect to "/" if true
   // quick redirect if auth'd cookies are present:
@@ -52,12 +52,13 @@ export default async function LoginPage({
     );
   }
 
-  // get oauth exchange from gateway for login form
-  const response_type = (await searchParams).response_type;
-  const state = (await searchParams).state;
-  const nonce = (await searchParams).nonce;
-  const client_id = (await searchParams).client_id;
-  const redirect_url = (await searchParams).redirect_url;
+  // get oauth exchange params from gateway for login form
+  const resolvedParams = await Promise.resolve(searchParams);
+  const response_type = resolvedParams.response_type;
+  const state = resolvedParams.state;
+  const nonce = resolvedParams.nonce;
+  const client_id = resolvedParams.client_id;
+  const redirect_url = resolvedParams.redirect_url;
 
   let oauth: OauthExchange = {};
   if (!response_type || !state || !nonce || !client_id || !redirect_url) {

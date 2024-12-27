@@ -14,7 +14,7 @@ export async function GET(req: NextRequest) {
     process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
     try {
       const apiResponse = await fetch(
-        `https://localhost:8443/session/csrf/${sessionCookie.value}`,
+        `${process.env.GATEWAY_SERVICE_URL}:${process.env.GATEWAY_SERVICE_PORT}/session/csrf/${sessionCookie.value}`,
         {
           method: "GET",
           headers: {

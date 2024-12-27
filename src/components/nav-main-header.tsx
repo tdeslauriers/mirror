@@ -43,7 +43,7 @@ export default async function NavMainHeader() {
 
         <NavLogin />
 
-        {hasIdentity && <NavDrawer />}
+        <NavDrawer />
       </header>
     </>
   );

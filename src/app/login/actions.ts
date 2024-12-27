@@ -94,13 +94,16 @@ export async function handleLogin(
   // call gateway registration endpoint
   process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
   try {
-    const apiResponse = await fetch("https://localhost:8443/login", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(loginCmd),
-    });
+    const apiResponse = await fetch(
+      `${process.env.GATEWAY_SERVICE_URL}:${process.env.GATEWAY_SERVICE_PORT}/login`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(loginCmd),
+      }
+    );
 
     if (apiResponse.ok) {
       const success: CallbackCmd = await apiResponse.json();
@@ -219,5 +222,3 @@ function handleLoginErrors(gatewayError: GatewayError) {
       throw new Error(ErrLoginSumbit);
   }
 }
-
-

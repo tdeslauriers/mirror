@@ -37,16 +37,19 @@ export default async function GetOauthExchange(
     // call gateway oauth state + nonce endpoint
     process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
     try {
-      const apiResponse = await fetch("https://localhost:8443/oauth/state", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          session_token: session,
-          nav_endpoint: endpoint,
-        }),
-      });
+      const apiResponse = await fetch(
+        `${process.env.GATEWAY_SERVICE_URL}:${process.env.GATEWAY_SERVICE_PORT}/oauth/state`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            session_token: session,
+            nav_endpoint: endpoint,
+          }),
+        }
+      );
 
       if (apiResponse.ok) {
         const success: OauthExchange = await apiResponse.json();

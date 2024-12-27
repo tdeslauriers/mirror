@@ -13,7 +13,7 @@ export default async function GetCsrf(session: string) {
   if (isValidSessionId(session)) {
     try {
       const apiResponse = await fetch(
-        `https://localhost:8443/session/csrf/${session}`,
+        `${process.env.GATEWAY_SERVICE_URL}:${process.env.GATEWAY_SERVICE_PORT}/session/csrf/${session}`,
         {
           method: "GET",
           headers: {

@@ -1,12 +1,36 @@
-import Link from "next/link";
+"use client";
+
 import style from "./nav-login.module.css";
-import { cookies } from "next/headers";
+import Link from "next/link";
 import { logout } from "@/actions/logout";
+import { useEffect, useState } from "react";
 
-export default async function NavLogin() {
-  const cookieStore = await cookies();
-  const hasIdentity = cookieStore.has("identity");
+export default function NavLogin() {
+  const [hasIdentity, setHasIdentity] = useState<boolean>(false);
 
+  useEffect(() => {
+    function getCookie(name: string): string | null {
+      if (typeof document === "undefined") {
+        // If document is not available, return null or handle as needed
+        return null;
+      }
+
+      const value = `; ${document.cookie}`;
+      const parts = value.split(`; ${name}=`);
+      if (parts.length === 2) {
+        return parts.pop()?.split(";").shift() || null;
+      }
+      return null;
+    }
+
+    const identity = getCookie("identity");
+    if (identity) {
+      setHasIdentity(true);
+    } else {
+      setHasIdentity(false);
+    }
+  }, []);
+  
   return (
     <>
       {hasIdentity ? (

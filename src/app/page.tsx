@@ -11,39 +11,39 @@ export default async function Home() {
 
   return (
     <>
-      <main className={`main`}>
+      <main className={`main ${hasIdentity ? "main-drawer" : null}`}>
         <div>
           <Welcome />
           <div className={`center`}>
-            <p>
-              Freatures our photo gallery, some art work, and I am adding to it
-              all the time! The site itself is a hobby project, sort of. To find
-              out more, check out the{" "}
-              <Link className={"locallink"} href={"/about"}>
-                about
-              </Link>{" "}
-              page.
-              {hasIdentity ? null : (
-                <>
-                  <br />
-                  <br />
-                  For most content, you will need to{" "}
-                  <Link className={"locallink"} href={"/register"}>
-                    create an account
-                  </Link>
-                  . If you already have one,{" "}
-                  <Link className={"locallink"} href={"/login"}>
-                    login
-                  </Link>
-                  !
-                </>
-              )}
-            </p>
+            <div className={`content`}>
+              <p>
+                This site is my personal passion project, featuring a growing
+                photo gallery and some of my artwork. It is in continuous flux
+                because I&apos;m always adding new content, improving the
+                services, and refining the user experience. To learn more about
+                the site&apos;s development, check out the{" "}
+                <Link className={"locallink"} href={"/about"}>
+                  about
+                </Link>{" "}
+                page.
+                {hasIdentity ? null : (
+                  <>
+                    <br />
+                    <br />
+                    For most content, you will need to{" "}
+                    <Link className={"locallink"} href={"/register"}>
+                      create an account
+                    </Link>
+                    . If you already have account,{" "}
+                    <Link className={"locallink"} href={"/login"}>
+                      login
+                    </Link>
+                    !
+                  </>
+                )}
+              </p>
+            </div>
           </div>
-          <p style={{ fontStyle: "italic" }}>
-            Designed, deployed, and administered by{" "}
-            <span className={"highlight"}>Tom des Lauriers</span>.
-          </p>
         </div>
       </main>
     </>

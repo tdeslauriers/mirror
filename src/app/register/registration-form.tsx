@@ -280,7 +280,7 @@ export default function RegistrationForm({
 
       {registrationState.complete && (
         <>
-          <div className={`card`}>
+          <div >
             <h2>
               <span className={`highlight`}>Registration successful!</span>
             </h2>

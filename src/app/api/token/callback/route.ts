@@ -17,9 +17,11 @@ export async function POST(req: NextRequest) {
   const errors: { [key: string]: string[] } = {};
 
   const cookieStore = await cookies();
+  const hasSession = cookieStore.has("session_id")
+    ? cookieStore.get("session_id")
+    : null;
 
-  const session_id = cookieStore.get("session_id");
-  if (session_id && isValidSessionId(session_id.value)) {
+  if (hasSession && isValidSessionId(hasSession.value)) {
     // check oauth query params
     const { searchParams } = req.nextUrl;
 
@@ -93,7 +95,7 @@ export async function POST(req: NextRequest) {
     // TODO: build error page to receive and display errors in redirect flow
 
     const cmd: CallbackCmd = {
-      session: session_id.value,
+      session: hasSession.value,
 
       auth_code,
       response_type,
@@ -106,13 +108,16 @@ export async function POST(req: NextRequest) {
     // post to gateway callback endpoint
     process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
     try {
-      const apiResponse = await fetch("https://localhost:8443/oauth/callback", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(cmd),
-      });
+      const apiResponse = await fetch(
+        `${process.env.GATEWAY_SERVICE_URL}:${process.env.GATEWAY_SERVICE_PORT}/oauth/callback`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(cmd),
+        }
+      );
       if (apiResponse.ok) {
         // handle redirect to home or restricted url content
         const callback: CallbackResponse = await apiResponse.json();
@@ -187,7 +192,6 @@ export async function POST(req: NextRequest) {
       );
     }
   } else {
-    // TODO: handle missing session_id cookie
     console.log("session_id cookie is missing or not well formed.");
     errors.server = [ErrMsgGeneric];
   }

@@ -1,12 +1,20 @@
 .drawer {
-  width: 250px; /* Width of the drawer */
-
+  width: var(--drawer-width); /* Width of the drawer */
   padding: 1rem;
   position: fixed;
-  
-  color: #fff;
   left: 0;
-  top: calc(var(--header-height) + 0.1rem); /* Height of the header */
+  top: var(--header-height); /* Height of the header */
   bottom: 0;
-  box-shadow: 1px 0 55px rgba(13, 14, 13, 0.5);
+
+  border-right: 1px solid var(--primary-border-color);
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    var(--primary-border-color),
+    transparent
+  );
+  mask-image: linear-gradient(
+    to bottom,
+    var(--primary-border-color),
+    transparent
+  );
 }
