@@ -3,6 +3,7 @@ import Callback from "./callback";
 
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
+import Loading from "@/components/loading";
 
 export default async function CallbackPage() {
   // quick redirect if auth'd cookies are present:
@@ -18,7 +19,7 @@ export default async function CallbackPage() {
   return (
     <>
       <main className={`main`}>
-        <Suspense fallback={<div>Loading...</div>}>
+        <Suspense fallback={<Loading />}>
           <Callback />
         </Suspense>
       </main>

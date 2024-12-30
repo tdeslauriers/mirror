@@ -4,6 +4,7 @@ import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { pageError } from ".";
 import { State } from "../api";
+import Loading from "@/components/loading";
 
 export default function Callback() {
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -68,7 +69,7 @@ export default function Callback() {
   return (
     <>
       <div className={`center`}>
-        {isLoading && <h1>Placeholder for Loading...</h1>}
+        {isLoading && <Loading />}
       </div>
     </>
   );

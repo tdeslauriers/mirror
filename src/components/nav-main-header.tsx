@@ -1,6 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
-import logo from "@/assets/logo512.png";
+import logo from "@/assets/logo_world_2.png";
 import style from "./nav-main-header.module.css";
 import NavLogin from "./nav-login";
 import { cookies } from "next/headers";

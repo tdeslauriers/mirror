@@ -49,7 +49,6 @@ const useOuathExchange = () => {
       !clientIdParam ||
       !redirectUrlParam
     ) {
-      
       fetchOauthExchange()
         .then((exchange) => {
           if (

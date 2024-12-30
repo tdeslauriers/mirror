@@ -1,0 +1,27 @@
+.loading {
+  height: 20vmin;
+  width: 20vmin;
+  pointer-events: none;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.banner {
+  padding-left: 2rem;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .loading {
+    animation: loading-spin infinite 10s linear;
+  }
+}
+
+@keyframes loading-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
