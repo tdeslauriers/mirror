@@ -1,4 +1,5 @@
 import { cookies } from "next/headers";
+import Link from "next/link";
 
 export default async function Welcome() {
   const cookieStore = await cookies();
@@ -28,7 +29,18 @@ export default async function Welcome() {
         <span className={`highlight`}>
           <strong>des Lauriers</strong>
         </span>
-        {bannerName.length > 0 ? ` world, ${bannerName}!` : " world!"}
+        {bannerName.length > 0 ? (
+          <>
+            {" "}
+            world,{" "}
+            <Link className={`locallink`} href={`/profile`}>
+              {bannerName}
+            </Link>
+            !
+          </>
+        ) : (
+          " world!"
+        )}
       </h2>
     </>
   );

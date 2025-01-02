@@ -87,7 +87,7 @@ export async function handleRegistration(
   }
 
   // call gateway registration endpoint
-  process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
+  // process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
   try {
     const apiResponse = await fetch(
       `${process.env.GATEWAY_SERVICE_URL}:${process.env.GATEWAY_SERVICE_PORT}/register`,

@@ -35,7 +35,7 @@ export default async function GetOauthExchange(
 
   if (isValidSessionId(session)) {
     // call gateway oauth state + nonce endpoint
-    process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
+    // process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
     try {
       const apiResponse = await fetch(
         `${process.env.GATEWAY_SERVICE_URL}:${process.env.GATEWAY_SERVICE_PORT}/oauth/state`,

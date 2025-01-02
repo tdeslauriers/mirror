@@ -1,4 +1,5 @@
 import { GatewayError, isGatewayError } from "@/app/api";
+// import fetch from "../setupFetch";
 
 const errMsg: string =
   "Failed to retrieve CSRF token.  Please try again by either clicking 'Try Again' or refreshing the page. If the problem persists, please contact me.";
@@ -34,9 +35,9 @@ export default async function GetCsrf(session: string) {
           throw new Error(errMsg);
         }
       }
-    } catch (error) {
-      console.log("Error fetching csrf token");
-      throw new Error(errMsg);
+    } catch (error: any) {
+      console.log(error);
+      throw new Error(error);
     }
   } else {
     throw new Error("Invalid session token.");

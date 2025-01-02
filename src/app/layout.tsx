@@ -1,8 +1,10 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
+
 import "./styles/globals.css";
 import "./styles/page.css";
 import "./styles/form.css";
+
 import MainHeader from "@/components/nav-main-header";
 import { cookies } from "next/headers";
 
@@ -27,9 +29,7 @@ export default async function RootLayout({
     <html lang="en">
       <body className={inter.className}>
         <MainHeader />
-
         {children}
-
         <footer>
           <div style={{ fontStyle: "italic" }}>
             Designed, deployed, and administered by{" "}

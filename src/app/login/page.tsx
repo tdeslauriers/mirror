@@ -1,4 +1,4 @@
-process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
+// process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 import { Suspense } from "react";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
@@ -7,6 +7,7 @@ import LoginForm from "./login-form";
 import { OauthExchange } from "../api";
 import GetOauthExchange from "@/components/oauth-exchange";
 import { pageError } from ".";
+import Loading from "@/components/loading";
 
 interface LoginParams {
   response_type?: string;
@@ -82,7 +83,7 @@ export default async function LoginPage({
             content.
           </h1>
         </div>
-        <Suspense fallback={<div>Loading...</div>}>
+        <Suspense fallback={<Loading />}>
           <div className={`card`}>
             <LoginForm csrf={csrf} oauth={oauth} />
           </div>

@@ -11,7 +11,7 @@ export async function GET(req: NextRequest) {
 
   // call gateway csrf endpoint
   if (sessionCookie && isValidSessionId(sessionCookie.value)) {
-    process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
+    // process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
     try {
       const apiResponse = await fetch(
         `${process.env.GATEWAY_SERVICE_URL}:${process.env.GATEWAY_SERVICE_PORT}/session/csrf/${sessionCookie.value}`,

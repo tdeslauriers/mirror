@@ -1,4 +1,4 @@
-process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
+// process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 import Link from "next/link";
 import { cookies } from "next/headers";
 import Welcome from "@/components/welcome";

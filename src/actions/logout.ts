@@ -21,7 +21,7 @@ export async function logout() {
       };
 
       // send session to gateway to remove
-      process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
+      // process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
       const apiResponse = await fetch(
         `${process.env.GATEWAY_SERVICE_URL}:${process.env.GATEWAY_SERVICE_PORT}/logout`,
         {

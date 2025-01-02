@@ -49,7 +49,7 @@ export async function handleUserEdit(
     : null;
 
   // call gateway profile endpoint
-  process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
+  // process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
   try {
     const apiResponse = await fetch(
       `${process.env.GATEWAY_SERVICE_URL}:${process.env.GATEWAY_SERVICE_PORT}/profile`,
@@ -122,7 +122,7 @@ export async function handleReset(
     : null;
 
   // call gateway reset endpoint
-  process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
+  // process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
   try {
     const apiResponse = await fetch(
       `${process.env.GATEWAY_SERVICE_URL}:${process.env.GATEWAY_SERVICE_PORT}/reset`,

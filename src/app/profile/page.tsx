@@ -1,4 +1,4 @@
-process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
+// process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import UserForm from "./user-form";
@@ -9,6 +9,8 @@ import { pageError } from "../login";
 import GetCsrf from "@/components/csrf-token";
 import ResetForm from "./reset-form";
 import GetOauthExchange from "@/components/oauth-exchange";
+import { Suspense } from "react";
+import Loading from "@/components/loading";
 
 export default async function ProfilePage() {
   // quick for redirect if auth'd cookies not present
@@ -99,14 +101,18 @@ export default async function ProfilePage() {
 
         <h2>Identity</h2>
         <div className={`card`}>
-          <UserForm csrf={csrf} profile={profile} userEdit={handleUserEdit} />
+          <Suspense fallback={<Loading />}>
+            <UserForm csrf={csrf} profile={profile} userEdit={handleUserEdit} />
+          </Suspense>
         </div>
 
         <br />
 
         <h2>Reset Password</h2>
         <div className={`card`}>
-          <ResetForm csrf={csrf} handleReset={handleReset} />
+          <Suspense fallback={<Loading />}>
+            <ResetForm csrf={csrf} handleReset={handleReset} />
+          </Suspense>
         </div>
       </main>
     </>
