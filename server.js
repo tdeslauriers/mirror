@@ -23,12 +23,25 @@ const httpsOptions = {
   cert: process.env.MIRROR_SERVER_CERT,
 };
 
+// validate url is set
+if (!process.env.MIRROR_SITE_URL) {
+  throw new Error("MIRROR_SITE_URL not set.");
+}
+
+// validate that ports are set
+if (!process.env.MIRROR_SITE_PORT_TLS) {
+  throw new Error("MIRROR_SITE_PORT_TLS not set.");
+}
+
+if (!process.env.MIRROR_SITE_PORT) {
+  throw new Error("MIRROR_SITE_PORT not set.");
+}
+
 // ports
-const httpsPort = 3443;
-const httpPort = 3000;
+const httpsPort = process.env.MIRROR_SITE_PORT_TLS;
+const httpPort = process.env.MIRROR_SITE_PORT;
 
 app.prepare().then(() => {
-  console.log("App is prepared");
   // HTTP server --> redirect all traffic to HTTPS
   createHttpServer((req, res) => {
     const host = req.headers.host || "";
@@ -48,7 +61,7 @@ app.prepare().then(() => {
   }).listen(httpsPort, (err) => {
     if (err) throw err;
     console.log(
-      `> Ready on https://deslauriers.world:${httpsPort} (${
+      `> Ready on ${process.env.MIRROR_SITE_URL}:${httpsPort} (${
         dev ? "Development" : "Production"
       })`
     );
