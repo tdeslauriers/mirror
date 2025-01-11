@@ -1,0 +1,65 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mirror
+  namespace: world
+  labels:
+    app: mirror
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: mirror
+  template:
+    metadata:
+      labels:
+        app: mirror
+    spec:
+      containers:
+        - name: mirror
+          image: tdeslauriers/mirror:latest
+          ports:
+            - containerPort: 3000
+          env:
+            - name: MIRROR_SITE_CLIENT_ID
+              valueFrom:
+                configMapKeyRef:
+                  name: cm-ux-service
+                  key: ux-client-id
+            - name: MIRROR_SITE_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: cm-ux-service
+                  key: ux-url
+            - name: MIRROR_SITE_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: cm-ux-service
+                  key: ux-port
+            - name: MIRROR_SITE_PORT_TLS
+              valueFrom:
+                configMapKeyRef:
+                  name: cm-ux-service
+                  key: ux-port-tls
+            - name: MIRROR_SERVER_CERT
+              valueFrom:
+                secretKeyRef:
+                  name: secret-ux-server-cert
+                  key: server-cert
+            - name: MIRROR_SERVER_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: secret-ux-server-cert
+                  key: server-key
+            - name: GATEWAY_SERVICE_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: cm-gateway-service
+                  key: gateway-url
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "250m"
+            limits:
+              memory: "512Mi"
+              cpu: "500m"
