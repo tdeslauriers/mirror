@@ -52,7 +52,7 @@ export async function handleUserEdit(
   // process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
   try {
     const apiResponse = await fetch(
-      `${process.env.GATEWAY_SERVICE_URL}:${process.env.GATEWAY_SERVICE_PORT}/profile`,
+      `${process.env.GATEWAY_SERVICE_URL}/profile`,
       {
         method: "PUT",
         headers: {
@@ -125,7 +125,7 @@ export async function handleReset(
   // process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
   try {
     const apiResponse = await fetch(
-      `${process.env.GATEWAY_SERVICE_URL}:${process.env.GATEWAY_SERVICE_PORT}/reset`,
+      `${process.env.GATEWAY_SERVICE_URL}/reset`,
       {
         method: "POST",
         headers: {

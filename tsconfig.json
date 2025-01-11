@@ -28,6 +28,6 @@
     "**/*.tsx",
     ".next/types/**/*.ts",
     "src/app/register/registration-form.tsx"
-, "server.js"  ],
+  ],
   "exclude": ["node_modules"]
 }

@@ -83,14 +83,18 @@ export async function handleRegistration(
       registration.birthMonth < 10
         ? `0${registration.birthMonth}`
         : registration.birthMonth;
-    registrationCmd.birthdate = `${registration.birthYear}-${month}-${registration.birthDay}`;
+    const day =
+      registration.birthDay < 10
+        ? `0${registration.birthDay}`
+        : registration.birthDay;
+    registrationCmd.birthdate = `${registration.birthYear}-${month}-${day}`;
   }
 
   // call gateway registration endpoint
   // process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
   try {
     const apiResponse = await fetch(
-      `${process.env.GATEWAY_SERVICE_URL}:${process.env.GATEWAY_SERVICE_PORT}/register`,
+      `${process.env.GATEWAY_SERVICE_URL}/register`,
       {
         method: "POST",
         headers: {

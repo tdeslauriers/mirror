@@ -109,7 +109,7 @@ export async function POST(req: NextRequest) {
     // process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
     try {
       const apiResponse = await fetch(
-        `${process.env.GATEWAY_SERVICE_URL}:${process.env.GATEWAY_SERVICE_PORT}/oauth/callback`,
+        `${process.env.GATEWAY_SERVICE_URL}/oauth/callback`,
         {
           method: "POST",
           headers: {

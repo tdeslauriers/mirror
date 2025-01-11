@@ -37,6 +37,9 @@ test-results
 # scripts folder
 sh/
 
+# k8s folder
+k8s/
+
 # Exclude any other temporary or unnecessary files
 *.swp
 *.swo

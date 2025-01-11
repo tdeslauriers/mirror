@@ -95,7 +95,7 @@ export async function handleLogin(
   // process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
   try {
     const apiResponse = await fetch(
-      `${process.env.GATEWAY_SERVICE_URL}:${process.env.GATEWAY_SERVICE_PORT}/login`,
+      `${process.env.GATEWAY_SERVICE_URL}/login`,
       {
         method: "POST",
         headers: {

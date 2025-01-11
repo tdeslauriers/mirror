@@ -1,6 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
-import logo from "@/assets/logo_world_2.png";
+import logo256 from "@/assets/logo_world_2_256.png";
 import style from "./nav-main-header.module.css";
 import NavLogin from "./nav-login";
 import { cookies } from "next/headers";
@@ -16,7 +16,7 @@ export default async function NavMainHeader() {
       <header className={style.header}>
         <div className={style.left}>
           <Link className={style.logo} href="/">
-            <Image src={logo} alt="Laurels Logo" />
+            <Image src={logo256} alt="Laurels Logo" />
             <span className={style.locallink}>des Lauriers world</span>{" "}
           </Link>
 

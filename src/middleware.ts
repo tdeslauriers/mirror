@@ -14,7 +14,7 @@ export default async function middleware(request: NextRequest) {
     // process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0"; // must be at top of page that calls this middleware
     try {
       const apiResponse = await fetch(
-        `${process.env.GATEWAY_SERVICE_URL}:${process.env.GATEWAY_SERVICE_PORT}/session/anonymous`,
+        `${process.env.GATEWAY_SERVICE_URL}/session/anonymous`,
         {
           method: "GET",
           headers: {
@@ -53,7 +53,10 @@ export default async function middleware(request: NextRequest) {
         }
       }
     } catch (error: any) {
-      console.log("unhandled error fetching anonymous session data: ", error);
+      console.log(
+        "unhandled error fetching anonymous session data: ",
+        error.message
+      );
       return response;
     }
   }

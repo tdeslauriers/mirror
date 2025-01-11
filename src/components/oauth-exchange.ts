@@ -38,7 +38,7 @@ export default async function GetOauthExchange(
     // process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
     try {
       const apiResponse = await fetch(
-        `${process.env.GATEWAY_SERVICE_URL}:${process.env.GATEWAY_SERVICE_PORT}/oauth/state`,
+        `${process.env.GATEWAY_SERVICE_URL}/oauth/state`,
         {
           method: "POST",
           headers: {

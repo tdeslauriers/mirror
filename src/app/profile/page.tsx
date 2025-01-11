@@ -48,14 +48,11 @@ export default async function ProfilePage() {
   }
 
   // get profile data from gateway
-  const response = await fetch(
-    `${process.env.GATEWAY_SERVICE_URL}:${process.env.GATEWAY_SERVICE_PORT}/profile`,
-    {
-      headers: {
-        Authorization: `${hasSession?.value}`,
-      },
-    }
-  );
+  const response = await fetch(`${process.env.GATEWAY_SERVICE_URL}/profile`, {
+    headers: {
+      Authorization: `${hasSession?.value}`,
+    },
+  });
 
   if (!response.ok) {
     if (response.status === 401 || response.status === 403) {
