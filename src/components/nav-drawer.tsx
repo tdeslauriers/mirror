@@ -2,8 +2,17 @@
 import { useEffect, useState } from "react";
 import style from "./nav-drawer.module.css";
 
+type Render = {
+  user_read?: boolean;
+  gallery_read?: boolean;
+  blog_read?: boolean;
+  task_read?: boolean;
+  payroll_read?: boolean;
+};
+
 export default function NavDrawer() {
   const [hasIdentity, setHasIdentity] = useState<boolean>(false);
+  const [render, setRender] = useState<Render>({});
 
   useEffect(() => {
     function getCookie(name: string): string | null {
@@ -24,7 +33,7 @@ export default function NavDrawer() {
     if (identityCookie) {
       setHasIdentity(true);
       const identity = JSON.parse(decodeURIComponent(identityCookie));
-       // TODO: pass ux render to drawer to render link buttons.
+      setRender(identity.ux_render);
     } else {
       setHasIdentity(false);
     }
@@ -35,10 +44,39 @@ export default function NavDrawer() {
       {hasIdentity ? (
         <>
           <div className={`${style.drawer} `}>
-            <div>User Administration</div>
-            <div className={style.flex}>Blog</div>
-            <div>Allowance</div>
-            <div>Gallery</div>
+            {render && render.user_read && (
+              <div className={`${style.section}`}>User Administration</div>
+            )}
+            {render && render.gallery_read && (
+              <div className={`${style.section}`}>
+                Gallery{" "}
+                <sup>
+                  <span className={`highlight ${style.annotation}`}>
+                    Coming Soon!
+                  </span>
+                </sup>
+              </div>
+            )}
+            {render && render.blog_read && (
+              <div className={`${style.section}`}>
+                Blog{" "}
+                <sup>
+                  <span className={`highlight ${style.annotation}`}>
+                    Coming Soon!
+                  </span>
+                </sup>
+              </div>
+            )}
+            {render && (render.task_read || render.payroll_read) && (
+              <div className={`${style.section}`}>
+                Allowance{" "}
+                <sup>
+                  <span className={`highlight ${style.annotation}`}>
+                    Coming Soon!
+                  </span>
+                </sup>
+              </div>
+            )}
           </div>
         </>
       ) : null}

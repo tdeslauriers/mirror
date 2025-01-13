@@ -18,3 +18,21 @@
     transparent
   );
 }
+
+.section {
+  display: block;
+  margin-bottom: 1rem;
+  font-size: 1.3rem;
+  font-family: "Montserrat", sans-serif;
+  text-transform: uppercase;
+
+  font-weight: bold;
+}
+
+.annotation {
+  font-size: 1rem;
+  font-family: "Montserrat", sans-serif;
+  text-transform: lowercase;
+
+  font-weight: bold;
+}

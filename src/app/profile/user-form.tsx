@@ -24,9 +24,10 @@ export default function UserForm({
     errors: {},
   });
 
-  const age: number | null = profileState.profile?.birth_year
-    ? getAge(profileState.profile.birth_year)
-    : null;
+  const age =
+    profile.birth_year && profile.birth_month && profile.birth_day
+      ? getAge(profile.birth_year, profile.birth_month, profile.birth_day)
+      : null;
 
   return (
     <>
@@ -157,7 +158,20 @@ export default function UserForm({
   );
 }
 
-function getAge(birthyear: number): number {
-  const currentYear = new Date().getFullYear();
-  return currentYear - birthyear;
+function getAge(year: number, month: number, day: number): number {
+  const today = new Date(); // current date
+  const birth = new Date(year, month, day);
+
+  let age = today.getFullYear() - birth.getFullYear();
+
+  // check if the birthday hasn't occurred yet this year
+  const monthDiff = today.getMonth() - birth.getMonth();
+  const dayDiff = today.getDate() - birth.getDate();
+
+  // if it hasn't, subtract a year from the age
+  if (monthDiff < 0 || (monthDiff === 0 && dayDiff < 0)) {
+    age--;
+  }
+
+  return age;
 }
