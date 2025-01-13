@@ -59,7 +59,7 @@ export default function NavDrawer() {
             )}
             {render && render.blog_read && (
               <div className={`${style.section}`}>
-                Blog{" "}
+                Short Blog{" "}
                 <sup>
                   <span className={`highlight ${style.annotation}`}>
                     Coming Soon!

@@ -24,7 +24,7 @@ export default async function Welcome() {
 
   return (
     <>
-      <h2>
+      <h1>
         Welcome to{" "}
         <span className={`highlight`}>
           <strong>des Lauriers</strong>
@@ -41,7 +41,7 @@ export default async function Welcome() {
         ) : (
           " world!"
         )}
-      </h2>
+      </h1>
     </>
   );
 }

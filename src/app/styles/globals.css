@@ -6,41 +6,34 @@
     "Fira Mono", "Droid Sans Mono", "Courier New", monospace;
 
   --foreground-rgb: 0, 0, 0;
-  --background-start-rgb: 214, 219, 220;
+  --background-start-rgb: 196, 196, 196;
   --background-end-rgb: 255, 255, 255;
 
+  --test-rbg: rgb(196, 196, 196);
+
+  --drawer-width: 15vw;
+
   --primary-border-color: rgb(76, 79, 76);
-  --primary-border-fade: rgb(23, 24, 23);
+  --primary-border-fade: rgb(255, 255, 255);
 
   --primary-site-color: rgb(21, 255, 0);
-  --primary-site-fade: rgb(144, 250, 144);
+  --primary-site-fade: rgb(18, 209, 1);
 
   --secondary-site-color: rgb(255, 3, 247);
-  --secondary-site-fade: rgb(253, 149, 251);
+  --secondary-site-fade: rgb(165, 3, 162);
 
-  --primary-glow: conic-gradient(
-    from 180deg at 50% 50%,
-    #16abff33 0deg,
-    #0885ff33 55deg,
-    #54d6ff33 120deg,
-    #0071ff33 160deg,
-    transparent 360deg
-  );
-  --secondary-glow: radial-gradient(
-    rgba(255, 255, 255, 1),
-    rgba(255, 255, 255, 0)
-  );
+  --info-site-color: rgb(253, 169, 2);
+  --info-site-fade: rgb(152, 102, 1);
 
-  --tile-start-rgb: 239, 245, 249;
-  --tile-end-rgb: 228, 232, 233;
-  --tile-border: conic-gradient(
-    #00000080,
-    #00000040,
-    #00000030,
-    #00000020,
-    #00000010,
-    #00000010,
-    #00000080
+  --error-site-color: rgb(255, 45, 3);
+  --error-site-fade: rgb(168, 31, 4);
+
+  --primary-glow: radial-gradient(rgba(21, 255, 0, 0.4), rgba(1, 65, 255, 0));
+  --secondary-glow: linear-gradient(
+    to top right,
+    rgba(1, 65, 255, 0),
+    rgba(1, 65, 255, 0),
+    rgba(21, 255, 0, 0.3)
   );
 
   --highlight-text: linear-gradient(
@@ -74,11 +67,6 @@
     var(--error-site-color),
     var(--error-site-fade)
   );
-
-  --callout-rgb: 238, 240, 241;
-  --callout-border-rgb: 172, 175, 176;
-  --card-rgb: 180, 185, 188;
-  --card-border-rgb: 131, 134, 135;
 }
 
 /* * {
@@ -90,8 +78,6 @@
     --foreground-rgb: 255, 255, 255;
     --background-start-rgb: 0, 0, 0;
     --background-end-rgb: 44, 43, 43;
-
-    --drawer-width: 15vw;
 
     --primary-border-color: rgb(76, 79, 76);
     --primary-border-fade: rgb(23, 24, 23);
@@ -130,11 +116,6 @@
       #ffffff10,
       #ffffff80
     );
-
-    --callout-rgb: 20, 20, 20;
-    --callout-border-rgb: 108, 108, 108;
-    --card-rgb: 100, 100, 100;
-    --card-border-rgb: 200, 200, 200;
   }
 }
 

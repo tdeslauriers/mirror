@@ -9,13 +9,13 @@ export default async function About() {
     <>
       <main className={`main ${hasIdentity ? "main-drawer" : null}`}>
         <div>
-          <h2>
+          <h1>
             About the{" "}
             <span className={`highlight`}>
               <strong>deslauriers.world</strong>
             </span>{" "}
             site:
-          </h2>
+          </h1>
 
           <div className={`center`}>
             <div className={`content`}>

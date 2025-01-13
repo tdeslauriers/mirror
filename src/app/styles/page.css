@@ -58,6 +58,7 @@
   margin: 1rem;
   border-radius: 4px;
   border: 1px solid var(--primary-border-color);
+  box-shadow: 1px 0 55px rgba(139, 150, 139, 0.5);
 }
 
 .card li,
@@ -99,5 +100,14 @@
   }
   to {
     transform: rotate(0deg);
+  }
+}
+
+@media (prefers-color-scheme: dark){
+  .card {
+   
+    border-radius: 4px;
+    border: 1px solid var(--primary-border-color);
+    box-shadow: 1px 0 55px rgba(7, 8, 7, 0.5);
   }
 }
