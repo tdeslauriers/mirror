@@ -1,4 +1,4 @@
-:root {
+[data-theme="light"] {
   --max-width: 1100px;
   --border-radius: 12px;
   --font-mono: ui-monospace, Menlo, Monaco, "Cascadia Mono", "Segoe UI Mono",
@@ -11,10 +11,10 @@
 
   --test-rbg: rgb(196, 196, 196);
 
-  --drawer-width: 15vw;
+  --drawer-width: 10vw;
 
-  --primary-border-color: rgb(76, 79, 76);
-  --primary-border-fade: rgb(255, 255, 255);
+  --primary-border-color: rgb(188, 193, 188);
+  --primary-border-fade: rgb(183, 185, 183);
 
   --primary-site-color: rgb(21, 255, 0);
   --primary-site-fade: rgb(18, 209, 1);
@@ -34,6 +34,58 @@
     rgba(1, 65, 255, 0),
     rgba(1, 65, 255, 0),
     rgba(21, 255, 0, 0.3)
+  );
+}
+
+/* Dark theme: default */
+:root {
+  --max-width: 1100px;
+  --border-radius: 12px;
+  --font-mono: ui-monospace, Menlo, Monaco, "Cascadia Mono", "Segoe UI Mono",
+    "Roboto Mono", "Oxygen Mono", "Ubuntu Monospace", "Source Code Pro",
+    "Fira Mono", "Droid Sans Mono", "Courier New", monospace;
+
+  --foreground-rgb: 255, 255, 255;
+  --background-start-rgb: 0, 0, 0;
+  --background-end-rgb: 44, 43, 43;
+
+  --drawer-width: 15vw;
+
+  --primary-border-color: rgb(76, 79, 76);
+  --primary-border-fade: rgb(23, 24, 23);
+
+  --primary-site-color: rgb(21, 255, 0);
+  --primary-site-fade: rgb(144, 250, 144);
+
+  --secondary-site-color: rgb(255, 3, 247);
+  --secondary-site-fade: rgb(253, 149, 251);
+
+  --info-site-color: rgb(253, 169, 2);
+  --info-site-fade: rgb(248, 198, 97);
+
+  --error-site-color: rgb(255, 45, 3);
+  --error-site-fade: rgb(254, 126, 100);
+
+  --primary-menutext-color: rgb(159, 164, 159);
+
+  --primary-glow: radial-gradient(rgba(196, 1, 255, 0.4), rgba(1, 65, 255, 0));
+  --secondary-glow: linear-gradient(
+    to top right,
+    rgba(1, 65, 255, 0),
+    rgba(1, 65, 255, 0),
+    rgba(196, 1, 255, 0.3)
+  );
+
+  --tile-start-rgb: 2, 13, 46;
+  --tile-end-rgb: 2, 5, 19;
+  --tile-border: conic-gradient(
+    #ffffff80,
+    #ffffff40,
+    #ffffff30,
+    #ffffff20,
+    #ffffff10,
+    #ffffff10,
+    #ffffff80
   );
 
   --highlight-text: linear-gradient(
@@ -67,56 +119,6 @@
     var(--error-site-color),
     var(--error-site-fade)
   );
-}
-
-/* * {
-  border: 1px solid red;
-} */
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --foreground-rgb: 255, 255, 255;
-    --background-start-rgb: 0, 0, 0;
-    --background-end-rgb: 44, 43, 43;
-
-    --primary-border-color: rgb(76, 79, 76);
-    --primary-border-fade: rgb(23, 24, 23);
-
-    --primary-site-color: rgb(21, 255, 0);
-    --primary-site-fade: rgb(144, 250, 144);
-
-    --secondary-site-color: rgb(255, 3, 247);
-    --secondary-site-fade: rgb(253, 149, 251);
-
-    --info-site-color: rgb(253, 169, 2);
-    --info-site-fade: rgb(248, 198, 97);
-
-    --error-site-color: rgb(255, 45, 3);
-    --error-site-fade: rgb(254, 126, 100);
-
-    --primary-glow: radial-gradient(
-      rgba(196, 1, 255, 0.4),
-      rgba(1, 65, 255, 0)
-    );
-    --secondary-glow: linear-gradient(
-      to top right,
-      rgba(1, 65, 255, 0),
-      rgba(1, 65, 255, 0),
-      rgba(196, 1, 255, 0.3)
-    );
-
-    --tile-start-rgb: 2, 13, 46;
-    --tile-end-rgb: 2, 5, 19;
-    --tile-border: conic-gradient(
-      #ffffff80,
-      #ffffff40,
-      #ffffff30,
-      #ffffff20,
-      #ffffff10,
-      #ffffff10,
-      #ffffff80
-    );
-  }
 }
 
 * {
@@ -158,10 +160,4 @@ span.highlight {
 
 footer {
   margin-left: 2%;
-}
-
-@media (prefers-color-scheme: dark) {
-  html {
-    color-scheme: dark;
-  }
 }

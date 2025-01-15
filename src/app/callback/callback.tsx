@@ -40,11 +40,9 @@ export default function Callback() {
           const fail = await response.json();
           console.log("failed to call oauth 2 redirect", fail);
           setIsLoading(false);
-          throw new Error(pageError);
         }
       } catch (error) {
         console.log(error);
-        throw new Error(pageError);
       }
     };
 
@@ -68,9 +66,7 @@ export default function Callback() {
 
   return (
     <>
-      <div className={`center`}>
-        {isLoading && <Loading />}
-      </div>
+      <div className={`center`}>{isLoading && <Loading />}</div>
     </>
   );
 }
