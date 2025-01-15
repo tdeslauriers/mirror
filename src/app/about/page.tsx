@@ -101,15 +101,16 @@ export default async function About() {
               >
                 Mirror
               </Link>{" "}
-              &mdash; a reference to Galadriel's mirror in J.R.R. Tolkien&apos;s{" "}
+              &mdash; a reference to Galadriel&apos;s mirror in J.R.R.
+              Tolkien&apos;s{" "}
               <span style={{ fontStyle: "italic" }}>The Lord of the Rings</span>
               , which shows each person who views it something different.
             </li>
             <li>
               <strong>Description: </strong> Mirror is a{" "}
               <span className={`highlight`}>NextJS</span> application written in{" "}
-              <span className={`highlight`}>TypeScript</span> using Next's App
-              Router pattern.
+              <span className={`highlight`}>TypeScript</span> using
+              NextJS&apos;s App Router pattern.
             </li>
           </ul>
           <h2>Service Layer:</h2>
@@ -132,8 +133,8 @@ export default async function About() {
             >
               carapace
             </Link>{" "}
-            (because 'exoskeleton' was taken) to provide reusable components,
-            functions, and models for my services below. Also in{" "}
+            (because &ldquo;exoskeleton&ldquo; was taken) to provide reusable
+            components, functions, and models for my services below. Also in{" "}
             <Link
               className="locallink"
               href="https://github.com/tdeslauriers/carapace"
@@ -163,9 +164,10 @@ export default async function About() {
               <span style={{ fontStyle: "italic" }}>
                 Avatar: The Last Airbender
               </span>
-              . Ran (燃) means "burn" or "ignite" in Mandarin, and since all
-              services need to get service credentials before taking any other
-              action, the ignite side of the dragon pair seemed appropriate.
+              . Ran (燃) means &quot;burn&quot; or &quot;ignite&quot; in
+              Mandarin, and since all services need to get service credentials
+              before taking any other action, the ignite side of the dragon pair
+              seemed appropriate.
             </li>
             <li>
               <strong>Description: </strong> Ran is an application written in{" "}
@@ -181,8 +183,8 @@ export default async function About() {
               project for core microservice functionality. It provides
               service-to-service (s2s) authentication and authorization to the
               rest of the services in the cluster. It mints s2s JWT tokens and
-              it is the source of for JWT scopes simply because the table
-              existed in this service first.
+              it is the source truth of for JWT scopes in both auth services
+              (simply because the scopes table existed in this service first).
             </li>
           </ul>
           <h3>
@@ -199,8 +201,9 @@ export default async function About() {
               >
                 Shaw
               </Link>
-              &mdash; Shaw, or more correctly: shāo (燒), means "burn" or
-              "blaze" in Mandarin, and is the second of two twin dragons in{" "}
+              &mdash; Shaw, or more correctly: shāo (燒), means &quot;burn&quot;
+              or &quot;blaze&quot; in Mandarin, and is the second of two twin
+              dragons in{" "}
               <span style={{ fontStyle: "italic" }}>
                 Avatar: The Last Airbender
               </span>
@@ -251,8 +254,9 @@ export default async function About() {
               J.R.R. Tolkien&apos;s{" "}
               <span style={{ fontStyle: "italic" }}>The Hobbit</span>. It is
               where Smaug is sitting on his mound of treasure, i.e., this
-              gateway will give access to the site's restricted content. Also,
-              in the story, Erebor had a Great Main Gate so I thought it fit.
+              gateway will give access to the site&apos;s restricted content.
+              Also, in the story, Erebor had a Great Main Gate so I thought it
+              fit.
             </li>
             <li>
               <strong>Description: </strong> Erebor is an application written in{" "}
@@ -266,10 +270,10 @@ export default async function About() {
                 carapace
               </Link>{" "}
               project for core microservice functionality. It provides the main
-              entry point to family website&apos;s backend functionality and
-              restricted content. It is more than a reverse proxy, however, it
+              entry point to the website&apos;s backend functionality and
+              restricted content. It is more than a reverse proxy however, it
               manages user sessions, Oauth2 exchange flow, and JWT tokens. Also,
-              it collates composite data from multiple services. It can be be
+              it assembles composite data from multiple services. It can be
               thought of as the site&apos;s primary service, or hub, with the
               other support services coming off of it like spokes.
             </li>
