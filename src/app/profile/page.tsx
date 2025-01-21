@@ -5,12 +5,14 @@ import UserForm from "./user-form";
 
 import { Profile } from ".";
 import { handleReset, handleUserEdit } from "./actions";
-import { pageError } from "../login";
+
 import GetCsrf from "@/components/csrf-token";
 import ResetForm from "./reset-form";
 import GetOauthExchange from "@/components/oauth-exchange";
 import { Suspense } from "react";
 import Loading from "@/components/loading";
+
+const pageError: string = "Failed to load profile page: ";
 
 export default async function ProfilePage() {
   // quick for redirect if auth'd cookies not present
@@ -35,16 +37,16 @@ export default async function ProfilePage() {
 
   // check session cookie exists for api calls
   if (!hasSession) {
-    console.log("Session cookie is missing");
-    throw new Error(pageError);
+    console.log(pageError + "session cookie is missing");
+    throw new Error(pageError + "session cookie is missing");
   }
 
   // get csrf token from gateway for registration form
   const csrf = await GetCsrf(hasSession.value);
 
   if (!csrf) {
-    console.log("CSRF token could not be retrieved.");
-    throw new Error(pageError);
+    console.log(pageError + "CSRF token could not be retrieved.");
+    throw new Error(pageError + "CSRF token could not be retrieved.");
   }
 
   // get profile data from gateway

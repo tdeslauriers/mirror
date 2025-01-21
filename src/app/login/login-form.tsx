@@ -11,7 +11,7 @@ import {
 import { handleLogin } from "./actions";
 import { OauthExchange } from "../api";
 import FormSubmit from "@/components/form-submit";
-import ErrorField from "@/components/error-field";
+import ErrorField from "@/components/errors/error-field";
 
 export default function LoginForm({
   csrf,

@@ -1,7 +1,7 @@
 "use client";
 
 import { ChangeEvent, useActionState, useState } from "react";
-import ErrorField from "@/components/error-field";
+import ErrorField from "@/components/errors/error-field";
 import {
   EMAIL_MAX_LENGTH,
   EMAIL_MIN_LENGTH,
@@ -280,7 +280,7 @@ export default function RegistrationForm({
 
       {registrationState.complete && (
         <>
-          <div >
+          <div>
             <h2>
               <span className={`highlight`}>Registration successful!</span>
             </h2>

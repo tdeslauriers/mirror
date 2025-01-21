@@ -1,0 +1,59 @@
+table {
+  width: auto; /* Full width */
+  border-collapse: collapse; /* Ensures no extra spacing between cells */
+  margin: 1rem 0;
+
+  display: block;
+
+  font-size: 1rem;
+  font-family: "Montserrat", sans-serif;
+  border-radius: 4px;
+  padding: 2rem;
+
+  border: 1px solid var(--primary-border-color);
+  box-shadow: 1px 0 55px rgba(7, 8, 7, 0.5);
+}
+
+thead {
+  background-color: rgb(49, 50, 49);
+}
+
+th {
+  background: var(--highlight-text);
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+  border: 1px solid var(--primary-border-color);
+  padding: 1rem;
+
+  font-weight: bold;
+  font-size: 1.5rem;
+  text-align: left; /* Aligns text to the left */
+
+  cursor: pointer; /* Shows pointer for sortable columns */
+  user-select: none; /* Prevents text selection while clicking */
+}
+
+td {
+  border: 1px solid var(--primary-border-color);
+  padding: 1rem;
+  text-align: left; /* Aligns text to the left */
+  font-size: 1.25rem;
+}
+
+
+
+tbody tr:nth-child(even) {
+  /* Alternating row color for better readability */
+
+  background-color: rgb(49, 50, 49);
+}
+
+tbody tr:hover {
+  /* Row highlight on hover */
+  color: var(--primary-site-color);
+  transition: 0.3s;
+  text-shadow: var(--highlight-text-glow);
+  outline: none;
+}

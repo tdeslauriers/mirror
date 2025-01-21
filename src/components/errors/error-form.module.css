@@ -16,7 +16,7 @@ span.highlightError {
 
 .error {
   font-size: 0.9rem;
-
+  color: var(--highlight-error);
   display: block;
   max-width: 50rem;
   padding: 2rem;
@@ -43,6 +43,7 @@ span.highlightError {
   );
   width: 100%;
   cursor: pointer;
+  color: var(--foreground-rgb);
   font: inherit;
   font-size: 1.25rem;
   text-transform: uppercase;

@@ -1,6 +1,6 @@
 "use client";
 
-import ErrorForm from "@/components/error-form";
+import ErrorForm from "@/components/errors/error-form";
 
 export default function Error({
   error,

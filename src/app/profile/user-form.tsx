@@ -2,7 +2,7 @@
 
 import { useActionState } from "react";
 import { Profile, ProfileActionCmd } from ".";
-import ErrorField from "@/components/error-field";
+import ErrorField from "@/components/errors/error-field";
 import FormSubmit from "@/components/form-submit";
 import { NAME_MAX_LENGTH, NAME_MIN_LENGTH } from "@/validation/fields";
 

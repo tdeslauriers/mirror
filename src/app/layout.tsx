@@ -4,8 +4,9 @@ import { Inter } from "next/font/google";
 import "./styles/globals.css";
 import "./styles/page.css";
 import "./styles/form.css";
+import "./styles/table.css";
 
-import MainHeader from "@/components/nav-main-header";
+import MainHeader from "@/components/nav/nav-main-header";
 import { cookies } from "next/headers";
 
 const inter = Inter({ subsets: ["latin"] });
