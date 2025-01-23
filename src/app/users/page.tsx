@@ -1,20 +1,13 @@
+import Loading from "@/components/loading";
 import GetOauthExchange from "@/components/oauth-exchange";
-import Table from "@/components/table";
 
 import { cookies } from "next/headers";
+
 import { redirect } from "next/navigation";
+import { Suspense } from "react";
+import UserTable from "./user-table";
 
 const pageError: string = "Failed to load users page: ";
-
-const columns = [
-  { header: "Username", accessor: "username", sortable: true },
-  { header: "Firstname", accessor: "firstname", sortable: true },
-  { header: "Lastname", accessor: "lastname", sortable: true },
-  { header: "Created At", accessor: "created_at", sortable: true },
-  { header: "Enabled", accessor: "enabled", sortable: false },
-  { header: "Account Expired", accessor: "account_expired", sortable: false },
-  { header: "Account Locked", accessor: "account_locked", sortable: false },
-];
 
 export default async function UsersPage() {
   // quick for redirect if auth'd cookies not present
@@ -43,6 +36,7 @@ export default async function UsersPage() {
     throw new Error(pageError + "session cookie is missing");
   }
 
+  // get user data from gateway
   const response = await fetch(`${process.env.GATEWAY_SERVICE_URL}/users`, {
     headers: {
       Authorization: `${hasSession?.value}`,
@@ -71,11 +65,18 @@ export default async function UsersPage() {
     <>
       <main className={`main main-drawer`}>
         <div className={`center`}>
-          <h1>Users</h1>
-          <hr />
+          <div className={`page-title`}>
+            <h1>Users</h1>
+          </div>
+          <hr className={`page-title`} />
+          <div style={{ fontStyle: "italic" }}>
+            To navigate to a specifc user, click on their row in the table
+            below:
+          </div>
         </div>
-
-        <Table data={users} columns={columns} />
+        <Suspense fallback={<Loading />}>
+          <UserTable data={users} />
+        </Suspense>
       </main>
     </>
   );

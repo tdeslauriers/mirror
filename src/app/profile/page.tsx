@@ -87,18 +87,19 @@ export default async function ProfilePage() {
     <>
       <main className={`main main-drawer`}>
         <div className={`center`}>
-          <h1>
-            Username: <span className={`highlight`}>{profile?.username}</span>
-          </h1>
-
+          <div className="page-title">
+            <h1>
+              Username: <span className={`highlight`}>{profile?.username}</span>
+            </h1>
+          </div>
+          <hr className={`page-title`} />
           {createdAt.length > 0 && (
-            <p style={{ marginTop: ".5rem", fontStyle: "italic" }}>
-              Registered since {regDate}
-            </p>
+            <p style={{ fontStyle: "italic" }}>Registered since {regDate}</p>
           )}
         </div>
-
-        <h2>Identity</h2>
+        <div className="card-title">
+          <h2>Identity</h2>
+        </div>
         <div className={`card`}>
           <Suspense fallback={<Loading />}>
             <UserForm csrf={csrf} profile={profile} userEdit={handleUserEdit} />
@@ -106,8 +107,9 @@ export default async function ProfilePage() {
         </div>
 
         <br />
-
-        <h2>Reset Password</h2>
+        <div className="card-title">
+          <h2>Reset Password</h2>
+        </div>
         <div className={`card`}>
           <Suspense fallback={<Loading />}>
             <ResetForm csrf={csrf} handleReset={handleReset} />

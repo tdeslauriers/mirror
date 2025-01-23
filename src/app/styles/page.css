@@ -21,7 +21,6 @@
   position: relative;
   padding: 2rem 0;
   width: 75vw;
-  
 }
 
 .center::before {
@@ -53,7 +52,20 @@
 .page-title {
   padding-left: 1rem;
   width: 100%;
+
   align-items: left;
+}
+
+hr.page-title {
+  margin: 1rem 0;
+  height: 2px;
+  background: var(--primary-site-color);
+  -webkit-mask-image: linear-gradient(
+    to right,
+    var(--primary-site-color),
+    transparent
+  );
+  mask-image: linear-gradient(to right, var(--primary-site-color), transparent);
 }
 
 .card {
@@ -63,7 +75,7 @@
   font-family: "Montserrat", sans-serif;
   border-radius: 4px;
   padding: 2rem;
-  margin: 1rem;
+  margin: 1rem 0 2rem;
   border: 1px solid var(--primary-border-color);
   box-shadow: 1px 0 55px rgba(7, 8, 7, 0.5);
   /* border-radius: 4px;
@@ -74,7 +86,13 @@
 .card li,
 .card p {
   padding-left: 0.5rem;
-  margin: 1rem;
+  margin: 1rem 0 0;
+}
+
+.card-title {
+  width: 50%;
+  font-size: 1rem;
+  font-family: "Montserrat", sans-serif;
 }
 
 .locallink {
@@ -127,7 +145,7 @@ p {
     var(--primary-border-color),
     transparent
   );
-  margin: 2rem 0 2rem;
+  margin: 2rem 0 0rem;
 }
 
 /* Mobile */
