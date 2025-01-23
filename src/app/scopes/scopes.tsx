@@ -63,12 +63,11 @@ export default async function ScopesPage() {
       <main className={`main main-drawer`}>
         <div className={`center`}>
           <div className={`page-title`}>
-            <h1>Users</h1>
+            <h1>Scopes</h1>
           </div>
           <hr className={`page-title`} />
           <div style={{ fontStyle: "italic" }}>
-            To navigate to a specifc user, click on their row in the table
-            below:
+            To navigate to a specifc scope, click on its row in the table below:
           </div>
         </div>
         <Suspense fallback={<Loading />}>
