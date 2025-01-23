@@ -68,8 +68,8 @@ export default async function UsersPage() {
           </div>
           <hr className={`page-title`} />
           <div style={{ fontStyle: "italic" }}>
-            To navigate to a specifc user, click on their row in the table
-            below:
+            To navigate to a specifc user record, click on their username in the
+            table below:
           </div>
         </div>
         <Suspense fallback={<Loading />}>

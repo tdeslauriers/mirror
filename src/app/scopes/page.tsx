@@ -67,7 +67,8 @@ export default async function ScopesPage() {
           </div>
           <hr className={`page-title`} />
           <div style={{ fontStyle: "italic" }}>
-            To navigate to a specifc scope, click on its row in the table below:
+            To navigate to a specifc scope record, click on its row in the table
+            below:
           </div>
         </div>
         <Suspense fallback={<Loading />}>

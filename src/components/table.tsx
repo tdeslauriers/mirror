@@ -150,7 +150,7 @@ export default function Table<T>({
           onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
           disabled={currentPage === 1}
         >
-          Previous
+          Prev
         </button>
         <span>
           Page {currentPage} of {totalPages}

@@ -39,53 +39,34 @@ export default function UserTable({ data }: UserTableProps) {
       header: "Firstname",
       accessor: "firstname" as keyof User,
       sortable: true,
-      render: (value: User[keyof User], row: User) => (
-        <Link href={`/users/${row.slug}`}>{value}</Link>
-      ),
     },
     {
       header: "Lastname",
       accessor: "lastname" as keyof User,
       sortable: true,
-      render: (value: User[keyof User], row: User) => (
-        <Link href={`/users/${row.slug}`}>{value}</Link>
-      ),
     },
     {
       header: "Created At",
       accessor: "created_at" as keyof User,
       sortable: true,
       render: (value: User[keyof User], row: User) => (
-        <Link href={`/users/${row.slug}`}>
-          {(value as string).split("T")[0]}
-        </Link>
+        <>{(value as string).split("T")[0]}</>
       ),
     },
     {
       header: "Enabled",
       accessor: "enabled" as keyof User,
       sortable: false,
-      render: (value: User[keyof User], row: User) => (
-        <Link href={`/users/${row.slug}`}>
-          {value ? "Enabled" : "Disabled"}
-        </Link>
-      ),
     },
     {
       header: "Account Expired",
       accessor: "account_expired" as keyof User,
       sortable: false,
-      render: (value: User[keyof User], row: User) => (
-        <Link href={`/users/${row.slug}`}>{value ? "Expired" : "Active"}</Link>
-      ),
     },
     {
       header: "Account Locked",
       accessor: "account_locked" as keyof User,
       sortable: false,
-      render: (value: User[keyof User], row: User) => (
-        <Link href={`/users/${row.slug}`}>{value ? "Locked" : "Unlocked"}</Link>
-      ),
     },
   ];
 
