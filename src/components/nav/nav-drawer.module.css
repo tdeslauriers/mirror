@@ -60,23 +60,27 @@
 }
 
 .menubutton:hover,
+.menubutton:active,
 .menubutton:focus {
   transition: 0.3s;
   outline-style: none;
   /* box-shadow: 0 0 40px var(--primary-site-color); */
-  animation: glow-input 5s ease-in-out infinite alternate;
+  /* animation: glow-input 5s ease-in-out infinite alternate; */
 }
 
 .submenu {
-  margin-top: 0.1rem;
+  --submenu-primary: rgb(71, 74, 71);
+  --submenu-fade: rgb(43, 44, 43);
+
+  margin-top: 0.25rem;
   padding: 1rem;
   list-style: none;
-  border: 1px solid var(--primary-border-color);
+  /* border: 1px solid var(--primary-border-color); */
   border-radius: 4px;
   background: linear-gradient(
     90deg,
-    var(--menu-button-primary),
-    var(--menu-button-fade)
+    var(--submenu-primary),
+    var(--submenu-fade)
   );
 }
 

@@ -30,7 +30,9 @@ export default function UserTable({ data }: UserTableProps) {
       accessor: "username" as keyof User,
       sortable: true,
       render: (value: User[keyof User], row: User) => (
-        <Link href={`/users/${row.slug}`}>{value}</Link>
+        <Link className="locallink no-hover" href={`/users/${row.slug}`}>
+          {value}
+        </Link>
       ),
     },
     {
@@ -88,10 +90,11 @@ export default function UserTable({ data }: UserTableProps) {
   ];
 
   return (
-    <>
+    <div className="table-wrapper">
       {/* Search bar */}
       <input
         type="text"
+        className="table-search"
         placeholder="Search users..."
         value={search}
         onChange={(e) => setSearch(e.target.value)}
@@ -101,9 +104,17 @@ export default function UserTable({ data }: UserTableProps) {
         data={data}
         columns={columns}
         search={search}
-        filterKeys={["username", "firstname", "lastname", "created_at"]}
+        filterKeys={[
+          "username",
+          "firstname",
+          "lastname",
+          "created_at",
+          "enabled",
+          "account_expired",
+          "account_locked",
+        ]}
         pageSize={10}
       />
-    </>
+    </div>
   );
 }

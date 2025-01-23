@@ -51,19 +51,39 @@ export default function Table<T>({
 
   // sorting
   const sortedDated = useMemo(() => {
+    // no sorting
     if (!sortConfig) {
       return filteredData;
     }
+
+    // sort
     const sorted = [...filteredData].sort((a, b) => {
       const aValue = a[sortConfig.key];
       const bValue = b[sortConfig.key];
-      if (aValue < bValue) {
-        return sortConfig.direction === "asc" ? -1 : 1;
+
+      // handle null/undefined values
+      if (aValue == null || bValue == null) {
+        return aValue == null ? 1 : -1;
       }
-      if (aValue > bValue) {
-        return sortConfig.direction === "asc" ? 1 : 1;
+
+      // string comparison
+      if (typeof aValue === "string" && typeof bValue === "string") {
+        return sortConfig.direction === "asc"
+          ? aValue.localeCompare(bValue, undefined, { sensitivity: "base" })
+          : bValue.localeCompare(aValue, undefined, { sensitivity: "base" });
       }
-      return 0;
+
+      // number comparison
+      if (typeof aValue === "number" && typeof bValue === "number") {
+        return sortConfig.direction === "asc"
+          ? aValue - bValue
+          : bValue - aValue;
+      }
+
+      // TODO: date comparison
+      // for now, dates are treated as strings and as long as in iso format, they will sort correctly
+
+      return 0; // default case
     });
     return sorted;
   }, [filteredData, sortConfig]);
@@ -94,10 +114,11 @@ export default function Table<T>({
       {/* Table */}
       <table>
         <thead>
-          <tr>
+          <tr className="no-hover">
             {columns.map((column) => (
               <th
                 key={String(column.accessor)}
+                className={column.sortable ? "sortable" : ""}
                 onClick={() => column.sortable && handleSort(column.accessor)}
               >
                 {column.header}
@@ -124,7 +145,7 @@ export default function Table<T>({
       </table>
 
       {/* Pagination */}
-      <div>
+      <div className="pagination">
         <button
           onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
           disabled={currentPage === 1}

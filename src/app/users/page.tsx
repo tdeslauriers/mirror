@@ -1,8 +1,6 @@
 import Loading from "@/components/loading";
 import GetOauthExchange from "@/components/oauth-exchange";
-
 import { cookies } from "next/headers";
-
 import { redirect } from "next/navigation";
 import { Suspense } from "react";
 import UserTable from "./user-table";

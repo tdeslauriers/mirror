@@ -52,7 +52,6 @@
 .page-title {
   padding-left: 1rem;
   width: 100%;
-
   align-items: left;
 }
 
@@ -105,7 +104,9 @@ hr.page-title {
   -webkit-text-fill-color: transparent;
 }
 
-.locallink:hover {
+.locallink:hover,
+.locallink:active,
+.locallink:focus {
   transition: 0.3s;
   text-shadow: var(--highlight-link-glow);
 }
