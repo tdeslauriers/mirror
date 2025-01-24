@@ -50,7 +50,7 @@ export default function Table<T>({
   }, [data, search, filterKeys]);
 
   // sorting
-  const sortedDated = useMemo(() => {
+  const sortedData = useMemo(() => {
     // no sorting
     if (!sortConfig) {
       return filteredData;
@@ -89,12 +89,15 @@ export default function Table<T>({
   }, [filteredData, sortConfig]);
 
   // pagination
-  const totalPages = Math.ceil(sortedDated.length / pageSize);
+  const totalPages = Math.ceil(sortedData.length / pageSize);
   const paginatedData = useMemo(() => {
+    if (currentPage > totalPages || totalPages === 0) {
+      setCurrentPage(1);
+    }
     const startIndex = (currentPage - 1) * pageSize;
     const endIndex = startIndex + pageSize;
-    return sortedDated.slice(startIndex, endIndex);
-  }, [sortedDated, currentPage, pageSize]);
+    return sortedData.slice(startIndex, endIndex);
+  }, [sortedData, currentPage, pageSize]);
 
   const handleSort = (key: keyof T) => {
     setSortConfig((prev) => {
@@ -153,13 +156,15 @@ export default function Table<T>({
           Prev
         </button>
         <span>
-          Page {currentPage} of {totalPages}
+          {totalPages === 0
+            ? `Page 0 of 0`
+            : `Page ${currentPage} of ${totalPages}`}
         </span>
         <button
           onClick={() =>
             setCurrentPage((prev) => Math.min(prev + 1, totalPages))
           }
-          disabled={currentPage === totalPages}
+          disabled={currentPage === totalPages || totalPages === 0}
         >
           Next
         </button>

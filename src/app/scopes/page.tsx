@@ -3,6 +3,7 @@ import GetOauthExchange from "@/components/oauth-exchange";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { Suspense } from "react";
+import ScopesTable from "./scopes_table";
 
 const pageError: string = "Failed to load scopes page: ";
 
@@ -67,12 +68,12 @@ export default async function ScopesPage() {
           </div>
           <hr className={`page-title`} />
           <div style={{ fontStyle: "italic" }}>
-            To navigate to a specifc scope record, click on its row in the table
-            below:
+            To navigate to a specifc scope record, click on the scope in the
+            table below:
           </div>
         </div>
         <Suspense fallback={<Loading />}>
-          {/* <ScopesTable data={scopes} /> */}
+          <ScopesTable data={scopes} />
         </Suspense>
       </main>
     </>
