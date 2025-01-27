@@ -11,7 +11,8 @@ export default function ErrorForm({
 }) {
   return (
     <>
-      <main className={styles.center}>
+      <main className={`main main-drawer`}>
+        <div className="center"></div>
         <div className={styles.error}>
           <h2>
             <span className={styles.highlightError}>
@@ -23,7 +24,9 @@ export default function ErrorForm({
             <p>{error.message}</p>
           </div>
           <div className={styles.actionsError}>
-            <button onClick={reset}><strong>Try again, but better</strong></button>
+            <button onClick={reset}>
+              <strong>Try again, but better</strong>
+            </button>
           </div>
         </div>
       </main>

@@ -10,7 +10,7 @@ export default function Error({
 }) {
   return (
     <>
-      <ErrorLoadPage error={error.message} redirectUrl={"/login"} />
+      <ErrorLoadPage errMsg={error.message} redirectUrl={"/login"} />
     </>
   );
 }

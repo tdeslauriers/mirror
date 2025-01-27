@@ -42,7 +42,7 @@ export default async function UsersPage() {
   });
 
   if (!response.ok) {
-    if (response.status === 401 || response.status === 403) {
+    if (response.status === 401) {
       const oauth = await GetOauthExchange(hasSession?.value, "/users");
       if (oauth) {
         redirect(
@@ -52,8 +52,8 @@ export default async function UsersPage() {
         redirect("/login");
       }
     } else {
-      const fail = await response.json();
-      throw new Error(fail.message);
+      const err = await response.json();
+      throw new Error(err.message);
     }
   }
 

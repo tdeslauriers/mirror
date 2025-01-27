@@ -64,9 +64,5 @@ export default function Callback() {
     }
   }
 
-  return (
-    <>
-      <div className={`center`}>{isLoading && <Loading />}</div>
-    </>
-  );
+  return <>{isLoading && <Loading />}</>;
 }

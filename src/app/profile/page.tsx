@@ -57,7 +57,7 @@ export default async function ProfilePage() {
   });
 
   if (!response.ok) {
-    if (response.status === 401 || response.status === 403) {
+    if (response.status === 401 ) {
       const oauth = await GetOauthExchange(hasSession?.value, "/profile");
       if (oauth) {
         redirect(

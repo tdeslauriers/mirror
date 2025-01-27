@@ -3,14 +3,14 @@
 import styles from "./error-form.module.css";
 
 export default function ErrorLoadPage({
-  error,
+  errMsg,
   redirectUrl,
 }: {
-  error: string | null;
+  errMsg: string | null;
   redirectUrl: string | null;
 }) {
-  if (!error) {
-    error =
+  if (!errMsg) {
+    errMsg =
       "An unknown error occurred.  Please try again. If the problem persists, please contact me.";
   }
   const handleRedirect = () => {
@@ -20,9 +20,12 @@ export default function ErrorLoadPage({
       window.location.href = "/";
     }
   };
+
+  const buttonLable = redirectUrl ? `Go to ${redirectUrl.slice(1)}` : "Go home";
   return (
     <>
-      <main className={styles.center}>
+      <main className={`main main-drawer`}>
+        <div className="center"></div>
         <div className={styles.error}>
           <h2>
             <span className={styles.highlightError}>
@@ -31,11 +34,11 @@ export default function ErrorLoadPage({
           </h2>
 
           <div className={styles.center}>
-            <p>{error}</p>
+            <p>{errMsg}</p>
           </div>
           <div className={styles.actionsError}>
             <button onClick={handleRedirect}>
-              <strong>Try again, but better</strong>
+              <strong>{buttonLable}</strong>
             </button>
           </div>
         </div>

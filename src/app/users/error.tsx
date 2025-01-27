@@ -1,6 +1,6 @@
 "use client";
 
-import ErrorForm from "@/components/errors/error-form";
+import ErrorLoadPage from "@/components/errors/error-load-page";
 
 export default function Error({
   error,
@@ -9,9 +9,16 @@ export default function Error({
   error: Error & { digest?: string };
   reset: () => void;
 }) {
+  let errMsg = "";
+  if (error.message === "forbidden" || error.message === "unauthorized") {
+    errMsg = `${error.message.toUpperCase()}: you do not have permission to view the /users page.`;
+  } else {
+    errMsg = error.message;
+  }
+
   return (
     <>
-      <ErrorForm error={error} reset={reset} />
+      <ErrorLoadPage errMsg={errMsg} redirectUrl={""} />
     </>
   );
 }

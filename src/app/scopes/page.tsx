@@ -18,7 +18,7 @@ export default async function ScopesPage() {
     : null;
 
   if (!hasIdentity) {
-    const oauth = await GetOauthExchange(hasSession?.value, "/users");
+    const oauth = await GetOauthExchange(hasSession?.value, "/scopes");
     if (oauth) {
       redirect(
         `/login?client_id=${oauth.client_id}&response_type=${oauth.response_type}&state=${oauth.state}&nonce=${oauth.nonce}&redirect_url=${oauth.redirect_url}`
@@ -34,7 +34,7 @@ export default async function ScopesPage() {
     throw new Error(pageError + "session cookie is missing");
   }
 
-  // get user data from gateway
+  // get scoeps data from gateway
   const response = await fetch(`${process.env.GATEWAY_SERVICE_URL}/scopes`, {
     headers: {
       Authorization: `${hasSession?.value}`,
@@ -42,7 +42,7 @@ export default async function ScopesPage() {
   });
 
   if (!response.ok) {
-    if (response.status === 401 || response.status === 403) {
+    if (response.status === 401 ) {
       const oauth = await GetOauthExchange(hasSession?.value, "/scopes");
       if (oauth) {
         redirect(
