@@ -3,17 +3,9 @@
 import Table, { TableColumn } from "@/components/table";
 import Link from "next/link";
 import { Suspense, useState } from "react";
+import { Scope } from ".";
 
-interface Scope {
-  scope_id: string;
-  service_name: string;
-  scope: string;
-  name: string;
-  description: string;
-  created_at: string;
-  active: boolean;
-  slug: string;
-}
+
 
 interface ScopesTableProps {
   data: Scope[];

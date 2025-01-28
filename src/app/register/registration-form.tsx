@@ -9,7 +9,7 @@ import {
   NAME_MIN_LENGTH,
   PASSWORD_MAX_LENGTH,
   PASSWORD_MIN_LENGTH,
-} from "@/validation/fields";
+} from "@/validation/user_fields";
 import Link from "next/link";
 import { PasswordEntries, RegistrationActionCmd, validatePasswords } from ".";
 import FormSubmit from "@/components/form-submit";

@@ -6,7 +6,7 @@ import {
   FieldValidation,
   PASSWORD_MAX_LENGTH,
   PASSWORD_MIN_LENGTH,
-} from "@/validation/fields";
+} from "@/validation/user_fields";
 import { error } from "console";
 
 export type Profile = {
@@ -185,4 +185,3 @@ export function validatePasswords(reset: ResetData) {
 
   return errors;
 }
-

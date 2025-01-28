@@ -3,8 +3,8 @@ import {
   PASSWORD_MIN_LENGTH,
   PASSWORD_MAX_LENGTH,
   checkUuid,
-} from "./../../validation/fields";
-import { EMAIL_MIN_LENGTH } from "@/validation/fields";
+} from "../../validation/user_fields";
+import { EMAIL_MIN_LENGTH } from "@/validation/user_fields";
 import { OauthExchange } from "../api";
 
 export const pageError =

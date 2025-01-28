@@ -5,7 +5,7 @@ import {
   FieldValidation,
   PASSWORD_MAX_LENGTH,
   PASSWORD_MIN_LENGTH,
-} from "@/validation/fields";
+} from "@/validation/user_fields";
 import { ChangeEvent, useActionState, useState } from "react";
 import ErrorField from "@/components/errors/error-field";
 import { ResetData, ResetPwActionCmd } from ".";

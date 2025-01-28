@@ -41,7 +41,7 @@ export default async function ProfilePage() {
     throw new Error(pageError + "session cookie is missing");
   }
 
-  // get csrf token from gateway for registration form
+  // get csrf token from gateway for profile form
   const csrf = await GetCsrf(hasSession.value);
 
   if (!csrf) {
@@ -57,7 +57,7 @@ export default async function ProfilePage() {
   });
 
   if (!response.ok) {
-    if (response.status === 401 ) {
+    if (response.status === 401) {
       const oauth = await GetOauthExchange(hasSession?.value, "/profile");
       if (oauth) {
         redirect(
@@ -75,14 +75,6 @@ export default async function ProfilePage() {
   // parse profile data from response
   const profile: Profile = await response.json();
 
-  // create the 'registered since' date
-  const createdAt = profile.created_at ? profile.created_at : "";
-  const regDate = new Date(createdAt).toLocaleDateString("en-US", {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-  });
-
   return (
     <>
       <main className={`main main-drawer`}>
@@ -93,8 +85,15 @@ export default async function ProfilePage() {
             </h1>
           </div>
           <hr className={`page-title`} />
-          {createdAt.length > 0 && (
-            <p style={{ fontStyle: "italic" }}>Registered since {regDate}</p>
+          {profile && profile.created_at && (
+            <p style={{ fontStyle: "italic" }}>
+              Registered since{" "}
+              {new Date(profile.created_at).toLocaleDateString("en-US", {
+                year: "numeric",
+                month: "long",
+                day: "numeric",
+              })}
+            </p>
           )}
         </div>
         <div className="card-title">

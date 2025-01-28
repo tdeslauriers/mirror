@@ -3,7 +3,7 @@ import {
   IdentityCookie,
   isGatewayError,
 } from "./../../index";
-import { checkUuid } from "@/validation/fields";
+import { checkUuid } from "@/validation/user_fields";
 import { NextRequest, NextResponse } from "next/server";
 import {
   CallbackCmd,

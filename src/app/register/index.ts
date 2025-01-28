@@ -5,7 +5,7 @@ import {
   checkName,
   checkPassword,
   FieldValidation,
-} from "@/validation/fields";
+} from "@/validation/user_fields";
 
 export const pageError =
   "Failed to load registration page.  Please try again.  If the problem persists, please contact me.";

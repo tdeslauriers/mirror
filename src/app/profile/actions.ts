@@ -49,7 +49,6 @@ export async function handleUserEdit(
     : null;
 
   // call gateway profile endpoint
-  // process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
   try {
     const apiResponse = await fetch(
       `${process.env.GATEWAY_SERVICE_URL}/profile`,

@@ -1,6 +1,9 @@
 import GetOauthExchange from "@/components/oauth-exchange";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
+import ScopeForm from "./scope-form";
+import GetCsrf from "@/components/csrf-token";
+import { handleScopeEdit } from "./actions";
 
 const pageError = "Failed to load scope record page: ";
 
@@ -22,7 +25,7 @@ export default async function Page({
     : null;
 
   if (!hasIdentity) {
-    const oauth = await GetOauthExchange(hasSession?.value, `/scope/${slug}`);
+    const oauth = await GetOauthExchange(hasSession?.value, `/scopes/${slug}`);
     if (oauth) {
       redirect(
         `/login?client_id=${oauth.client_id}&response_type=${oauth.response_type}&state=${oauth.state}&nonce=${oauth.nonce}&redirect_url=${oauth.redirect_url}`
@@ -30,6 +33,24 @@ export default async function Page({
     } else {
       redirect("/login");
     }
+  }
+
+  // check session cookie exists for api calls
+  if (!hasSession) {
+    console.log(pageError + "session cookie is missing");
+    throw new Error(pageError + "session cookie is missing");
+  }
+
+  // get csrf token from gateway for profile form
+  const csrf = await GetCsrf(hasSession.value);
+
+  if (!csrf) {
+    console.log(
+      pageError + "CSRF token could not be retrieved for scope form."
+    );
+    throw new Error(
+      pageError + "CSRF token could not be retrieved for scope form."
+    );
   }
 
   // check session cookie exists for api call
@@ -40,7 +61,7 @@ export default async function Page({
 
   // get scope record data from gateway
   const response = await fetch(
-    `${process.env.GATEWAY_SERVICE_URL}/scope/${slug}`,
+    `${process.env.GATEWAY_SERVICE_URL}/scopes/${slug}`,
     {
       headers: {
         Authorization: `${hasSession?.value}`,
@@ -50,7 +71,10 @@ export default async function Page({
 
   if (!response.ok) {
     if (response.status === 401) {
-      const oauth = await GetOauthExchange(hasSession?.value, `/scope/${slug}`);
+      const oauth = await GetOauthExchange(
+        hasSession?.value,
+        `/scopes/${slug}`
+      );
       if (oauth) {
         redirect(
           `/login?client_id=${oauth.client_id}&response_type=${oauth.response_type}&state=${oauth.state}&nonce=${oauth.nonce}&redirect_url=${oauth.redirect_url}`
@@ -72,12 +96,26 @@ export default async function Page({
         <div className={`center`}>
           <div className={`page-title`}>
             <h1>
-              Scopes:{" "}
+              Scope:{" "}
               {scope && scope.scope && (
                 <span className="highlight">{scope.scope}</span>
               )}
             </h1>
           </div>
+          <hr className={`page-title`} />
+          {scope && scope.created_at && (
+            <p style={{ fontStyle: "italic" }}>
+              Scope created{" "}
+              {new Date(scope.created_at).toLocaleDateString("en-US", {
+                year: "numeric",
+                month: "long",
+                day: "numeric",
+              })}
+            </p>
+          )}
+        </div>
+        <div className="card">
+          <ScopeForm csrf={csrf} scope={scope} scopeEdit={handleScopeEdit}/>
         </div>
       </main>
     </>
