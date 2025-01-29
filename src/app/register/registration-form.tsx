@@ -221,10 +221,7 @@ export default function RegistrationForm({
               >
                 Birth date{" "}
                 <sup>
-                  <span
-                    className={`highlight`}
-                    style={{ textTransform: "lowercase" }}
-                  >
+                  <span className={`highlight`} style={{ fontSize: ".7rem" }}>
                     optional
                   </span>
                 </sup>

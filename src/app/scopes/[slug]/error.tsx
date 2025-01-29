@@ -1,6 +1,6 @@
 "use client";
 
-import ErrorLoadPage from "@/components/errors/error-load-page";
+import ErrorForm from "@/components/errors/error-form";
 
 export default function Error({
   error,
@@ -9,16 +9,9 @@ export default function Error({
   error: Error & { digest?: string };
   reset: () => void;
 }) {
-  let errMsg = "";
-  if (error.message === "forbidden") {
-    errMsg = `${error.message.toUpperCase()}: you do not have permission to view this scope's page.`;
-  } else {
-    errMsg = error.message;
-  }
-
   return (
     <>
-      <ErrorLoadPage errMsg={errMsg} redirectUrl={""} />
+      <ErrorForm error={error} reset={reset} />
     </>
   );
 }

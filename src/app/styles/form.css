@@ -63,7 +63,8 @@
 }
 
 .form input[type="text"],
-.form input[type="password"] {
+.form input[type="password"],
+.form textarea {
   display: block;
   width: 100%;
   padding: 0.5rem 1rem;
@@ -76,7 +77,8 @@
 }
 
 .form input:focus[type="text"],
-.form input:focus[type="password"] {
+.form input:focus[type="password"],
+.form textarea:focus {
   transition: 0.3s;
   outline-style: solid;
   outline-color: var(--primary-site-color);
@@ -103,6 +105,18 @@ input[type="checkbox"]:focus {
   transform: scale(2) translateZ(0); /* trigger GPU acceleration */
   will-change: transform; /* inform the browser that this element will be animated */
 }
+
+/* textarea {
+  display: block;
+  width: 100%;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  border: 1px solid #60635f;
+  color: rgb(var(--foreground-rgb));
+  background: rgb(var(--background-end-rgb));
+  font-size: 1.25rem;
+  font-family: "Montserrat", sans-serif;
+} */
 
 .date {
   width: 100%;

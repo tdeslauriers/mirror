@@ -114,8 +114,21 @@ export default async function Page({
             </p>
           )}
         </div>
+        <div className="card-title">
+          <h2>
+            Id:{" "}
+            {scope && scope.scope_id && (
+              <span className="highlight">{scope.scope_id}</span>
+            )}
+          </h2>
+        </div>
         <div className="card">
-          <ScopeForm csrf={csrf} scope={scope} scopeEdit={handleScopeEdit}/>
+          <ScopeForm
+            csrf={csrf}
+            slug={slug}
+            scope={scope}
+            scopeEdit={handleScopeEdit}
+          />
         </div>
       </main>
     </>

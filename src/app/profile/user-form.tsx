@@ -35,6 +35,7 @@ export default function UserForm({
         {profileState.errors.server && (
           <ErrorField errorMsgs={profileState.errors.server} />
         )}
+
         <div className={`row`}>
           <div className={`field`}>
             <label className={`label`} htmlFor="firstname">
@@ -57,6 +58,7 @@ export default function UserForm({
             />
           </div>
         </div>
+
         <div className={`row`}>
           <div className={`field`}>
             <label className={`label`} htmlFor="lastname">
@@ -147,10 +149,11 @@ export default function UserForm({
             </div>
           </div>
         </div>
+
         <div className={`row`}>
           <FormSubmit
-            buttonLabel="update user data"
-            pendingLabel="updating user record..."
+            buttonLabel="update profile data"
+            pendingLabel="updating profile record..."
           />
         </div>
       </form>
