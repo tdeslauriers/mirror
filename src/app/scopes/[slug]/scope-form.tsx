@@ -11,6 +11,7 @@ import {
   SERVICENAME_MIN_LENGTH,
 } from "@/validation/scope_fields";
 import FormSubmit from "@/components/form-submit";
+import ErrorField from "@/components/errors/error-field";
 
 export default function ScopeForm({
   csrf,
@@ -36,11 +37,18 @@ export default function ScopeForm({
   return (
     <>
       <form className="form" action={formAction}>
+        {scopeState.errors.server && (
+          <ErrorField errorMsgs={scopeState.errors.server} />
+        )}
+
         <div className="row">
           <div className="field">
             <label className="label" htmlFor="service_name">
               Service Name
             </label>
+            {scopeState.errors.service_name && (
+              <ErrorField errorMsgs={scopeState.errors.service_name} />
+            )}
             <input
               className="form"
               name="service_name"
@@ -66,6 +74,9 @@ export default function ScopeForm({
                 </span>
               </sup>
             </label>
+            {scopeState.errors.scope && (
+              <ErrorField errorMsgs={scopeState.errors.scope} />
+            )}
             <input
               className="form"
               name="scope"
@@ -86,6 +97,9 @@ export default function ScopeForm({
             <label className="label" htmlFor="name">
               Name
             </label>
+            {scopeState.errors.name && (
+              <ErrorField errorMsgs={scopeState.errors.name} />
+            )}
             <input
               className="form"
               name="name"
@@ -105,6 +119,9 @@ export default function ScopeForm({
             <label className="label" htmlFor="description">
               Description
             </label>
+            {scopeState.errors.description && (
+              <ErrorField errorMsgs={scopeState.errors.description} />
+            )}
             <textarea
               className="form"
               name="description"
@@ -119,6 +136,9 @@ export default function ScopeForm({
             <label className="label" htmlFor="active">
               Active
             </label>
+            {scopeState.errors.active && (
+              <ErrorField errorMsgs={scopeState.errors.active} />
+            )}
             <input
               className="form"
               name="active"

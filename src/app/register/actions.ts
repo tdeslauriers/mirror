@@ -54,9 +54,13 @@ export async function handleRegistration(
     ? cookieStore.get("session_id")
     : null;
 
-  if (!hasSession) {
+  if (
+    !hasSession ||
+    hasSession.value.trim().length < 16 ||
+    hasSession.value.trim().length > 64
+  ) {
     console.log(
-      `Session cookie is missing for a registration attempt, proposed username: ${registration.username}.`
+      `Session cookie is missing or not well formed for a registration attempt, proposed username: ${registration.username}.`
     );
     throw new Error(ErrMsgGeneric);
   }

@@ -47,6 +47,15 @@ export async function handleUserEdit(
   const hasSession = cookieStore.has("session_id")
     ? cookieStore.get("session_id")
     : null;
+  if (
+    !hasSession ||
+    hasSession.value.trim().length < 16 ||
+    hasSession.value.trim().length > 64
+  ) {
+    throw new Error(
+      "Session cookie is missing or not well formed.  This value is required and cannot be tampered with."
+    );
+  }
 
   // call gateway profile endpoint
   try {
@@ -119,9 +128,17 @@ export async function handleReset(
   const hasSession = cookieStore.has("session_id")
     ? cookieStore.get("session_id")
     : null;
+  if (
+    !hasSession ||
+    hasSession.value.trim().length < 16 ||
+    hasSession.value.trim().length > 64
+  ) {
+    throw new Error(
+      "Session cookie is missing or not well formed.  This value is required and cannot be tampered with."
+    );
+  }
 
   // call gateway reset endpoint
-  // process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
   try {
     const apiResponse = await fetch(
       `${process.env.GATEWAY_SERVICE_URL}/reset`,
@@ -166,6 +183,8 @@ export async function handleReset(
   }
 }
 
+const ErrPasswordInvalid = "password must include";
+const ErrPasswordInvalidContains = "password contains";
 const ErrPasswordUsedPreviously = "password has been used previously";
 const ErrNewConfirmPwMismatch =
   "new password and confirmation password do not match";
@@ -175,14 +194,16 @@ function handleProfileErrors(gatewayError: GatewayError) {
 
   switch (gatewayError.code) {
     case 400:
-      errors.badrequest = [gatewayError.message];
+      errors.server = [gatewayError.message];
       return errors;
     case 401:
+      errors.server = [gatewayError.message];
     case 403:
+      errors.server = [gatewayError.message];
     case 404:
       errors.server = [gatewayError.message];
     case 405:
-      errors.badrequest = [gatewayError.message];
+      errors.server = [gatewayError.message];
       return errors;
     case 422:
       // temporary fix for now: determine which error received
@@ -197,9 +218,15 @@ function handleProfileErrors(gatewayError: GatewayError) {
           errors.birthdate = [gatewayError.message];
           return errors;
         case gatewayError.message.includes(ErrPasswordUsedPreviously):
-          errors.new_password = [gatewayError.message];
+          errors.confirm_password = [gatewayError.message];
           return errors;
         case gatewayError.message.includes(ErrNewConfirmPwMismatch):
+          errors.confirm_password = [gatewayError.message];
+          return errors;
+        case gatewayError.message.includes(ErrPasswordInvalid):
+          errors.confirm_password = [gatewayError.message];
+          return errors;
+        case gatewayError.message.includes(ErrPasswordInvalidContains):
           errors.confirm_password = [gatewayError.message];
           return errors;
         default:
