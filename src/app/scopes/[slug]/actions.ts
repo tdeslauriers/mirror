@@ -27,12 +27,15 @@ export async function handleScopeEdit(
   }
 
   let updated: Scope = {
+    csrf: csrf,
+
     // TODO: update service name to be dropdown
     service_name: formData.get("service_name") as string,
     scope: formData.get("scope") as string,
     name: formData.get("name") as string,
     description: formData.get("description") as string,
     active: formData.get("active") === "on" ? true : false,
+    slug: slug, // this will be discarded by the scope service, but good practice to include it
   };
 
   // validate form data
