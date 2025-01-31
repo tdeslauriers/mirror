@@ -1,11 +1,10 @@
 import {
   checkScope,
   checkScopeDescription,
+  checkScopeName,
   checkServiceName,
-  SERVICENAME_MAX_LENGTH,
-  SERVICENAME_MIN_LENGTH,
 } from "@/validation/scope_fields";
-import { checkName, FieldValidation } from "@/validation/user_fields";
+import { FieldValidation } from "@/validation/user_fields";
 
 export type Scope = {
   csrf?: string;
@@ -60,7 +59,7 @@ export function validateScope(scope: Scope) {
   }
 
   if (scope.name && scope.name.trim().length > 0) {
-    const nameCheck: FieldValidation = checkName(scope.name);
+    const nameCheck: FieldValidation = checkScopeName(scope.name);
     if (!nameCheck.isValid) {
       errors.name = nameCheck.messages;
     }

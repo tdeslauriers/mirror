@@ -4,11 +4,11 @@ const SERVICENAME_REGEX: RegExp = /^[a-z]+$/; // service names can only be lower
 
 export const SCOPE_MIN_LENGTH = 7; // r:ran:*
 export const SCOPE_MAX_LENGTH = 64;
-const SCOPE_REGEX: RegExp = /^[a-z\:\*]+$/;
+const SCOPE_REGEX: RegExp = /^[a-z0-9\:\*]+$/;
 
 export const SCOPE_NAME_MIN_LENGTH = 2;
 export const SCOPE_NAME_MAX_LENGTH = 64;
-const SCOPE_NAME_REGEX: RegExp = /^[a-zA-Z0-9\s]+$/;
+const SCOPE_NAME_REGEX: RegExp = /^[a-zA-Z0-9 ]+$/;
 
 export const SCOPE_DESCRIPTION_MIN_LENGTH = 2;
 export const SCOPE_DESCRIPTION_MAX_LENGTH = 254;
