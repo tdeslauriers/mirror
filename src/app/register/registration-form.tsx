@@ -12,7 +12,7 @@ import {
 } from "@/validation/user_fields";
 import Link from "next/link";
 import { PasswordEntries, RegistrationActionCmd, validatePasswords } from ".";
-import FormSubmit from "@/components/form-submit";
+import FormSubmit from "@/components/forms/form-submit";
 
 type Err = { [key: string]: string[] };
 

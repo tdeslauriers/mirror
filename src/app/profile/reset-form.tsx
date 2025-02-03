@@ -9,7 +9,7 @@ import {
 import { ChangeEvent, useActionState, useState } from "react";
 import ErrorField from "@/components/errors/error-field";
 import { ResetData, ResetPwActionCmd } from ".";
-import FormSubmit from "@/components/form-submit";
+import FormSubmit from "@/components/forms/form-submit";
 
 type Err = { [key: string]: string[] };
 

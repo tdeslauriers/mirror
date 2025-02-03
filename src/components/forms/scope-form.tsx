@@ -1,7 +1,7 @@
 "use client";
 
 import { useActionState } from "react";
-import { Scope, ScopeActionCmd } from "..";
+
 import {
   SCOPE_MAX_LENGTH,
   SCOPE_MIN_LENGTH,
@@ -10,24 +10,44 @@ import {
   SERVICENAME_MAX_LENGTH,
   SERVICENAME_MIN_LENGTH,
 } from "@/validation/scope_fields";
-import FormSubmit from "@/components/form-submit";
+import FormSubmit from "@/components/forms/form-submit";
 import ErrorField from "@/components/errors/error-field";
+
+export type Scope = {
+  csrf?: string;
+
+  scope_id?: string;
+  service_name?: string;
+  scope?: string;
+  name?: string;
+  description?: string;
+  created_at?: string;
+  active?: boolean;
+  slug?: string;
+};
+
+export type ScopeActionCmd = {
+  csrf?: string;
+  slug?: string | null;
+  scope?: Scope | null;
+  errors: { [key: string]: string[] };
+};
 
 export default function ScopeForm({
   csrf,
   slug,
   scope,
-  scopeEdit,
+  scopeFormUpdate,
 }: {
   csrf: string;
-  slug: string;
-  scope: Scope;
-  scopeEdit: (
+  slug: string | null;
+  scope: Scope | null;
+  scopeFormUpdate: (
     prevState: ScopeActionCmd,
     formData: FormData
   ) => ScopeActionCmd | Promise<ScopeActionCmd>;
 }) {
-  const [scopeState, formAction] = useActionState(scopeEdit, {
+  const [scopeState, formAction] = useActionState(scopeFormUpdate, {
     csrf: csrf,
     slug: slug,
     scope: scope,

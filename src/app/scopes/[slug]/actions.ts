@@ -1,8 +1,9 @@
 "use server";
 
 import { cookies } from "next/headers";
-import { Scope, ScopeActionCmd, validateScope } from "..";
+import {  validateScope } from "..";
 import { GatewayError, isGatewayError } from "@/app/api";
+import { Scope, ScopeActionCmd } from "@/components/forms/scope-form";
 
 export async function handleScopeEdit(
   previousState: ScopeActionCmd,
@@ -60,7 +61,7 @@ export async function handleScopeEdit(
     hasSession.value.trim().length > 64
   ) {
     throw new Error(
-      "Session cookie is missingor not well formed.  This value is required and cannot be tampered with."
+      "Session cookie is missing or not well formed.  This value is required and cannot be tampered with."
     );
   }
 

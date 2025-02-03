@@ -10,7 +10,7 @@ import {
 } from "@/validation/user_fields";
 import { handleLogin } from "./actions";
 import { OauthExchange } from "../api";
-import FormSubmit from "@/components/form-submit";
+import FormSubmit from "@/components/forms/form-submit";
 import ErrorField from "@/components/errors/error-field";
 
 export default function LoginForm({

@@ -1,7 +1,7 @@
 import GetOauthExchange from "@/components/oauth-exchange";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
-import ScopeForm from "./scope-form";
+import ScopeForm from "@/components/forms/scope-form";
 import GetCsrf from "@/components/csrf-token";
 import { handleScopeEdit } from "./actions";
 
@@ -51,12 +51,6 @@ export default async function Page({
     throw new Error(
       pageError + "CSRF token could not be retrieved for scope form."
     );
-  }
-
-  // check session cookie exists for api call
-  if (!hasSession) {
-    console.log(pageError + "session cookie is missing");
-    throw new Error(pageError + "session cookie is missing");
   }
 
   // get scope record data from gateway
@@ -127,7 +121,7 @@ export default async function Page({
             csrf={csrf}
             slug={slug}
             scope={scope}
-            scopeEdit={handleScopeEdit}
+            scopeFormUpdate={handleScopeEdit}
           />
         </div>
       </main>
