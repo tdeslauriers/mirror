@@ -1,5 +1,5 @@
 table {
-  width: auto; /* Full width */
+  width: 100vh;
   border-collapse: collapse; /* Ensures no extra spacing between cells */
   margin: 1rem 0;
 
@@ -54,7 +54,6 @@ td {
 
 tbody tr:nth-child(even) {
   /* Alternating row color for better readability */
-
   background-color: rgb(49, 50, 49);
 }
 

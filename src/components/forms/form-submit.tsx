@@ -1,7 +1,6 @@
 "use client";
 
 import { useFormStatus } from "react-dom";
-import styles from "./form-submit.module.css";
 
 interface FormSubmitProps {
   buttonLabel: string;
@@ -19,7 +18,7 @@ export default function FormSubmit({
 
   return (
     <>
-      <div className={styles.actions}>
+      <div className={`actions`}>
         <button type="submit" disabled={status.pending}>
           <strong>
             {status.pending ? pending.toUpperCase() : buttonLabel.toUpperCase()}

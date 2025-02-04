@@ -5,7 +5,6 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { handleScopeAdd } from "./actions";
 
-
 const pageError = "Failed to load scope add page: ";
 
 export default async function Page() {

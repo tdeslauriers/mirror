@@ -93,6 +93,11 @@ export default function NavDrawer() {
                         Scopes
                       </Link>
                     </li>
+                    <li>
+                      <Link className={`locallink`} href={"/services"}>
+                        Services
+                      </Link>
+                    </li>
                   </ul>
                 )}
               </div>

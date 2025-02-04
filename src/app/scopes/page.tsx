@@ -4,6 +4,7 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { Suspense } from "react";
 import ScopesTable from "./scopes_table";
+import Link from "next/link";
 
 const pageError: string = "Failed to load scopes page: ";
 
@@ -42,7 +43,7 @@ export default async function ScopesPage() {
   });
 
   if (!response.ok) {
-    if (response.status === 401 ) {
+    if (response.status === 401) {
       const oauth = await GetOauthExchange(hasSession?.value, "/scopes");
       if (oauth) {
         redirect(
@@ -64,7 +65,19 @@ export default async function ScopesPage() {
       <main className={`main main-drawer`}>
         <div className={`center`}>
           <div className={`page-title`}>
-            <h1>Scopes</h1>
+            <div
+              className="actions"
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                paddingRight: "1rem",
+              }}
+            >
+              <h1>Scopes</h1>
+              <Link href="/scopes/add">
+                <button>Add Scope</button>
+              </Link>
+            </div>
           </div>
           <hr className={`page-title`} />
           <div style={{ fontStyle: "italic" }}>
