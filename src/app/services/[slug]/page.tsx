@@ -1,0 +1,137 @@
+import GetCsrf from "@/components/csrf-token";
+import ClientForm from "@/components/forms/client-form";
+import Loading from "@/components/loading";
+import GetOauthExchange from "@/components/oauth-exchange";
+import { log } from "console";
+import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
+import { Suspense } from "react";
+import { handleClientEdit } from "./actions";
+
+const pageError = "Failed to load service client page.";
+
+export default async function Page({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}) {
+  // get slug param from url
+  const slug = (await params).slug;
+
+  // quick for redirect if auth'd cookies not present
+  const cookieStore = await cookies();
+  const hasIdentity = cookieStore.has("identity")
+    ? cookieStore.get("identity")
+    : null;
+  const hasSession = cookieStore.has("session_id")
+    ? cookieStore.get("session_id")
+    : null;
+
+  if (!hasIdentity) {
+    const oauth = await GetOauthExchange(hasSession?.value, `/clients/${slug}`);
+    if (oauth) {
+      redirect(
+        `/login?client_id=${oauth.client_id}&response_type=${oauth.response_type}&state=${oauth.state}&nonce=${oauth.nonce}&redirect_url=${oauth.redirect_url}`
+      );
+    } else {
+      redirect("/login");
+    }
+  }
+
+  // check session cookie exists for api calls
+  if (!hasSession) {
+    console.log(pageError + "session cookie is missing");
+    throw new Error(pageError + "session cookie is missing");
+  }
+
+  // get csrf token from gateway for profile form
+  const csrf = await GetCsrf(hasSession.value);
+
+  if (!csrf) {
+    console.log(
+      pageError + "CSRF token could not be retrieved for client form."
+    );
+    throw new Error(
+      pageError + "CSRF token could not be retrieved for client form."
+    );
+  }
+
+  // get client record data from gateway
+  const response = await fetch(
+    `${process.env.GATEWAY_SERVICE_URL}/clients/${slug}`,
+    {
+      headers: {
+        Authorization: `${hasSession?.value}`,
+      },
+    }
+  );
+
+  if (!response.ok) {
+    if (response.status === 401) {
+      const oauth = await GetOauthExchange(
+        hasSession?.value,
+        `/clients/${slug}`
+      );
+      if (oauth) {
+        redirect(
+          `/login?client_id=${oauth.client_id}&response_type=${oauth.response_type}&state=${oauth.state}&nonce=${oauth.nonce}&redirect_url=${oauth.redirect_url}`
+        );
+      } else {
+        redirect("/login");
+      }
+    } else {
+      const fail = await response.json();
+      throw new Error(fail.message);
+    }
+  }
+
+  const client = await response.json();
+  log(client);
+
+  return (
+    <>
+      <main className="main main-drawer">
+        <div className="center">
+          <div className="page-title">
+            <h1>
+              Service:{" "}
+              {client && client.name && (
+                <span className="highlight">{client.name}</span>
+              )}
+            </h1>
+          </div>
+          <hr className="page-title" />
+
+          {client && client.created_at && (
+            <p>
+              Client created{" "}
+              {new Date(client.created_at).toLocaleDateString("en-US", {
+                year: "numeric",
+                month: "long",
+                day: "numeric",
+              })}
+            </p>
+          )}
+        </div>
+        <div className="card-title">
+          <h2>
+            Service Id:{" "}
+            {client && client.id && (
+              <span className="highlight">{client.id}</span>
+            )}
+          </h2>
+        </div>
+        <div className="card">
+          <Suspense fallback={<Loading />}>
+            <ClientForm
+              csrf={csrf}
+              slug={slug}
+              client={client}
+              clientFormUpdate={handleClientEdit}
+            />
+          </Suspense>
+        </div>
+      </main>
+    </>
+  );
+}
