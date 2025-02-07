@@ -1,6 +1,4 @@
-export const SERVICENAME_MIN_LENGTH = 2;
-export const SERVICENAME_MAX_LENGTH = 32;
-const SERVICENAME_REGEX: RegExp = /^[a-z]+$/; // service names can only be lowercase letters
+import { SERVICENAME_MAX_LENGTH, SERVICENAME_MIN_LENGTH, SERVICENAME_REGEX } from "./service_client_field";
 
 export const SCOPE_MIN_LENGTH = 7; // r:ran:*
 export const SCOPE_MAX_LENGTH = 64;
@@ -12,28 +10,6 @@ const SCOPE_NAME_REGEX: RegExp = /^[a-zA-Z0-9 ]+$/;
 
 export const SCOPE_DESCRIPTION_MIN_LENGTH = 2;
 export const SCOPE_DESCRIPTION_MAX_LENGTH = 254;
-
-export function checkServiceName(service_name: string) {
-  let errors: string[] = [];
-  if (
-    service_name.trim().length < SERVICENAME_MIN_LENGTH ||
-    service_name.trim().length > SERVICENAME_MAX_LENGTH
-  ) {
-    errors.push(
-      `Service name must be between ${SERVICENAME_MIN_LENGTH} and ${SERVICENAME_MAX_LENGTH} characters long.`
-    );
-  }
-
-  if (!SERVICENAME_REGEX.test(service_name)) {
-    errors.push("Service name must be lowercase letters only.");
-  }
-
-  if (errors.length > 0) {
-    return { isValid: false, messages: errors };
-  }
-
-  return { isValid: true, messages: [] };
-}
 
 export function checkScope(scope: string) {
   let errors: string[] = [];

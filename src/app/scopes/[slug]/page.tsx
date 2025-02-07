@@ -4,6 +4,8 @@ import { redirect } from "next/navigation";
 import ScopeForm from "@/components/forms/scope-form";
 import GetCsrf from "@/components/csrf-token";
 import { handleScopeEdit } from "./actions";
+import { Suspense } from "react";
+import Loading from "@/components/loading";
 
 const pageError = "Failed to load scope record page: ";
 
@@ -110,19 +112,21 @@ export default async function Page({
         </div>
         <div className="card-title">
           <h2>
-            Id:{" "}
+            Scope Id:{" "}
             {scope && scope.scope_id && (
               <span className="highlight">{scope.scope_id}</span>
             )}
           </h2>
         </div>
         <div className="card">
-          <ScopeForm
-            csrf={csrf}
-            slug={slug}
-            scope={scope}
-            scopeFormUpdate={handleScopeEdit}
-          />
+          <Suspense fallback={<Loading />}>
+            <ScopeForm
+              csrf={csrf}
+              slug={slug}
+              scope={scope}
+              scopeFormUpdate={handleScopeEdit}
+            />
+          </Suspense>
         </div>
       </main>
     </>

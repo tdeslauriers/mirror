@@ -34,15 +34,18 @@ export default function Callback() {
         });
 
         if (response.ok) {
-          setIsLoading(false);
+          // no need to turn off loading because will navigate away
           setCallbackSucceeded(true);
         } else {
           const fail = await response.json();
           console.log("failed to call oauth 2 redirect", fail);
           setIsLoading(false);
+          throw new Error("failed to call oauth 2 redirect");
         }
       } catch (error) {
-        console.log(error);
+        console.log("failed to call oauth 2 redirect/callback", error);
+        setIsLoading(false);
+        throw new Error("failed to call oauth 2 redirect/callback");
       }
     };
 

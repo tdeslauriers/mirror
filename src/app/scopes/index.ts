@@ -1,10 +1,10 @@
-import { Scope } from "@/components/forms/scope-form";
+import { Scope } from "@/components/forms";
 import {
   checkScope,
   checkScopeDescription,
   checkScopeName,
-  checkServiceName,
 } from "@/validation/scope_fields";
+import { checkServiceName } from "@/validation/service_client_field";
 import { FieldValidation } from "@/validation/user_fields";
 
 export function validateScope(scope: Scope) {

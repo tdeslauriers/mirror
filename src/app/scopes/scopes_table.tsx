@@ -1,11 +1,10 @@
 "use client";
 
+
+import { Scope } from "@/components/forms";
 import Table, { TableColumn } from "@/components/table";
 import Link from "next/link";
 import { Suspense, useState } from "react";
-import { Scope } from ".";
-
-
 
 interface ScopesTableProps {
   data: Scope[];

@@ -18,7 +18,7 @@ export default function Error({
 
   return (
     <>
-      <ErrorLoadPage errMsg={errMsg} redirectUrl={""} />
+      <ErrorLoadPage errMsg={errMsg} redirectUrl={"/users"} />
     </>
   );
 }

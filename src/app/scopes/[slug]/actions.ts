@@ -1,14 +1,29 @@
 "use server";
 
 import { cookies } from "next/headers";
-import {  validateScope } from "..";
+import { validateScope } from "..";
 import { GatewayError, isGatewayError } from "@/app/api";
-import { Scope, ScopeActionCmd } from "@/components/forms/scope-form";
+import { Scope, ScopeActionCmd } from "@/components/forms";
 
 export async function handleScopeEdit(
   previousState: ScopeActionCmd,
   formData: FormData
 ) {
+  // get session token
+  const cookieStore = await cookies();
+  const hasSession = cookieStore.has("session_id")
+    ? cookieStore.get("session_id")
+    : null;
+  if (
+    !hasSession ||
+    hasSession.value.trim().length < 16 ||
+    hasSession.value.trim().length > 64
+  ) {
+    throw new Error(
+      "Session cookie is missing or not well formed.  This value is required and cannot be tampered with."
+    );
+  }
+
   // light-weight validation of csrf token
   // true validation happpens in the gateway
   const csrf = previousState.csrf;
@@ -36,7 +51,6 @@ export async function handleScopeEdit(
     name: formData.get("name") as string,
     description: formData.get("description") as string,
     active: formData.get("active") === "on" ? true : false,
-    slug: slug, // this will be discarded by the scope service, but good practice to include it
   };
 
   // validate form data
@@ -48,21 +62,6 @@ export async function handleScopeEdit(
       scope: updated,
       errors: errors,
     } as ScopeActionCmd;
-  }
-
-  // get session token
-  const cookieStore = await cookies();
-  const hasSession = cookieStore.has("session_id")
-    ? cookieStore.get("session_id")
-    : null;
-  if (
-    !hasSession ||
-    hasSession.value.trim().length < 16 ||
-    hasSession.value.trim().length > 64
-  ) {
-    throw new Error(
-      "Session cookie is missing or not well formed.  This value is required and cannot be tampered with."
-    );
   }
 
   // call gateway to update scope record
@@ -97,18 +96,15 @@ export async function handleScopeEdit(
           scope: updated,
           errors: errors,
         } as ScopeActionCmd;
+      } else {
+        throw new Error(
+          "FScope record could not be updated. Please try again."
+        );
       }
     }
   } catch (error) {
     throw new Error("Failed to update scope record due to unhandled error.");
   }
-
-  return {
-    csrf: csrf,
-    slug: slug,
-    scope: updated,
-    errors: errors,
-  } as ScopeActionCmd;
 }
 
 function handleScopeErrors(gatewayError: GatewayError) {

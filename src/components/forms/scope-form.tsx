@@ -7,31 +7,11 @@ import {
   SCOPE_MIN_LENGTH,
   SCOPE_NAME_MAX_LENGTH,
   SCOPE_NAME_MIN_LENGTH,
-  SERVICENAME_MAX_LENGTH,
-  SERVICENAME_MIN_LENGTH,
 } from "@/validation/scope_fields";
 import FormSubmit from "@/components/forms/form-submit";
 import ErrorField from "@/components/errors/error-field";
-
-export type Scope = {
-  csrf?: string;
-
-  scope_id?: string;
-  service_name?: string;
-  scope?: string;
-  name?: string;
-  description?: string;
-  created_at?: string;
-  active?: boolean;
-  slug?: string;
-};
-
-export type ScopeActionCmd = {
-  csrf?: string;
-  slug?: string | null;
-  scope?: Scope | null;
-  errors: { [key: string]: string[] };
-};
+import { Scope, ScopeActionCmd } from ".";
+import { SERVICENAME_MAX_LENGTH, SERVICENAME_MIN_LENGTH } from "@/validation/service_client_field";
 
 export default function ScopeForm({
   csrf,

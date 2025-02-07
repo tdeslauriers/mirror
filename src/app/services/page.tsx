@@ -3,6 +3,7 @@ import GetOauthExchange from "@/components/oauth-exchange";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { Suspense } from "react";
+import ServicesTable from "./services_table";
 
 const pageError: string = "Failed to load clients page.";
 
@@ -33,7 +34,30 @@ export default async function ServicesPage() {
     throw new Error(pageError + "session cookie is missing");
   }
 
-  // TODO: get services data from gateway
+  // get services data from gateway
+  const response = await fetch(`${process.env.GATEWAY_SERVICE_URL}/clients`, {
+    headers: {
+      Authorization: `${hasSession?.value}`,
+    },
+  });
+
+  if (!response.ok) {
+    if (response.status === 401) {
+      const oauth = await GetOauthExchange(hasSession?.value, "/clients");
+      if (oauth) {
+        redirect(
+          `/login?client_id=${oauth.client_id}&response_type=${oauth.response_type}&state=${oauth.state}&nonce=${oauth.nonce}&redirect_url=${oauth.redirect_url}`
+        );
+      } else {
+        redirect("/login");
+      }
+    } else {
+      const fail = await response.json();
+      throw new Error(fail.message);
+    }
+  }
+
+  const clients = await response.json();
 
   return (
     <>
@@ -48,7 +72,9 @@ export default async function ServicesPage() {
             table below:
           </div>
         </div>
-        <Suspense fallback={<Loading />}>Table</Suspense>
+        <Suspense fallback={<Loading />}>
+          <ServicesTable data={clients} />
+        </Suspense>
       </main>
     </>
   );
