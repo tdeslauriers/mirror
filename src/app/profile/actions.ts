@@ -1,15 +1,17 @@
 "use server";
 
 import { cookies } from "next/headers";
+import { Profile, ProfileActionCmd, validateUpdateProfile } from ".";
+import { ErrMsgGeneric, GatewayError, isGatewayError } from "../api";
 import {
-  Profile,
-  ProfileActionCmd,
+  ErrNewConfirmPwMismatch,
+  ErrPasswordInvalid,
+  ErrPasswordInvalidContains,
+  ErrPasswordUsedPreviously,
   ResetData,
   ResetPwActionCmd,
   validatePasswords,
-  validateUpdateProfile,
-} from ".";
-import { ErrMsgGeneric, GatewayError, isGatewayError } from "../api";
+} from "@/components/forms";
 
 export async function handleUserEdit(
   previousState: ProfileActionCmd,
@@ -111,6 +113,7 @@ export async function handleReset(
 
   const resetCmd: ResetData = {
     csrf: csrf,
+    // resourceId not used: identity will come from user's access token in gateway
 
     current_password: formData.get("current_password") as string,
     new_password: formData.get("new_password") as string,
@@ -178,16 +181,13 @@ export async function handleReset(
       }
     }
   } catch (error: any) {
-    console.log("Attempt to call gateway service failed.", error);
+    console.log(
+      "Attempt to call password reset gateway endpoint failed.",
+      error
+    );
     throw new Error(error.message || ErrMsgGeneric);
   }
 }
-
-const ErrPasswordInvalid = "password must include";
-const ErrPasswordInvalidContains = "password contains";
-const ErrPasswordUsedPreviously = "password has been used previously";
-const ErrNewConfirmPwMismatch =
-  "new password and confirmation password do not match";
 
 function handleProfileErrors(gatewayError: GatewayError) {
   const errors: { [key: string]: string[] } = {};

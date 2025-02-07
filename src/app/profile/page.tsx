@@ -2,12 +2,10 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import UserForm from "./user-form";
-
 import { Profile } from ".";
 import { handleReset, handleUserEdit } from "./actions";
-
 import GetCsrf from "@/components/csrf-token";
-import ResetForm from "./reset-form";
+import ResetForm from "../../components/forms/reset-form";
 import GetOauthExchange from "@/components/oauth-exchange";
 import { Suspense } from "react";
 import Loading from "@/components/loading";

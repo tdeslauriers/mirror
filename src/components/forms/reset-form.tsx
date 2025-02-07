@@ -8,16 +8,18 @@ import {
 } from "@/validation/user_fields";
 import { ChangeEvent, useActionState, useState } from "react";
 import ErrorField from "@/components/errors/error-field";
-import { ResetData, ResetPwActionCmd } from ".";
 import FormSubmit from "@/components/forms/form-submit";
+import { ResetData, ResetPwActionCmd } from ".";
 
 type Err = { [key: string]: string[] };
 
 export default function ResetForm({
   csrf,
+  resourceId,
   handleReset,
 }: {
   csrf: string;
+  resourceId?: string;
   handleReset: (
     prevState: ResetPwActionCmd,
     formData: FormData
@@ -52,9 +54,12 @@ export default function ResetForm({
 
   const [resetState, formAction] = useActionState(handleReset, {
     csrf: csrf,
+    resourceId: resourceId,
     reset: {},
     errors: {},
   });
+
+  
 
   return (
     <>

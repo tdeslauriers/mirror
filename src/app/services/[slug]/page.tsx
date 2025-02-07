@@ -6,7 +6,8 @@ import { log } from "console";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { Suspense } from "react";
-import { handleClientEdit } from "./actions";
+import { handleClientEdit, handleReset } from "./actions";
+import ResetForm from "@/components/forms/reset-form";
 
 const pageError = "Failed to load service client page.";
 
@@ -86,7 +87,6 @@ export default async function Page({
   }
 
   const client = await response.json();
-  log(client);
 
   return (
     <>
@@ -128,6 +128,26 @@ export default async function Page({
               slug={slug}
               client={client}
               clientFormUpdate={handleClientEdit}
+            />
+          </Suspense>
+        </div>
+
+        <div className="card-title">
+          <h2>
+            Reset Service Password:{" "}
+            <sup>
+              <span className="highlight-info" style={{ fontSize: ".7em" }}>
+                *requires update of 1password, k8s secrets, and service restart
+              </span>
+            </sup>
+          </h2>
+        </div>
+        <div className="card">
+          <Suspense fallback={<Loading />}>
+            <ResetForm
+              csrf={csrf}
+              resourceId={client && client.id ? client.id : undefined}
+              handleReset={handleReset}
             />
           </Suspense>
         </div>

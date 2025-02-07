@@ -159,6 +159,24 @@ span.highlight {
   font-weight: bold;
 }
 
+span.highlight-error {
+  background: var(--highlight-error);
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+  font-weight: bold;
+}
+
+span.highlight-info {
+  background: var(--highlight-info);
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+  font-weight: bold;
+}
+
 footer {
   margin-left: 2%;
 }
