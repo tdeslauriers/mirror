@@ -28,7 +28,7 @@
     width: 100%;
     padding: 0.5rem 1rem;
     border-radius: 4px;
-    border: 1px solid #60635f;
+    border: 1px solid var(--primary-border-color);
     background: rgb(var(--background-end-rgb));
     font-size: 1.25rem;
     font-family: "Montserrat", sans-serif;
@@ -59,9 +59,11 @@
 }
 
 ::placeholder {
-  color: #60635f;
+  color: var(--primary-border-color);
 }
 
+.form select,
+.form option,
 .form input[type="text"],
 .form input[type="password"],
 .form textarea {
@@ -69,13 +71,14 @@
   width: 100%;
   padding: 0.5rem 1rem;
   border-radius: 4px;
-  border: 1px solid #60635f;
+  border: 1px solid var(--primary-border-color);
   color: rgb(var(--foreground-rgb));
   background: rgb(var(--background-end-rgb));
   font-size: 1.25rem;
   font-family: "Montserrat", sans-serif;
 }
 
+.form select:focus,
 .form input:focus[type="text"],
 .form input:focus[type="password"],
 .form textarea:focus {
@@ -137,7 +140,7 @@ input[type="checkbox"]:focus {
   font-family: "Montserrat", sans-serif;
   padding: 0.5rem 1rem;
   border-radius: 4px;
-  border: 1px solid #60635f;
+  border: 1px solid var(--primary-border-color);
   background: rgb(var(--background-end-rgb));
   width: 100%;
 }
@@ -204,7 +207,7 @@ span.highlightError {
 
 .actionsError button:hover:disabled,
 .actionsError button:focus:disabled {
-  box-shadow: 0 0 40px #60635f;
+  box-shadow: 0 0 40px var(--primary-border-color);
   animation: glow-input-fix 3s ease-in-out infinite alternate;
   transform: translateZ(0); /* trigger GPU acceleration */
   will-change: transform; /* inform the browser that this element will be animated */

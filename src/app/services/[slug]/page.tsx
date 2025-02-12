@@ -8,6 +8,7 @@ import { redirect } from "next/navigation";
 import { Suspense } from "react";
 import { handleClientEdit, handleReset } from "./actions";
 import ResetForm from "@/components/forms/reset-form";
+import ScopesManageForm from "@/components/forms/scopes-manage-form";
 
 const pageError = "Failed to load service client page.";
 
@@ -29,7 +30,10 @@ export default async function Page({
     : null;
 
   if (!hasIdentity) {
-    const oauth = await GetOauthExchange(hasSession?.value, `/clients/${slug}`);
+    const oauth = await GetOauthExchange(
+      hasSession?.value,
+      `/services/${slug}`
+    );
     if (oauth) {
       redirect(
         `/login?client_id=${oauth.client_id}&response_type=${oauth.response_type}&state=${oauth.state}&nonce=${oauth.nonce}&redirect_url=${oauth.redirect_url}`
@@ -58,7 +62,7 @@ export default async function Page({
   }
 
   // get client record data from gateway
-  const response = await fetch(
+  const clientResponse = await fetch(
     `${process.env.GATEWAY_SERVICE_URL}/clients/${slug}`,
     {
       headers: {
@@ -67,11 +71,12 @@ export default async function Page({
     }
   );
 
-  if (!response.ok) {
-    if (response.status === 401) {
+  // get client
+  if (!clientResponse.ok) {
+    if (clientResponse.status === 401) {
       const oauth = await GetOauthExchange(
         hasSession?.value,
-        `/clients/${slug}`
+        `/services/${slug}`
       );
       if (oauth) {
         redirect(
@@ -81,12 +86,40 @@ export default async function Page({
         redirect("/login");
       }
     } else {
-      const fail = await response.json();
+      const fail = await clientResponse.json();
       throw new Error(fail.message);
     }
   }
 
-  const client = await response.json();
+  const client = await clientResponse.json();
+
+  // get scoeps data from gateway for scopes dropdown
+  const scopesResponse = await fetch(
+    `${process.env.GATEWAY_SERVICE_URL}/scopes`,
+    {
+      headers: {
+        Authorization: `${hasSession?.value}`,
+      },
+    }
+  );
+
+  if (!scopesResponse.ok) {
+    if (scopesResponse.status === 401) {
+      const oauth = await GetOauthExchange(hasSession?.value, "/scopes");
+      if (oauth) {
+        redirect(
+          `/login?client_id=${oauth.client_id}&response_type=${oauth.response_type}&state=${oauth.state}&nonce=${oauth.nonce}&redirect_url=${oauth.redirect_url}`
+        );
+      } else {
+        redirect("/login");
+      }
+    } else {
+      const fail = await scopesResponse.json();
+      throw new Error(fail.message);
+    }
+  }
+
+  const allScopes = await scopesResponse.json();
 
   return (
     <>
@@ -115,9 +148,9 @@ export default async function Page({
         </div>
         <div className="card-title">
           <h2>
-            Service Id:{" "}
-            {client && client.id && (
-              <span className="highlight">{client.id}</span>
+            Service Slug:{" "}
+            {client && client.slug && (
+              <span className="highlight">{client.slug}</span>
             )}
           </h2>
         </div>
@@ -136,7 +169,7 @@ export default async function Page({
           <h2>
             Reset Service Password:{" "}
             <sup>
-              <span className="highlight-info" style={{ fontSize: ".7em" }}>
+              <span className="highlight-info" style={{ fontSize: ".65em" }}>
                 *requires update of 1password, k8s secrets, and service restart
               </span>
             </sup>
@@ -146,8 +179,29 @@ export default async function Page({
           <Suspense fallback={<Loading />}>
             <ResetForm
               csrf={csrf}
-              resourceId={client && client.id ? client.id : undefined}
+              resource_id={client && client.id ? client.id : undefined}
               handleReset={handleReset}
+            />
+          </Suspense>
+        </div>
+
+        <div className="card-title">
+          <h2>
+            Scopes:{" "}
+            <sup>
+              <span className="highlight-info" style={{ fontSize: ".65em" }}>
+                * must click 'Update Scopes' to save changes
+              </span>
+            </sup>
+          </h2>
+        </div>
+        <div className="card">
+          <Suspense fallback={<Loading />}>
+            <ScopesManageForm
+              csrf={csrf}
+              slug={slug}
+              entityScopes={client.scopes}
+              menuScopes={allScopes}
             />
           </Suspense>
         </div>

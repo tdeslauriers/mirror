@@ -15,11 +15,11 @@ type Err = { [key: string]: string[] };
 
 export default function ResetForm({
   csrf,
-  resourceId,
+  resource_id,
   handleReset,
 }: {
   csrf: string;
-  resourceId?: string;
+  resource_id?: string;
   handleReset: (
     prevState: ResetPwActionCmd,
     formData: FormData
@@ -54,12 +54,10 @@ export default function ResetForm({
 
   const [resetState, formAction] = useActionState(handleReset, {
     csrf: csrf,
-    resourceId: resourceId,
+    resource_id: resource_id,
     reset: {},
     errors: {},
   });
-
-  
 
   return (
     <>

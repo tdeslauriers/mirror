@@ -113,7 +113,7 @@ export async function handleReset(
 
   const resetCmd: ResetData = {
     csrf: csrf,
-    // resourceId not used: identity will come from user's access token in gateway
+    // resource_id not used: identity will come from user's access token in gateway
 
     current_password: formData.get("current_password") as string,
     new_password: formData.get("new_password") as string,

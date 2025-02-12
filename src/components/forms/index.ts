@@ -49,7 +49,7 @@ export type ServiceClientActionCmd = {
 // username will come from the access token downstream
 export type ResetData = {
   csrf?: string;
-  resourceId?: string; // used for service pw resets, users will be undefined.
+  resource_id?: string; // used for service pw resets, users will be undefined.
 
   current_password?: string;
   new_password?: string;
@@ -58,7 +58,7 @@ export type ResetData = {
 
 export type ResetPwActionCmd = {
   csrf?: string;
-  resourceId?: string; // used for service pw resets, users will be undefined.
+  resource_id?: string; // used for service pw resets, users will be undefined.
   reset: ResetData | null;
   errors: { [key: string]: string[] };
 };

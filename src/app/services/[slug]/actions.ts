@@ -132,12 +132,12 @@ export async function handleReset(
     );
   }
 
-  // lightweight validation of resourceId
-  const resourceId = previousState.resourceId;
+  // lightweight validation of resource_id
+  const resource_id = previousState.resource_id;
   if (
-    !resourceId ||
-    resourceId.trim().length < 16 ||
-    resourceId.trim().length > 64
+    !resource_id ||
+    resource_id.trim().length < 16 ||
+    resource_id.trim().length > 64
   ) {
     throw new Error(
       "Resource ID missing or not well formed.  This value is required and cannot be tampered with."
@@ -146,7 +146,7 @@ export async function handleReset(
 
   const reset: ResetData = {
     csrf: csrf,
-    resourceId: resourceId,
+    resource_id: resource_id,
 
     current_password: formData.get("current_password") as string,
     new_password: formData.get("new_password") as string,
@@ -158,7 +158,7 @@ export async function handleReset(
   if (errors && Object.keys(errors).length > 0) {
     return {
       csrf: csrf,
-      resourceId: resourceId,
+      resource_id: resource_id,
       reset: reset,
       errors: errors,
     } as ResetPwActionCmd;
@@ -193,11 +193,9 @@ export async function handleReset(
     );
 
     if (apiResponse.ok) {
-      const success = await apiResponse.json();
-
       return {
         csrf: csrf,
-        resourceId: resourceId,
+        resource_id: resource_id,
         reset: {}, // cannot return password values, obviously
         errors: {},
       } as ResetPwActionCmd;
@@ -208,7 +206,7 @@ export async function handleReset(
         console.log("Gateway error: ", errors);
         return {
           csrf: csrf,
-          resourceId: resourceId,
+          resource_id: resource_id,
           reset: reset,
           errors: errors,
         } as ResetPwActionCmd;
