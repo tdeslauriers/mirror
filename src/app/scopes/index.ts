@@ -5,7 +5,7 @@ import {
   checkScopeName,
 } from "@/validation/scope_fields";
 import { checkServiceName } from "@/validation/service_client_field";
-import { FieldValidation } from "@/validation/user_fields";
+import { checkUuid, FieldValidation } from "@/validation/user_fields";
 
 export function validateScope(scope: Scope) {
   const errors: { [key: string]: string[] } = {};
@@ -62,3 +62,4 @@ export function validateScope(scope: Scope) {
 
   return errors;
 }
+

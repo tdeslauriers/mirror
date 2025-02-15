@@ -7,11 +7,13 @@ import {
   ErrPasswordUsedPreviously,
   ResetData,
   ResetPwActionCmd,
+  Scope,
+  EntityScopesActionCmd,
   ServiceClient,
   ServiceClientActionCmd,
   validatePasswords,
 } from "@/components/forms";
-import { validateServiceClient } from "..";
+import { ClientScopesCmd, validateScopeSlugs, validateServiceClient } from "..";
 import { cookies } from "next/headers";
 import { GatewayError, isGatewayError } from "@/app/api";
 
@@ -219,6 +221,108 @@ export async function handleReset(
   } catch (error) {
     throw new Error(
       "Attempt to call password reset gateway endpoint failed.  Please refresh and try again."
+    );
+  }
+}
+
+export async function handleScopesUpdate(
+  previousState: EntityScopesActionCmd,
+  formData: FormData
+) {
+  // get session token
+  const cookieStore = await cookies();
+  const hasSession = cookieStore.has("session_id")
+    ? cookieStore.get("session_id")
+    : null;
+  if (
+    !hasSession ||
+    hasSession.value.trim().length < 16 ||
+    hasSession.value.trim().length > 64
+  ) {
+    throw new Error(
+      "Session cookie is missing or not well formed.  This value is required and cannot be tampered with."
+    );
+  }
+
+  // lightweight validation of csrf token
+  // true validation happens in the gateway
+  const csrf = previousState.csrf;
+  if (!csrf || csrf.trim().length < 16 || csrf.trim().length > 64) {
+    throw new Error(
+      "Scopes form CSRF token is missing or not well formed.  This value is required and cannot be tampered with."
+    );
+  }
+
+  // if this is tampered with, the gateway will error because
+  // the slug will not be found, or invalid, etc.
+  const slug = previousState.slug;
+  if (!slug || slug.trim().length < 16 || slug.trim().length > 64) {
+    throw new Error(
+      "Service client slug is missing or not well formed.  This value is required and cannot be tampered with."
+    );
+  }
+
+  // get form data
+  // Note: array of scope slugs
+  const scopeSlugs = formData.getAll("scopes[]") as string[];
+
+  //  validate scope slugs are well formed uuids
+  const errors = validateScopeSlugs(scopeSlugs);
+  if (errors && Object.keys(errors).length > 0) {
+    return {
+      csrf: csrf,
+      slug: slug,
+      errors: errors,
+    } as EntityScopesActionCmd;
+  }
+
+  const cmd: ClientScopesCmd = {
+    csrf: csrf,
+    client_slug: slug,
+    scope_slugs: scopeSlugs,
+  };
+
+  // call the gateway to update the service client scopes
+  // Note: only the slug values submitted with the entity uuid and csrf.
+  // No need to send the entire scope or entity values.
+  // The gateway services will look everything up or error if not found.
+  try {
+    const apiResponse = await fetch(
+      `${process.env.GATEWAY_SERVICE_URL}/clients/scopes`,
+      {
+        method: "PUT",
+        headers: {
+          Authorization: `${hasSession?.value}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(cmd),
+      }
+    );
+
+    if (apiResponse.ok) {
+      return {
+        csrf: csrf,
+        slug: slug,
+        errors: {},
+      } as EntityScopesActionCmd;
+    } else {
+      const fail = await apiResponse.json();
+      if (isGatewayError(fail)) {
+        const errors = handleServiceClientErrors(fail);
+        return {
+          csrf: csrf,
+          slug: slug,
+          errors: errors,
+        } as EntityScopesActionCmd;
+      } else {
+        throw new Error(
+          "Service client scopes form could not be updated.  Please try again."
+        );
+      }
+    }
+  } catch (error) {
+    throw new Error(
+      "Service client scopes form could not be updated.  Please try again."
     );
   }
 }

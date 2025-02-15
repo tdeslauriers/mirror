@@ -224,7 +224,7 @@ export function allNumbersValid(...numbers: (number | undefined)[]): boolean {
 export function checkUuid(uuid: string) {
   let errors: string[] = [];
   if (!UUID_REGEX.test(uuid)) {
-    errors.push("UUID must be a valid UUID.");
+    errors.push("value must be a valid UUID.");
   }
 
   if (errors.length > 0) {

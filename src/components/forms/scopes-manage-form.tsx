@@ -1,26 +1,34 @@
 "use client";
 
-import { useState } from "react";
-import { Scope } from ".";
+import { useActionState, useState } from "react";
+import { Scope, EntityScopesActionCmd } from ".";
 import styles from "./scopes-manage-form.module.css";
 import Link from "next/link";
+import FormSubmit from "./form-submit";
+import { handleScopesUpdate } from "@/app/services/[slug]/actions";
+import ErrorField from "../errors/error-field";
 
 export default function ScopesManageForm({
   csrf,
   slug,
   entityScopes: entityScopes,
   menuScopes: menuScopes,
+  updateScopes,
 }: {
-  csrf: string;
-  slug: string | null;
+  csrf?: string;
+  slug?: string | null;
   entityScopes: Scope[];
   menuScopes: Scope[];
+  updateScopes: (
+    previousState: EntityScopesActionCmd,
+    formData: FormData
+  ) => EntityScopesActionCmd | Promise<EntityScopesActionCmd>;
 }) {
   const [currentScopes, setCurrentScopes] = useState<Scope[]>(entityScopes);
-  const [selectedScope, setSelectedScope] = useState("");
+  const [selectedScopeName, setSelectedScopeName] = useState("");
 
   const handleSelect = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setSelectedScope(e.target.value);
+    setSelectedScopeName(e.target.value);
   };
 
   const addScope = (slug: string | undefined) => {
@@ -29,23 +37,33 @@ export default function ScopesManageForm({
     if (scope && !exists) {
       setCurrentScopes([...currentScopes, scope]);
     }
-    setSelectedScope("");
+    setSelectedScopeName("");
   };
 
   const removeScope = (slug: string | undefined) => {
     setCurrentScopes(currentScopes.filter((s) => s.slug !== slug));
   };
 
+  const [entityScopesState, formAction] = useActionState(updateScopes, {
+    csrf: csrf,
+    slug: slug,
+    // entityScopes not needed because scopes are coming from useState currentScopes variable
+    errors: {},
+  });
+
   return (
     <>
-      <form className="form">
+      <form className="form" action={formAction}>
+        {entityScopesState.errors.server && (
+          <ErrorField errorMsgs={entityScopesState.errors.server} />
+        )}
         <label>add scope</label>
         <div className={styles.row}>
           <div className={styles.box}>
             <select
               name="scope-select"
               className={styles.select}
-              value={selectedScope}
+              value={selectedScopeName}
               onChange={handleSelect}
             >
               <option value="">Select scope...</option>
@@ -64,7 +82,7 @@ export default function ScopesManageForm({
               <button
                 name="add-scope"
                 type="button"
-                onClick={() => addScope(selectedScope)}
+                onClick={() => addScope(selectedScopeName)}
               >
                 Add scope
               </button>
@@ -121,6 +139,12 @@ export default function ScopesManageForm({
             </div>
           </>
         ))}
+        <div className={`row`}>
+          <FormSubmit
+            buttonLabel="update service scopes"
+            pendingLabel="updating service scopes..."
+          />
+        </div>
       </form>
     </>
   );

@@ -1,6 +1,10 @@
 import { ServiceClient } from "@/components/forms";
 import { checkServiceName } from "@/validation/service_client_field";
-import { checkName, FieldValidation } from "@/validation/user_fields";
+import {
+  checkName,
+  checkUuid,
+  FieldValidation,
+} from "@/validation/user_fields";
 
 export function validateServiceClient(serviceClient: ServiceClient) {
   let errors: { [key: string]: string[] } = {};
@@ -34,3 +38,32 @@ export function validateServiceClient(serviceClient: ServiceClient) {
 
   return errors;
 }
+
+export function validateScopeSlugs(slugs: string[]) {
+  const errors: { [key: string]: string[] } = {};
+
+  slugs.forEach((s, i) => {
+    if (s.trim().length < 16 || s.trim().length > 64) {
+      errors.scopes = [
+        `Scope slug index ${i} is not well formed. Must be between 16 and 64 characters.`,
+      ];
+    }
+
+    const slug = checkUuid(s.trim());
+    if (!slug.isValid) {
+      errors.scopes = [
+        `Scope slug, index ${i}: ${s.substring(0, 9)}xxxxx, is invalid: slug ${
+          slug.messages
+        }`,
+      ];
+    }
+  });
+
+  return errors;
+}
+
+export type ClientScopesCmd = {
+  csrf?: string | null;
+  client_slug?: string | null;
+  scope_slugs: string[];
+};

@@ -2,11 +2,10 @@ import GetCsrf from "@/components/csrf-token";
 import ClientForm from "@/components/forms/client-form";
 import Loading from "@/components/loading";
 import GetOauthExchange from "@/components/oauth-exchange";
-import { log } from "console";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { Suspense } from "react";
-import { handleClientEdit, handleReset } from "./actions";
+import { handleClientEdit, handleReset, handleScopesUpdate } from "./actions";
 import ResetForm from "@/components/forms/reset-form";
 import ScopesManageForm from "@/components/forms/scopes-manage-form";
 
@@ -190,7 +189,7 @@ export default async function Page({
             Scopes:{" "}
             <sup>
               <span className="highlight-info" style={{ fontSize: ".65em" }}>
-                * must click 'Update Scopes' to save changes
+                * must click &lsquo;Update Service Scopes&lsquo; to save changes
               </span>
             </sup>
           </h2>
@@ -202,6 +201,7 @@ export default async function Page({
               slug={slug}
               entityScopes={client.scopes}
               menuScopes={allScopes}
+              updateScopes={handleScopesUpdate}
             />
           </Suspense>
         </div>

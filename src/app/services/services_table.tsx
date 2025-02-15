@@ -23,7 +23,7 @@ export default function ServicesTable({ data }: ServicesTableProps) {
         row: ServiceClient
       ) => (
         <Link className="locallink no-hover" href={`/services/${row.slug}`}>
-          {value}
+          {value as string}
         </Link>
       ),
     },

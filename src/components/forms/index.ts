@@ -135,3 +135,9 @@ export function validatePasswords(reset: ResetData) {
 
   return errors;
 }
+
+export type EntityScopesActionCmd = {
+  csrf?: string | null;
+  slug?: string | null;
+  errors: { [key: string]: string[] };
+};

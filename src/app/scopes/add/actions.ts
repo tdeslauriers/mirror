@@ -1,10 +1,10 @@
 "use server";
 
-import { Scope, ScopeActionCmd } from "@/components/forms/scope-form";
 import { validateScope } from "..";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { GatewayError, isGatewayError } from "@/app/api";
+import { Scope, ScopeActionCmd } from "@/components/forms";
 
 export async function handleScopeAdd(
   previousState: ScopeActionCmd,
