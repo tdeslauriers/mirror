@@ -191,8 +191,11 @@ export default function ClientRegistrationForm({
       )}
 
       {clientState.complete && (
-        <div className="card">
-          <h2>Service registration successful!</h2>
+        <div>
+          <h2>
+            <span className="highlight">{clientState.registration?.name}</span>{" "}
+            service registration successful!
+          </h2>
           <p>
             <ul>
               <li>

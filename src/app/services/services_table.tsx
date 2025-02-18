@@ -39,7 +39,7 @@ export default function ServicesTable({ data }: ServicesTableProps) {
       render: (
         value: ServiceClient[keyof ServiceClient],
         row: ServiceClient
-      ) => <>{(value as string).split(" ")[0]}</>,
+      ) => <>{(value as string).split("T")[0]}</>,
     },
     {
       header: "Enabled",

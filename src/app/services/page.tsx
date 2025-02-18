@@ -4,6 +4,7 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { Suspense } from "react";
 import ServicesTable from "./services_table";
+import Link from "next/link";
 
 const pageError: string = "Failed to load clients page.";
 
@@ -64,7 +65,19 @@ export default async function ServicesPage() {
       <main className="main main-drawer">
         <div className="center">
           <div className="page-title">
-            <h1>Services</h1>
+            <div
+              className="actions"
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                paddingRight: "1rem",
+              }}
+            >
+              <h1>Services</h1>
+              <Link href="/services/register">
+                <button>Register Service</button>
+              </Link>
+            </div>
           </div>
           <hr className="page-title" />
           <div style={{ fontStyle: "italic" }}>

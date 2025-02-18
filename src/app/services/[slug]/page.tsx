@@ -150,6 +150,11 @@ export default async function Page({
         </div>
         <div className="card-title">
           <h2>
+            Serivce Uuid:{" "}
+            {client && client.id && (
+              <span className="highlight">{client.id}</span>
+            )}
+            <br />
             Service Slug:{" "}
             {client && client.slug && (
               <span className="highlight">{client.slug}</span>
