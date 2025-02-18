@@ -141,3 +141,22 @@ export type EntityScopesActionCmd = {
   slug?: string | null;
   errors: { [key: string]: string[] };
 };
+
+export type ClientRegisterActionCmd = {
+  csrf?: string;
+  complete?: boolean;
+  registration?: RegisterClient | null;
+  errors: { [key: string]: string[] };
+};
+
+export type RegisterClient = {
+  csrf?: string;
+
+  id?: string;
+  name?: string;
+  owner?: string;
+  password?: string;
+  confirm_password?: string;
+  slug?: string;
+  enabled?: boolean;
+};

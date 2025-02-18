@@ -18,7 +18,7 @@ export default async function ServicesPage() {
     : null;
 
   if (!hasIdentity) {
-    const oauth = await GetOauthExchange(hasSession?.value, "/scopes");
+    const oauth = await GetOauthExchange(hasSession?.value, "/services");
     if (oauth) {
       redirect(
         `/login?client_id=${oauth.client_id}&response_type=${oauth.response_type}&state=${oauth.state}&nonce=${oauth.nonce}&redirect_url=${oauth.redirect_url}`
@@ -43,7 +43,7 @@ export default async function ServicesPage() {
 
   if (!response.ok) {
     if (response.status === 401) {
-      const oauth = await GetOauthExchange(hasSession?.value, "/clients");
+      const oauth = await GetOauthExchange(hasSession?.value, "/services");
       if (oauth) {
         redirect(
           `/login?client_id=${oauth.client_id}&response_type=${oauth.response_type}&state=${oauth.state}&nonce=${oauth.nonce}&redirect_url=${oauth.redirect_url}`

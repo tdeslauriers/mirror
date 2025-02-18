@@ -92,7 +92,7 @@ export default async function Page({
 
   const client = await clientResponse.json();
 
-  // get scoeps data from gateway for scopes dropdown
+  // get scopess data from gateway for scopes dropdown
   const scopesResponse = await fetch(
     `${process.env.GATEWAY_SERVICE_URL}/scopes`,
     {
@@ -104,7 +104,10 @@ export default async function Page({
 
   if (!scopesResponse.ok) {
     if (scopesResponse.status === 401) {
-      const oauth = await GetOauthExchange(hasSession?.value, "/scopes");
+      const oauth = await GetOauthExchange(
+        hasSession?.value,
+        `/services/${slug}`
+      );
       if (oauth) {
         redirect(
           `/login?client_id=${oauth.client_id}&response_type=${oauth.response_type}&state=${oauth.state}&nonce=${oauth.nonce}&redirect_url=${oauth.redirect_url}`
@@ -189,7 +192,7 @@ export default async function Page({
             Scopes:{" "}
             <sup>
               <span className="highlight-info" style={{ fontSize: ".65em" }}>
-                * must click &lsquo;Update Service Scopes&lsquo; to save changes
+                * must click &lsquo;Update Scopes&lsquo; to save changes
               </span>
             </sup>
           </h2>

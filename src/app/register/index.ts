@@ -49,7 +49,7 @@ export type RegistrationCmd = {
 export function validateRegistration(registration: RegistrationData) {
   const errors: { [key: string]: string[] } = {};
 
-  // username
+  // check username
   if (!registration.username || registration.username.trim().length === 0) {
     errors.username = ["Email/username address is required."];
   }
@@ -61,7 +61,7 @@ export function validateRegistration(registration: RegistrationData) {
     }
   }
 
-  // password
+  // check password
   if (!registration.password || registration.password.trim().length === 0) {
     errors.password = ["Password is required."];
   }
@@ -73,7 +73,7 @@ export function validateRegistration(registration: RegistrationData) {
     }
   }
 
-  // confirm_password: check if matches password
+  // check confirm_password: check if matches password
   if (
     !registration.confirm_password ||
     registration.confirm_password.trim().length === 0

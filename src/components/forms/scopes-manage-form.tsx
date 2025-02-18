@@ -5,7 +5,6 @@ import { Scope, EntityScopesActionCmd } from ".";
 import styles from "./scopes-manage-form.module.css";
 import Link from "next/link";
 import FormSubmit from "./form-submit";
-import { handleScopesUpdate } from "@/app/services/[slug]/actions";
 import ErrorField from "../errors/error-field";
 
 export default function ScopesManageForm({
@@ -17,14 +16,16 @@ export default function ScopesManageForm({
 }: {
   csrf?: string;
   slug?: string | null;
-  entityScopes: Scope[];
+  entityScopes: Scope[] | null;
   menuScopes: Scope[];
   updateScopes: (
     previousState: EntityScopesActionCmd,
     formData: FormData
   ) => EntityScopesActionCmd | Promise<EntityScopesActionCmd>;
 }) {
-  const [currentScopes, setCurrentScopes] = useState<Scope[]>(entityScopes);
+  const [currentScopes, setCurrentScopes] = useState<Scope[] | null>(
+    entityScopes
+  );
   const [selectedScopeName, setSelectedScopeName] = useState("");
 
   const handleSelect = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -33,14 +34,22 @@ export default function ScopesManageForm({
 
   const addScope = (slug: string | undefined) => {
     const scope = menuScopes.find((s) => s.slug === slug);
-    const exists = currentScopes.find((s) => s.slug === slug);
-    if (scope && !exists) {
-      setCurrentScopes([...currentScopes, scope]);
+    if (currentScopes && currentScopes.length > 0) {
+      const exists = currentScopes.find((s) => s.slug === slug);
+      if (scope && !exists) {
+        setCurrentScopes([...currentScopes, scope]);
+      }
+    } else {
+      if (scope) {
+        setCurrentScopes([scope]);
+      }
     }
     setSelectedScopeName("");
   };
 
   const removeScope = (slug: string | undefined) => {
+    if (!slug) return;
+    if (!currentScopes) return;
     setCurrentScopes(currentScopes.filter((s) => s.slug !== slug));
   };
 
@@ -89,60 +98,67 @@ export default function ScopesManageForm({
             </div>
           </div>
         </div>
-        <sub style={{ fontSize: ".65rem" }}>
-          A scope can only be added one time.
+        <sub style={{ fontSize: ".75rem" }}>
+          * A scope may only be added once below.
         </sub>
-        <hr className="page-title" />
+        <hr className="page-title" style={{ marginTop: "2rem" }} />
 
-        <h3 style={{ marginTop: "2rem" }}>Current Scopes</h3>
-
-        {currentScopes.map((scope) => (
+        {(!currentScopes || currentScopes.length < 1) && (
           <>
             <div className={styles.scopecard}>
-              <div className={styles.row} style={{ fontSize: "2rem" }}>
-                <div className={styles.box}>
-                  <Link
-                    className="locallink no-hover"
-                    href={`/scopes/${scope.slug}`}
-                  >
-                    {scope.scope}
-                  </Link>
-                </div>
-                <div className={`${styles.box} ${styles.right}`}>
-                  <span className="highlight">{scope.service_name}</span>
-                </div>
-              </div>
-              {/* <hr className="page-title" /> */}
-              <div
-                className={styles.row}
-                style={{ marginTop: "0.5rem", fontWeight: "bold" }}
-              >
-                <div className={styles.box}>{scope.name}</div>
-              </div>
-              <div className={styles.row}>
-                <div className={styles.box}>{scope.description}</div>
-                <div className={`${styles.box} ${styles.right}`}>
-                  <div
-                    style={{ width: "auto", alignItems: "right" }}
-                    className={`actions  ${styles.right}`}
-                  >
-                    <button
-                      type="button"
-                      onClick={() => removeScope(scope.slug)}
-                    >
-                      Remove
-                    </button>
-                  </div>
-                </div>
-              </div>
-              <input type="hidden" name="scopes[]" value={scope.slug} />
+              <span className="highlight-info">No scopes assigned.</span>
             </div>
           </>
-        ))}
+        )}
+
+        {currentScopes &&
+          currentScopes.map((scope) => (
+            <>
+              <div className={styles.scopecard}>
+                <div className={styles.row} style={{ fontSize: "2rem" }}>
+                  <div className={styles.box}>
+                    <Link
+                      className="locallink no-hover"
+                      href={`/scopes/${scope.slug}`}
+                    >
+                      {scope.scope}
+                    </Link>
+                  </div>
+                  <div className={`${styles.box} ${styles.right}`}>
+                    <span className="highlight">{scope.service_name}</span>
+                  </div>
+                </div>
+                {/* <hr className="page-title" /> */}
+                <div
+                  className={styles.row}
+                  style={{ marginTop: "0.5rem", fontWeight: "bold" }}
+                >
+                  <div className={styles.box}>{scope.name}</div>
+                </div>
+                <div className={styles.row}>
+                  <div className={styles.box}>{scope.description}</div>
+                  <div className={`${styles.box} ${styles.right}`}>
+                    <div
+                      style={{ width: "auto", alignItems: "right" }}
+                      className={`actions  ${styles.right}`}
+                    >
+                      <button
+                        type="button"
+                        onClick={() => removeScope(scope.slug)}
+                      >
+                        Remove
+                      </button>
+                    </div>
+                  </div>
+                </div>
+                <input type="hidden" name="scopes[]" value={scope.slug} />
+              </div>
+            </>
+          ))}
         <div className={`row`}>
           <FormSubmit
-            buttonLabel="update service scopes"
-            pendingLabel="updating service scopes..."
+            buttonLabel="Update Scopes"
+            pendingLabel="updating assigned scopes..."
           />
         </div>
       </form>

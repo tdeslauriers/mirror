@@ -1,21 +1,21 @@
 "use server";
 
 import {
-  ErrNewConfirmPwMismatch,
-  ErrPasswordInvalid,
-  ErrPasswordInvalidContains,
-  ErrPasswordUsedPreviously,
   ResetData,
   ResetPwActionCmd,
-  Scope,
   EntityScopesActionCmd,
   ServiceClient,
   ServiceClientActionCmd,
   validatePasswords,
 } from "@/components/forms";
-import { ClientScopesCmd, validateScopeSlugs, validateServiceClient } from "..";
+import {
+  ClientScopesCmd,
+  handleServiceClientErrors,
+  validateScopeSlugs,
+  validateServiceClient,
+} from "..";
 import { cookies } from "next/headers";
-import { GatewayError, isGatewayError } from "@/app/api";
+import { isGatewayError } from "@/app/api";
 
 export async function handleClientEdit(
   previousState: ServiceClientActionCmd,
@@ -324,53 +324,5 @@ export async function handleScopesUpdate(
     throw new Error(
       "Service client scopes form could not be updated.  Please try again."
     );
-  }
-}
-
-function handleServiceClientErrors(gatewayError: GatewayError) {
-  const errors: { [key: string]: string[] } = {};
-  switch (gatewayError.code) {
-    case 400:
-      errors.server = [gatewayError.message];
-      return errors;
-    case 401:
-      errors.server = [gatewayError.message];
-      return errors;
-    case 403:
-      errors.server = [gatewayError.message];
-      return errors;
-    case 404:
-      errors.server = [gatewayError.message];
-      return errors;
-    case 405:
-      errors.server = [gatewayError.message];
-      return errors;
-    case 422:
-      switch (true) {
-        case gatewayError.message.includes("name"):
-          errors.name = [gatewayError.message];
-          return errors;
-        case gatewayError.message.includes("owner"):
-          errors.owner = [gatewayError.message];
-          return errors;
-        case gatewayError.message.includes(ErrPasswordUsedPreviously):
-          errors.confirm_password = [gatewayError.message];
-          return errors;
-        case gatewayError.message.includes(ErrNewConfirmPwMismatch):
-          errors.confirm_password = [gatewayError.message];
-          return errors;
-        case gatewayError.message.includes(ErrPasswordInvalid):
-          errors.confirm_password = [gatewayError.message];
-          return errors;
-        case gatewayError.message.includes(ErrPasswordInvalidContains):
-          errors.confirm_password = [gatewayError.message];
-          return errors;
-        default:
-          errors.server = [gatewayError.message];
-          return errors;
-      }
-    default:
-      errors.server = ["Unhandled error calling gateway service."];
-      return errors;
   }
 }
