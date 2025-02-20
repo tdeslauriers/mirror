@@ -8,6 +8,7 @@ import { Suspense } from "react";
 import { handleClientEdit, handleReset, handleScopesUpdate } from "./actions";
 import ResetForm from "@/components/forms/reset-form";
 import ScopesManageForm from "@/components/forms/scopes-manage-form";
+import Link from "next/link";
 
 const pageError = "Failed to load service client page.";
 
@@ -44,19 +45,19 @@ export default async function Page({
 
   // check session cookie exists for api calls
   if (!hasSession) {
-    console.log(pageError + "session cookie is missing");
-    throw new Error(pageError + "session cookie is missing");
+    console.log(`${pageError} session cookie is missing`);
+    throw new Error(`${pageError} session cookie is missing`);
   }
 
-  // get csrf token from gateway for profile form
+  // get csrf token from gateway for service form
   const csrf = await GetCsrf(hasSession.value);
 
   if (!csrf) {
     console.log(
-      pageError + "CSRF token could not be retrieved for client form."
+      `${pageError} CSRF token could not be retrieved for service client ${slug}.`
     );
     throw new Error(
-      pageError + "CSRF token could not be retrieved for client form."
+      `${pageError} CSRF token could not be retrieved for service client ${slug}.`
     );
   }
 
@@ -128,12 +129,24 @@ export default async function Page({
       <main className="main main-drawer">
         <div className="center">
           <div className="page-title">
-            <h1>
-              Service:{" "}
-              {client && client.name && (
-                <span className="highlight">{client.name}</span>
-              )}
-            </h1>
+            <div
+              className="actions"
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                paddingRight: "1rem",
+              }}
+            >
+              <h1>
+                Service:{" "}
+                {client && client.name && (
+                  <span className="highlight">{client.name}</span>
+                )}
+              </h1>
+              <Link href={`/services`}>
+                <button>back</button>
+              </Link>
+            </div>
           </div>
           <hr className="page-title" />
 

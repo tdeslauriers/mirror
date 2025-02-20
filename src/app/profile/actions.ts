@@ -28,7 +28,7 @@ export async function handleUserEdit(
 
   // any fields that are not allowed to be changed by user will not be submitted
   // likewise, gateway/identity will dump any fields that are not allowed to be changed
-  let updated: Profile = {
+  const updated: Profile = {
     csrf: csrf,
 
     firstname: formData.get("firstname") as string,

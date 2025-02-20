@@ -216,7 +216,9 @@ export function checkBirthdate(year: number, month: number, day: number) {
   return { isValid: true, messages: [] };
 }
 
-export function allNumbersValid(...numbers: (number | undefined)[]): boolean {
+export function allNumbersValid(
+  ...numbers: (number | null | undefined)[]
+): boolean {
   return numbers.every((num) => num != undefined && !isNaN(num));
 }
 

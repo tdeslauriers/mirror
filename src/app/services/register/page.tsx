@@ -7,6 +7,7 @@ import { Suspense } from "react";
 
 import ClientRegistrationForm from "@/components/forms/client-registration-form";
 import handleClientRegister from "./actions";
+import Link from "next/link";
 
 const pageError = "Failed to load /services/register page: ";
 
@@ -57,9 +58,21 @@ export default async function Page() {
       <main className="main main-drawer">
         <div className="center">
           <div className="page-title">
-            <h1>
-              Service <span className="highlight">register</span>
-            </h1>
+            <div
+              className="actions"
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                paddingRight: "1rem",
+              }}
+            >
+              <h1>
+                Service: <span className="highlight">register</span>
+              </h1>
+              <Link href="/services">
+                <button>Back</button>
+              </Link>
+            </div>
           </div>
           <hr className={`page-title`} />
         </div>

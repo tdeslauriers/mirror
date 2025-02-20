@@ -1,6 +1,5 @@
 "use client";
 
-
 import { Scope } from "@/components/forms";
 import Table, { TableColumn } from "@/components/table";
 import Link from "next/link";
@@ -52,6 +51,15 @@ export default function ScopesTable({ data }: ScopesTableProps) {
       header: "Active",
       accessor: "active" as keyof Scope,
       sortable: false,
+      render: (value: Scope[keyof Scope]) => (
+        <>
+          {value ? (
+            <span>Active</span>
+          ) : (
+            <span className="highlight-error">Inactive</span>
+          )}
+        </>
+      ),
     },
   ];
 

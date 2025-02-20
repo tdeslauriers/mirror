@@ -4,6 +4,7 @@ import GetOauthExchange from "@/components/oauth-exchange";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { handleScopeAdd } from "./actions";
+import Link from "next/link";
 
 const pageError = "Failed to load scope add page: ";
 
@@ -51,9 +52,21 @@ export default async function Page() {
       <main className="main main-drawer">
         <div className="center">
           <div className="page-title">
-            <h1>
-              Scope: <span className="highlight">add</span>
-            </h1>
+            <div
+              className="actions"
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                paddingRight: "1rem",
+              }}
+            >
+              <h1>
+                Scope: <span className="highlight">add</span>
+              </h1>
+              <Link href="/scopes">
+                <button>Back</button>
+              </Link>
+            </div>
           </div>
           <hr className={`page-title`} />
         </div>

@@ -28,6 +28,7 @@ export type Profile = {
 
 export type ProfileActionCmd = {
   csrf?: string;
+  slug?: string;
   profile: Profile | null;
   errors: { [key: string]: string[] };
 };
@@ -103,5 +104,3 @@ export function validateUpdateProfile(profile: Profile) {
 
   return errors;
 }
-
-

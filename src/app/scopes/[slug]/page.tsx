@@ -6,6 +6,7 @@ import GetCsrf from "@/components/csrf-token";
 import { handleScopeEdit } from "./actions";
 import { Suspense } from "react";
 import Loading from "@/components/loading";
+import Link from "next/link";
 
 const pageError = "Failed to load scope record page: ";
 
@@ -91,12 +92,24 @@ export default async function Page({
       <main className={`main main-drawer`}>
         <div className={`center`}>
           <div className={`page-title`}>
-            <h1>
-              Scope:{" "}
-              {scope && scope.scope && (
-                <span className="highlight">{scope.scope}</span>
-              )}
-            </h1>
+            <div
+              className="actions"
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                paddingRight: "1rem",
+              }}
+            >
+              <h1>
+                Scope:{" "}
+                {scope && scope.scope && (
+                  <span className="highlight">{scope.scope}</span>
+                )}
+              </h1>
+              <Link href={`/scopes`}>
+                <button>Back</button>
+              </Link>
+            </div>
           </div>
           <hr className={`page-title`} />
           {scope && scope.created_at && (

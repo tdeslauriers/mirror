@@ -45,16 +45,43 @@ export default function ServicesTable({ data }: ServicesTableProps) {
       header: "Enabled",
       accessor: "enabled" as keyof ServiceClient,
       sortable: false,
+      render: (value: ServiceClient[keyof ServiceClient]) => (
+        <>
+          {value ? (
+            <span>Enabled</span>
+          ) : (
+            <span className="highlight-error">Disabled</span>
+          )}
+        </>
+      ),
     },
     {
       header: "Account expired",
       accessor: "account_expired" as keyof ServiceClient,
       sortable: false,
+      render: (value: ServiceClient[keyof ServiceClient]) => (
+        <>
+          {value ? (
+            <span className="highlight-error">Expired</span>
+          ) : (
+            <span>Active</span>
+          )}
+        </>
+      ),
     },
     {
       header: "Account Locked",
       accessor: "account_locked" as keyof ServiceClient,
       sortable: false,
+      render: (value: ServiceClient[keyof ServiceClient]) => (
+        <>
+          {value ? (
+            <span className="highlight-error">Locked</span>
+          ) : (
+            <span>Unlocked</span>
+          )}
+        </>
+      ),
     },
   ];
 

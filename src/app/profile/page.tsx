@@ -1,7 +1,7 @@
 // process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
-import UserForm from "./user-form";
+import UserForm from "../../components/forms/user-form";
 import { Profile } from ".";
 import { handleReset, handleUserEdit } from "./actions";
 import GetCsrf from "@/components/csrf-token";
