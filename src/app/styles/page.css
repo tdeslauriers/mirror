@@ -116,13 +116,16 @@ hr.page-title {
   width: 75vw;
 }
 
-.content h2,
-p {
-  padding: 1rem;
+.content h2 {
+  padding: 2rem 0rem 1rem;
 }
 
 .content h3 {
-  padding: 1rem 2rem;
+  padding: 1rem 2rem 1rem;
+}
+
+.content p {
+  padding: 0rem 2rem 1rem;
 }
 
 .content li {
