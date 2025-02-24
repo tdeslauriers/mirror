@@ -269,7 +269,7 @@ export default function RegistrationForm({
             </div>
           </div>
 
-          <div className={`row`}>
+          <div className={`row`} style={{ paddingTop: "1rem" }}>
             <FormSubmit buttonLabel="register" pendingLabel="registering..." />
           </div>
         </form>

@@ -5,6 +5,10 @@ import { redirect } from "next/navigation";
 import { Suspense } from "react";
 import UserTable from "./user-table";
 
+export const metadata = {
+  robots: "noindex, nofollow",
+};
+
 const pageError: string = "Failed to load users page: ";
 
 export default async function UsersPage() {

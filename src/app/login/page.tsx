@@ -8,6 +8,11 @@ import { OauthExchange } from "../api";
 import GetOauthExchange from "@/components/oauth-exchange";
 import { pageError } from ".";
 import Loading from "@/components/loading";
+import Link from "next/link";
+
+export const metadata = {
+  robots: "noindex, nofollow",
+};
 
 interface LoginParams {
   response_type?: string;
@@ -88,6 +93,7 @@ export default async function LoginPage({
             <LoginForm csrf={csrf} oauth={oauth} />
           </div>
         </Suspense>
+
       </main>
     </>
   );

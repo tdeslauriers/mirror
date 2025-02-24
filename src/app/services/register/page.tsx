@@ -9,6 +9,10 @@ import ClientRegistrationForm from "@/components/forms/client-registration-form"
 import handleClientRegister from "./actions";
 import Link from "next/link";
 
+export const metadata = {
+  robots: "noindex, nofollow",
+};
+
 const pageError = "Failed to load /services/register page: ";
 
 export default async function Page() {

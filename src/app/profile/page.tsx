@@ -10,6 +10,10 @@ import GetOauthExchange from "@/components/oauth-exchange";
 import { Suspense } from "react";
 import Loading from "@/components/loading";
 
+export const metadata = {
+  robots: "noindex, nofollow",
+};
+
 const pageError: string = "Failed to load profile page: ";
 
 export default async function ProfilePage() {

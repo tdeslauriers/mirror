@@ -8,6 +8,10 @@ import { Suspense } from "react";
 import Loading from "@/components/loading";
 import Link from "next/link";
 
+export const metadata = {
+  robots: "noindex, nofollow",
+};
+
 const pageError = "Failed to load scope record page: ";
 
 export default async function Page({

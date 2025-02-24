@@ -6,6 +6,10 @@ import { redirect } from "next/navigation";
 import { handleScopeAdd } from "./actions";
 import Link from "next/link";
 
+export const metadata = {
+  robots: "noindex, nofollow",
+};
+
 const pageError = "Failed to load scope add page: ";
 
 export default async function Page() {

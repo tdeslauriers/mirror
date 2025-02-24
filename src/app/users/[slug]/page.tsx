@@ -10,6 +10,10 @@ import Loading from "@/components/loading";
 import { handleScopesUpdate, handleUserEdit } from "./actions";
 import ScopesManageForm from "@/components/forms/scopes-manage-form";
 
+export const metadata = {
+  robots: "noindex, nofollow",
+};
+
 const pageError = "Failed to load user page.";
 
 export default async function Page({

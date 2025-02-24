@@ -12,6 +12,7 @@ import { handleLogin } from "./actions";
 import { OauthExchange } from "../api";
 import FormSubmit from "@/components/forms/form-submit";
 import ErrorField from "@/components/errors/error-field";
+import Link from "next/link";
 
 export default function LoginForm({
   csrf,
@@ -157,6 +158,11 @@ export default function LoginForm({
           <FormSubmit buttonLabel="login" pendingLabel="logging in..." />
         </div>
       </form>
+      <p style={{ paddingTop: "1rem" }}>
+        <Link className="locallink" href="/register">
+          Dont have an account?
+        </Link>
+      </p>
     </>
   );
 }

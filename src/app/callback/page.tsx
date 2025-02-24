@@ -5,6 +5,10 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import Loading from "@/components/loading";
 
+export const metadata = {
+  robots: "noindex, nofollow",
+};
+
 export default async function CallbackPage() {
   // quick redirect if auth'd cookies are present:
   // only unauthenticated users should be be able to be redirected/see the callback page

@@ -10,6 +10,10 @@ import ResetForm from "@/components/forms/reset-form";
 import ScopesManageForm from "@/components/forms/scopes-manage-form";
 import Link from "next/link";
 
+export const metadata = {
+  robots: "noindex, nofollow",
+};
+
 const pageError = "Failed to load service client page.";
 
 export default async function Page({

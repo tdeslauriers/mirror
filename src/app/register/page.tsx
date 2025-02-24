@@ -8,6 +8,10 @@ import { handleRegistration } from "./actions";
 import { Suspense } from "react";
 import Loading from "@/components/loading";
 
+export const metadata = {
+  robots: "noindex, nofollow",
+};
+
 export default async function Registration() {
   // quick redirect if auth'd cookies are present:
   // only unauthenticated users should be able to register

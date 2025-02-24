@@ -6,6 +6,10 @@ import { Suspense } from "react";
 import ServicesTable from "./services_table";
 import Link from "next/link";
 
+export const metadata = {
+  robots: "noindex, nofollow",
+};
+
 const pageError: string = "Failed to load clients page.";
 
 export default async function ServicesPage() {

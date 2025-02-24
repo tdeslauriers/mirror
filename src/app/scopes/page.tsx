@@ -6,6 +6,10 @@ import { Suspense } from "react";
 import ScopesTable from "./scopes_table";
 import Link from "next/link";
 
+export const metadata = {
+  robots: "noindex, nofollow",
+};
+
 const pageError: string = "Failed to load scopes page: ";
 
 export default async function ScopesPage() {
