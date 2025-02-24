@@ -5,6 +5,7 @@ import style from "./nav-main-header.module.css";
 import NavLogin from "./nav-login";
 import { cookies } from "next/headers";
 import NavDrawer from "./nav-drawer";
+import ExtendedNav from "./nav-extended";
 
 export default async function NavMainHeader() {
   const cookieStore = await cookies();
@@ -27,6 +28,7 @@ export default async function NavMainHeader() {
                   About
                 </Link>
               </li>
+              <ExtendedNav />
               <li>
                 <Link
                   className={style.locallink}

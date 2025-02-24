@@ -7,6 +7,7 @@ import { pageError } from ".";
 import { handleRegistration } from "./actions";
 import { Suspense } from "react";
 import Loading from "@/components/loading";
+import Link from "next/link";
 
 export const metadata = {
   robots: "noindex, nofollow",
@@ -49,6 +50,11 @@ export default async function Registration() {
           <h1>
             <span className={`highlight`}>Sign up</span> for an account.
           </h1>
+          <p>
+            <Link className="locallink" href="/login">
+              Already Registered?
+            </Link>
+          </p>
         </div>
         <Suspense fallback={<Loading />}>
           <div className={`card`}>

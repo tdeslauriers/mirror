@@ -34,9 +34,8 @@ export default async function Welcome() {
             {" "}
             world,{" "}
             <Link className={`locallink`} href={`/profile`}>
-              {bannerName}
+              {bannerName}!
             </Link>
-            !
           </>
         ) : (
           " world!"

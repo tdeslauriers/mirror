@@ -25,8 +25,6 @@ export default async function AboutPage() {
           <About />
         </div>
 
-        {/* <hr className={`content-divider`} /> */}
-
         <div className={`content`} style={{ marginTop: "2rem" }}>
           <h1>The Current Tech Stack:</h1>
           <hr className="page-title" />

@@ -64,6 +64,18 @@ export default function RegistrationForm({
     <>
       {!registrationState.complete && (
         <form className={`form`} action={formAction}>
+          <div style={{ paddingBottom: "1rem" }}>
+            Before registering, make sure to read the{" "}
+            <Link
+              className="locallink"
+              href="/privacy"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Privacy Notice.
+            </Link>
+          </div>
+
           {registrationState.errors.server && (
             <ErrorField errorMsgs={fieldErrors.server} />
           )}
