@@ -14,6 +14,9 @@ export default async function PrivacyPage() {
           <hr className="page-title" />
         </div>
         <div className={`content`}>
+          <h2 style={{ paddingTop: "0rem" }}>
+            Colleciton and Use of Personal Information
+          </h2>
           <Privacy />
         </div>
       </main>
