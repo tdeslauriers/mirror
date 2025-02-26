@@ -30,6 +30,11 @@ export default async function NavMainHeader() {
               </li>
               <ExtendedNav />
               <li>
+                <Link href="/resume" className={style.locallink}>
+                  Résumé
+                </Link>
+              </li>
+              <li>
                 <Link
                   className={style.locallink}
                   href="https://www.github.com/tdeslauriers"
