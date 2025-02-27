@@ -74,7 +74,7 @@ export default async function Page() {
                 Service: <span className="highlight">register</span>
               </h1>
               <Link href="/services">
-                <button>Back</button>
+                <button>Services Table</button>
               </Link>
             </div>
           </div>

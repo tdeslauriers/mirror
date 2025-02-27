@@ -15,7 +15,7 @@ export default function UserForm({
   userEdit,
 }: {
   csrf: string;
-  slug?: string; 
+  slug?: string;
   profile: Profile | User;
   userEdit: (
     prevState: ProfileActionCmd,
@@ -28,8 +28,6 @@ export default function UserForm({
     profile: profile,
     errors: {},
   });
-
-  console.log("profileState", profileState);
 
   const age =
     profile.birth_year && profile.birth_month && profile.birth_day

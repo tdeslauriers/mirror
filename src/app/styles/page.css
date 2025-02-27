@@ -69,7 +69,7 @@ hr.page-title {
 
 .card {
   display: block;
-  width: 50%;
+  width: 35vw;
   font-size: 1rem;
   font-family: "Montserrat", sans-serif;
   border-radius: 4px;
@@ -161,6 +161,34 @@ hr.page-title {
   .center::before {
     transform: none;
     height: 300px;
+  }
+
+  .content,
+  .page-title,
+  .card,
+  .card-title {
+    flex-direction: column;
+    width: 85vw;
+  }
+}
+
+/* Tablet */
+@media (min-width: 700px) and (max-width: 1500px) {
+  .center {
+    padding: 8rem 0 6rem;
+  }
+
+  .center::before {
+    transform: none;
+    height: 300px;
+  }
+
+  .content,
+  .page-title,
+  .card,
+  .card-title {
+    flex-direction: column;
+    width: 65vw;
   }
 }
 

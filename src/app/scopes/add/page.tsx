@@ -12,7 +12,7 @@ export const metadata = {
 
 const pageError = "Failed to load scope add page: ";
 
-export default async function Page() {
+export default async function ScopesAddPage() {
   // quick for redirect if auth'd cookies not present
   const cookieStore = await cookies();
   const hasIdentity = cookieStore.has("identity")
@@ -68,7 +68,7 @@ export default async function Page() {
                 Scope: <span className="highlight">add</span>
               </h1>
               <Link href="/scopes">
-                <button>Back</button>
+                <button>Scopes Table</button>
               </Link>
             </div>
           </div>

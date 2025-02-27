@@ -125,7 +125,9 @@ export default function ScopesManageForm({
                     </Link>
                   </div>
                   <div className={`${styles.box} ${styles.right}`}>
-                    <span className="highlight">{scope.service_name}</span>
+                    <h3>
+                      <span className="highlight">{scope.service_name}</span>
+                    </h3>
                   </div>
                 </div>
                 {/* <hr className="page-title" /> */}
@@ -136,7 +138,9 @@ export default function ScopesManageForm({
                   <div className={styles.box}>{scope.name}</div>
                 </div>
                 <div className={styles.row}>
-                  <div className={styles.box}>{scope.description}</div>
+                  <div className={styles.box} style={{}}>
+                    {scope.description}
+                  </div>
                   <div className={`${styles.box} ${styles.right}`}>
                     <div
                       style={{ width: "auto", alignItems: "right" }}

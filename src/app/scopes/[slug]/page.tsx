@@ -111,7 +111,7 @@ export default async function Page({
                 )}
               </h1>
               <Link href={`/scopes`}>
-                <button>Back</button>
+                <button>Scopes Table</button>
               </Link>
             </div>
           </div>

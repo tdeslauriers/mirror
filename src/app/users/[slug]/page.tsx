@@ -135,7 +135,7 @@ export default async function Page({
                 User: <span className="highlight">{user?.username}</span>
               </h1>
               <Link href={`/users`}>
-                <button>Back</button>
+                <button>Users Table</button>
               </Link>
             </div>
           </div>
