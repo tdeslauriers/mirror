@@ -3,26 +3,33 @@ import Image from "next/image";
 import logo256 from "@/assets/logo_world_2_256.png";
 import style from "./nav-main-header.module.css";
 import NavLogin from "./nav-login";
-import { cookies } from "next/headers";
 import NavDrawer from "./nav-drawer";
 import ExtendedNav from "./nav-extended";
+import MobileMenu from "./nav-mobile-main-header";
 
 export default async function NavMainHeader() {
-  const cookieStore = await cookies();
-  const hasIdentity = cookieStore.has("identity")
-    ? cookieStore.get("identity")
-    : null;
   return (
     <>
       <header className={style.header}>
         <div className={style.left}>
-          <Link className={style.logo} href="/">
-            <Image src={logo256} alt="Laurels Logo" />
-            <span className={style.locallink}>des Lauriers world</span>{" "}
-          </Link>
+          <div className={style.logo}>
+            <Link className={style.locallink} href="/">
+              <Image src={logo256} alt="Laurels Logo" />
+            </Link>
+          </div>
+
+          {/* mobile nave menu */}
+          <div className={style.mobilenav}>
+            <MobileMenu />
+          </div>
 
           <nav className={style.nav}>
             <ul>
+              <li>
+                <Link className={style.locallink} href="/">
+                  des Lauriers world
+                </Link>
+              </li>
               <li>
                 <Link href="/about" className={style.locallink}>
                   About
@@ -48,7 +55,9 @@ export default async function NavMainHeader() {
           </nav>
         </div>
 
-        <NavLogin />
+        <div className={style.right}>
+          <NavLogin />
+        </div>
 
         <NavDrawer />
       </header>

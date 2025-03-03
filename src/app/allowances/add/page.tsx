@@ -6,24 +6,12 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { Suspense } from "react";
 import AddAllowanceForm from "./add-allowance-form";
-import { User } from "@/app/users";
+import { handleAddAllowance } from "./actions";
+import { AllowanceUser } from "..";
 
 export const metadata = {
   robots: "noindex, nofollow",
 };
-
-interface UserJson {
-  id: string;
-  username: string;
-  firstname: string;
-  lastname: string;
-  slug: string;
-  created_at: string;
-  birth_date: string;
-  enabled: boolean;
-  account_expired: boolean;
-  account_locked: boolean;
-}
 
 const pageError = "Failed to load allowance add page: ";
 
@@ -89,24 +77,7 @@ export default async function Page() {
     }
   }
 
-  const userJson: UserJson[] = await response.json();
-  // need to loop thru and build the dobs for the form
-  const users: User[] = userJson.map((u) => {
-    const dob = new Date(u.birth_date);
-
-    return {
-      firstname: u.firstname,
-      lastname: u.lastname,
-      slug: u.slug,
-      created_at: u.created_at,
-      enabled: u.enabled,
-      account_expired: u.account_expired,
-      account_locked: u.account_locked,
-      birth_month: dob.getMonth() ? dob.getMonth() : undefined,
-      birth_day: dob.getDate() ? dob.getDate() : undefined,
-      birth_year: dob.getFullYear() ? dob.getFullYear() : undefined,
-    };
-  });
+  const users: AllowanceUser[] = await response.json();
 
   return (
     <>
@@ -136,7 +107,11 @@ export default async function Page() {
         </div>
         <div className="card">
           <Suspense fallback={<Loading />}>
-            <AddAllowanceForm csrf={csrf} users={users} />
+            <AddAllowanceForm
+              csrf={csrf}
+              users={users}
+              addAllowance={handleAddAllowance}
+            />
           </Suspense>
         </div>
       </main>

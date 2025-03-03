@@ -30,45 +30,41 @@ export default function NavLogin() {
       setHasIdentity(false);
     }
   }, []);
-  
+
   return (
     <>
       {hasIdentity ? (
         <>
-          <div className={style.right}>
-            <div className={style.nav}>
-              <ul>
-                <li>
-                  <Link className={style.locallink} href="/profile">
-                    Profile
-                  </Link>
-                </li>
-                <li>
-                  <form className={style.logoutform} action={logout}>
-                    <button className={style.logoutbutton}>Logout</button>
-                  </form>
-                </li>
-              </ul>
-            </div>
+          <div className={style.nav}>
+            <ul>
+              <li>
+                <Link className={style.locallink} href="/profile">
+                  Profile
+                </Link>
+              </li>
+              <li>
+                <form className={style.logoutform} action={logout}>
+                  <button className={style.logoutbutton}>Logout</button>
+                </form>
+              </li>
+            </ul>
           </div>
         </>
       ) : (
         <>
-          <div className={style.right}>
-            <div className={style.nav}>
-              <ul>
-                <li>
-                  <Link className={style.locallink} href="/register">
-                    Register
-                  </Link>
-                </li>
-                <li>
-                  <Link className={style.locallink} href="/login">
-                    Login
-                  </Link>
-                </li>
-              </ul>
-            </div>
+          <div className={style.nav}>
+            <ul>
+              <li>
+                <Link className={style.locallink} href="/register">
+                  Register
+                </Link>
+              </li>
+              <li>
+                <Link className={style.locallink} href="/login">
+                  Login
+                </Link>
+              </li>
+            </ul>
           </div>
         </>
       )}

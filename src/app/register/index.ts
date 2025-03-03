@@ -49,6 +49,17 @@ export type RegistrationCmd = {
 export function validateRegistration(registration: RegistrationData) {
   const errors: { [key: string]: string[] } = {};
 
+  // check csrf
+  if (
+    registration.csrf &&
+    registration.csrf.trim().length === 16 &&
+    registration.csrf.trim().length > 64
+  ) {
+    errors.csrf = [
+      "CSRF token is not well formed.  My cannot edit or tamper with this value.",
+    ];
+  }
+
   // check username
   if (!registration.username || registration.username.trim().length === 0) {
     errors.username = ["Email/username address is required."];

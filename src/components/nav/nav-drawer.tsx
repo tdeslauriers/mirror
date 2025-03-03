@@ -1,4 +1,5 @@
 "use client";
+
 import { useEffect, useState } from "react";
 import style from "./nav-drawer.module.css";
 import Link from "next/link";
@@ -35,6 +36,7 @@ export default function NavDrawer() {
       return null;
     }
 
+    // run on mount to chack for identity cookie
     const identityCookie = getCookie("identity");
     if (identityCookie) {
       setHasIdentity(true);
@@ -43,6 +45,21 @@ export default function NavDrawer() {
     } else {
       setHasIdentity(false);
     }
+
+    // run on storage change (cross-tab sync)
+    window.addEventListener("storage", (e) => {
+      if (e.key === "identity") {
+        const identityCookie = getCookie("identity");
+        if (identityCookie) {
+          setHasIdentity(true);
+          const identity = JSON.parse(decodeURIComponent(identityCookie));
+          setRender(identity.ux_render);
+        } else {
+          setHasIdentity(false);
+        }
+      }
+    });
+
   }, []);
 
   useEffect(() => {
@@ -64,6 +81,9 @@ export default function NavDrawer() {
 
   return (
     <>
+
+      {/* mobile drawer and drawer button  */}
+
       {hasIdentity ? (
         <>
           <div className={`${style.drawer} `}>

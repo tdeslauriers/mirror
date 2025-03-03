@@ -1,36 +1,114 @@
 "use client";
 
-import { User } from "@/app/users";
 import FormSubmit from "@/components/forms/form-submit";
 import Link from "next/link";
-import { useState } from "react";
+import { useActionState, useState } from "react";
+import { AddAllowanceActionCmd, AllowanceUser } from "..";
+import ErrorField from "@/components/errors/error-field";
 
 type Err = { [key: string]: string[] };
 
 export default function AddAllowanceForm({
   csrf,
   users,
+  addAllowance,
 }: {
   csrf: string;
-  users: User[];
+  users: AllowanceUser[];
+  addAllowance: (
+    prevState: AddAllowanceActionCmd,
+    formData: FormData
+  ) => AddAllowanceActionCmd | Promise<AddAllowanceActionCmd>;
 }) {
-  const [selectedUser, setSelectedUser] = useState("");
-  const [user, setUser] = useState<User | null>(null);
+  const [addAllowanceState, formAction] = useActionState(addAllowance, {
+    csrf: csrf,
+
+    errors: {},
+  });
+
+  const [selectedUser, setSelectedUser] = useState<string | undefined>(
+    addAllowanceState?.slug || ""
+  );
+  const [selectedUsername, setSelectedUsername] = useState<string | undefined>(
+    addAllowanceState?.username || ""
+  );
+  const [selectedUserSlug, setSelectedUserSlug] = useState<string | undefined>(
+    addAllowanceState?.slug || ""
+  );
+  const [selectedUserDob, setSelectedUserDob] = useState<string | undefined>(
+    addAllowanceState?.birth_date || ""
+  );
+
+  const [fieldErrors, setFieldErrors] = useState<Err>({}); // client side errors
+
+  // Sync the selected value with form state AFTER form submission
 
   const handleSelect = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    // set the value of the selector to the selected user
-    setSelectedUser(e.target.value);
+    e.preventDefault();
+    if (e.target.value !== "") {
+      // find the user by username
+      const user = users.find((u) => u.slug === e.target.value);
 
-    // get the selected user and set state so we can use it in the form
-    const user = users.find((u) => u.slug === e.target.value);
-    if (user) {
-      setUser(user);
+      if (!user) {
+        setFieldErrors({
+          dob: ["User does not exist."],
+        });
+        return;
+      }
+
+      // set the value of the selector to the selected user
+      setSelectedUser(user?.slug);
+
+      if (!user?.birth_date) {
+        setFieldErrors({
+          dob: ["User does not have a date of birth in their profile."],
+        });
+        return;
+      } else {
+        setFieldErrors({
+          dob: [],
+        });
+        // set the username and slug
+        setSelectedUsername(user?.username);
+        setSelectedUserSlug(user?.slug);
+        setSelectedUserDob(user?.birth_date);
+      }
     }
   };
 
   return (
     <>
-      <form className="form">
+      <form className="form" action={formAction}>
+        {addAllowanceState.errors.server && (
+          <ErrorField errorMsgs={addAllowanceState.errors.server} />
+        )}
+        {addAllowanceState.errors.csrf && (
+          <ErrorField errorMsgs={addAllowanceState.errors.csrf} />
+        )}
+        {addAllowanceState.errors.username && (
+          <ErrorField errorMsgs={addAllowanceState.errors.username} />
+        )}
+        {addAllowanceState.errors.slug && (
+          <ErrorField errorMsgs={addAllowanceState.errors.slug} />
+        )}
+        {addAllowanceState.errors.dob && (
+          <ErrorField errorMsgs={addAllowanceState.errors.dob} />
+        )}
+
+        {fieldErrors.dob && fieldErrors.dob.length > 0 && (
+          <ErrorField errorMsgs={fieldErrors.dob} />
+        )}
+        {fieldErrors.dob && fieldErrors.dob.length > 0 && (
+          <div
+            className="row"
+            style={{ fontSize: "1.5rem", marginTop: "1rem" }}
+          >
+            Add date of birth to their user profile in the{" "}
+            <Link className="locallink" href={`/users`}>
+              user table.
+            </Link>
+          </div>
+        )}
         <label>
           Site User{" "}
           <sup>
@@ -43,10 +121,12 @@ export default function AddAllowanceForm({
           <select
             name="user-select"
             className="select"
-            value={selectedUser}
+            defaultValue={selectedUser}
             onChange={handleSelect}
           >
-            <option value="">Select user...</option>
+            <option key="no-user-selected" value="">
+              Select user...
+            </option>
             {users.map((u) => (
               <option key={u.slug} value={u.slug}>
                 {u.lastname}, {u.firstname}
@@ -55,76 +135,19 @@ export default function AddAllowanceForm({
           </select>
         </div>
 
+        <input type="hidden" name="username" value={selectedUsername} />
+        <input type="hidden" name="slug" value={selectedUserSlug} />
+        <input type="hidden" name="birth_date" value={selectedUserDob} />
+
         <div className={`row`}>
-          <div className={`date`}>
-            <label
-              className={`label`}
-              htmlFor="birthdate"
-              title="only required for allowance app"
-            >
-              Birth date{" "}
-              <sup>
-                <span className={`highlight`} style={{ fontSize: ".7rem" }}>
-                  Required for allowance remittance calculation.
-                </span>
-              </sup>
-            </label>
-            <div className={`daterow`}>
-              <input
-                className={`birthdate`}
-                name="birthMonth"
-                title="Enter a month number between 1 and 12"
-                type="number"
-                min={1}
-                max={12}
-                defaultValue={user?.birth_month}
-                placeholder="Month"
-              />
-
-              <input
-                className={`birthdate`}
-                name="birthDay"
-                title="Enter a day number between 1 and 31"
-                type="number"
-                min={1}
-                max={31}
-                defaultValue={user?.birth_day}
-                placeholder="Day"
-              />
-
-              <input
-                className={`birthdate`}
-                name="birthYear"
-                title={`Enter a year number between ${
-                  new Date().getFullYear() - 120
-                } and ${new Date().getFullYear()}`}
-                type="number"
-                min={new Date().getFullYear() - 120}
-                max={new Date().getFullYear()}
-                defaultValue={user?.birth_year}
-                placeholder="Year"
-              />
-            </div>
-
-            <ul style={{ fontSize: ".75rem", paddingLeft: "1rem" }}>
-              <li>
-                A remittee may earn up to the amount of their age in years each
-                week.
-              </li>
-              <li>
-                Once allownace account created, the remittee's age will appear
-                in their{" "}
-                {user?.slug ? (
-                  <Link className="locallink" href={`/users/${user.slug}`}>
-                    user profile
-                  </Link>
-                ) : (
-                  "user profile"
-                )}
-                .
-              </li>
-            </ul>
-          </div>
+          <ul style={{ paddingLeft: "1rem" }}>
+            <li>
+              <em>
+                A remittee may earn <span className="highlight">up to</span> the
+                dollar amount of their age in years each week.
+              </em>
+            </li>
+          </ul>
         </div>
 
         <div className={`row`}>

@@ -77,10 +77,13 @@ export default function RegistrationForm({
           </div>
 
           {registrationState.errors.server && (
-            <ErrorField errorMsgs={fieldErrors.server} />
+            <ErrorField errorMsgs={registrationState.errors.server} />
           )}
           {registrationState.errors.badrequest && (
-            <ErrorField errorMsgs={fieldErrors.badrequest} />
+            <ErrorField errorMsgs={registrationState.errors.badrequest} />
+          )}
+          {registrationState.errors.csrf && (
+            <ErrorField errorMsgs={registrationState.errors.csrf} />
           )}
           <input
             type="hidden"

@@ -135,6 +135,17 @@ hr.page-title {
   font-family: "Montserrat", sans-serif;
 }
 
+.content code {
+  font-size: 1rem;
+  background: linear-gradient(
+    90deg,
+    var(--menu-button-primary),
+    var(--menu-button-fade)
+  );
+  padding: 0.1rem 0.5rem;
+  border-radius: 4px;
+}
+
 .content-divider {
   width: 100%;
 
@@ -168,7 +179,7 @@ hr.page-title {
   .card,
   .card-title {
     flex-direction: column;
-    width: 85vw;
+    width: 75vw;
   }
 }
 
@@ -188,7 +199,7 @@ hr.page-title {
   .card,
   .card-title {
     flex-direction: column;
-    width: 65vw;
+    width: 85vw;
   }
 }
 

@@ -47,6 +47,9 @@ export default function ScopeForm({
         {scopeState.errors.server && (
           <ErrorField errorMsgs={scopeState.errors.server} />
         )}
+        {scopeState.errors.csrf && (
+          <ErrorField errorMsgs={scopeState.errors.csrf} />
+        )}
 
         <div className="row">
           <div className="field">

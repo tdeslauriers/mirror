@@ -10,8 +10,9 @@ export default async function middleware(request: NextRequest) {
   const hasSession = cookieStore.has("session_id")
     ? cookieStore.get("session_id")
     : null;
+
+  // if session cookie is missing, fetch anonymous session data
   if (!hasSession || hasSession.value === "") {
-    // process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0"; // must be at top of page that calls this middleware
     try {
       const apiResponse = await fetch(
         `${process.env.GATEWAY_SERVICE_URL}/session/anonymous`,

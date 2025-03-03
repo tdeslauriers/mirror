@@ -235,3 +235,28 @@ export function checkUuid(uuid: string) {
 
   return { isValid: true, messages: [] };
 }
+
+export function isRealDob(dateString: string | undefined): FieldValidation {
+  let errors: string[] = [];
+  if (!dateString) {
+    return { isValid: false, messages: ["Date of birth is required."] };
+  }
+  const parsedDate = new Date(dateString);
+
+  // Check if the parsedDate is a valid date
+  if (isNaN(parsedDate.getTime())) {
+    return { isValid: false, messages: ["Date of birth must be a valid date."] };
+  }
+
+  const today = new Date();
+  const hundredYearsAgo = new Date();
+  hundredYearsAgo.setFullYear(today.getFullYear() - 100);
+
+  // Ensure the date is within 100 years and not in the future
+  const isRealDob = parsedDate >= hundredYearsAgo && parsedDate <= today;
+  if (!isRealDob) {
+    return { isValid: false, messages: ["Date of birth must be a valid date."] };
+  }
+
+  return { isValid: true, messages: [] };
+}

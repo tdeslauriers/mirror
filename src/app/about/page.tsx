@@ -6,6 +6,7 @@ import Techstack from "@/markdown/techstack.mdx";
 export default async function AboutPage() {
   const cookieStore = await cookies();
   const hasIdentity = cookieStore.has("identity");
+  
   return (
     <>
       <main className={`main ${hasIdentity ? "main-drawer" : null}`}>

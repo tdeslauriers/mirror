@@ -5,10 +5,21 @@ import {
   checkScopeName,
 } from "@/validation/scope_fields";
 import { checkServiceName } from "@/validation/service_client_field";
-import { checkUuid, FieldValidation } from "@/validation/user_fields";
+import { FieldValidation } from "@/validation/user_fields";
 
 export function validateScope(scope: Scope) {
   const errors: { [key: string]: string[] } = {};
+
+  // check csrf
+  if (
+    scope.csrf &&
+    scope.csrf.trim().length === 16 &&
+    scope.csrf.trim().length > 64
+  ) {
+    errors.csrf = [
+      "CSRF token is not well formed.  My cannot edit or tamper with this value.",
+    ];
+  }
 
   // check service name
   if (!scope.service_name || scope.service_name.trim().length === 0) {
@@ -62,4 +73,3 @@ export function validateScope(scope: Scope) {
 
   return errors;
 }
-

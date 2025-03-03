@@ -88,7 +88,9 @@ export function validateClientRegister(cmd: RegisterClient) {
     cmd.csrf.trim().length === 16 &&
     cmd.csrf.trim().length > 64
   ) {
-    errors.csrf = ["CSRF token is not well formed."];
+    errors.csrf = [
+      "CSRF token is not well formed.  My cannot edit or tamper with this value.",
+    ];
   }
 
   if (cmd.csrf && cmd.csrf.trim().length > 0) {
