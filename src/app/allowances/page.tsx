@@ -20,7 +20,7 @@ export default async function AllowancesPage() {
     : null;
 
   if (!hasIdentity) {
-    const oauth = await GetOauthExchange(hasSession?.value, "/services");
+    const oauth = await GetOauthExchange(hasSession?.value, "/allowances");
     if (oauth) {
       redirect(
         `/login?client_id=${oauth.client_id}&response_type=${oauth.response_type}&state=${oauth.state}&nonce=${oauth.nonce}&redirect_url=${oauth.redirect_url}`

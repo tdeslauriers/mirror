@@ -3,13 +3,17 @@ import {
   FieldValidation,
   isRealDob,
 } from "@/validation/user_fields";
+import { GatewayError } from "../api";
 
 export type AddAllowanceActionCmd = {
   csrf?: string;
+  complete: boolean;
 
   username?: string;
   slug?: string;
   birth_date?: string;
+
+  allowance_account?: string;
 
   errors: {
     [key: string]: string[];
@@ -77,4 +81,28 @@ export function validateAddAllowanceCmd(cmd: AddAllowanceCmd) {
   }
 
   return errors;
+}
+
+export function handleAllowanceAddErrors(gatewayError: GatewayError) {
+  const errors: { [key: string]: string[] } = {};
+  switch (gatewayError.code) {
+    case 400:
+      errors.server = [gatewayError.message];
+      return errors;
+    case 401:
+      errors.server = [gatewayError.message];
+      return errors;
+    case 403:
+      errors.server = [gatewayError.message];
+      return errors;
+    case 404:
+      errors.server = [gatewayError.message];
+      return errors;
+    case 405:
+      errors.server = [gatewayError.message];
+      return errors;
+    default:
+      errors.server = ["Unhandled error calling gateway service."];
+      return errors;
+  }
 }
