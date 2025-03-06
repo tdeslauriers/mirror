@@ -1,37 +1,38 @@
 .header {
   --header-height: 6rem;
   display: flex;
+  position: fixed;
+  width: 100%;
   height: var(--header-height);
   justify-content: space-between;
   align-items: center;
   padding: 2rem 1rem;
   /* border-bottom: 1px solid var(--primary-border-color); */
   box-shadow: 1px 0 55px rgba(13, 14, 13, 0.5);
-  border: 1px solid red;
+  background: linear-gradient(
+      to left,
+      transparent,
+      rgb(var(--background-end-rgb))
+    )
+    rgb(38, 41, 38);
+  z-index: 9999;
 }
 
 .left {
   display: flex;
   align-items: center;
-  border: 1px solid red;
+  height: 6rem;
 }
 
 .right {
   display: flex;
   align-items: center;
   height: 6rem;
-  border: 1px solid red;
 }
 
 .logo {
-  display: flex;
   align-items: center;
   justify-content: center;
-  text-decoration: none;
-  font-weight: bold;
-  letter-spacing: 0.15rem;
-  font-size: 1.5rem;
-  margin-right: 1rem;
 }
 
 .logo:hover,
@@ -43,7 +44,6 @@
 }
 
 .logo img {
-  
   width: 5rem;
   height: 5rem;
   object-fit: contain;
@@ -61,7 +61,7 @@
   color: transparent;
   -webkit-text-fill-color: transparent;
   padding: 0.5rem 1rem;
-  border-radius: 0.5rem;
+  /* border-radius: 0.5rem; */
 }
 
 .locallink:hover,

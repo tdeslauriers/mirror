@@ -131,40 +131,40 @@ export default async function Page({
   return (
     <>
       <main className="main main-drawer">
-        <div className="center">
-          <div className="page-title">
-            <div
-              className="actions"
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                paddingRight: "1rem",
-              }}
-            >
-              <h1>
-                Service:{" "}
-                {client && client.name && (
-                  <span className="highlight">{client.name}</span>
-                )}
-              </h1>
-              <Link href={`/services`}>
-                <button>Services Table</button>
-              </Link>
-            </div>
+        <div className="center"></div>
+        <div className="page-title">
+          <div
+            className="actions"
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              paddingRight: "1rem",
+            }}
+          >
+            <h1>
+              Service:{" "}
+              {client && client.name && (
+                <span className="highlight">{client.name}</span>
+              )}
+            </h1>
+            <Link href={`/services`}>
+              <button>Services Table</button>
+            </Link>
           </div>
-          <hr className="page-title" />
-
-          {client && client.created_at && (
-            <p>
-              Client created{" "}
-              {new Date(client.created_at).toLocaleDateString("en-US", {
-                year: "numeric",
-                month: "long",
-                day: "numeric",
-              })}
-            </p>
-          )}
         </div>
+        <hr className="page-title" />
+
+        {client && client.created_at && (
+          <p>
+            Client created{" "}
+            {new Date(client.created_at).toLocaleDateString("en-US", {
+              year: "numeric",
+              month: "long",
+              day: "numeric",
+            })}
+          </p>
+        )}
+
         <div className="card-title">
           <h2>
             Serivce Uuid:{" "}

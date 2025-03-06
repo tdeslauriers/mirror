@@ -59,7 +59,6 @@ export default function NavDrawer() {
         }
       }
     });
-
   }, []);
 
   useEffect(() => {
@@ -81,7 +80,6 @@ export default function NavDrawer() {
 
   return (
     <>
-
       {/* mobile drawer and drawer button  */}
 
       {hasIdentity ? (
@@ -91,34 +89,36 @@ export default function NavDrawer() {
               <div className={`${style.section}`}>
                 <button
                   className={`${style.menubutton}`}
-                  onClick={() => toggleMenu("usres")}
+                  onClick={() => toggleMenu("users")}
                 >
                   <strong>
                     <span
-                      className={`${showMenus["usres"] ? "highlight" : "base"}`}
+                      className={`${showMenus["users"] ? "highlight" : "base"}`}
                     >
                       Identity
                     </span>
                   </strong>
                 </button>
-                {showMenus["usres"] && (
-                  <ul className={`${style.submenu}`}>
-                    <li>
-                      <Link className={`locallink`} href={"/users"}>
-                        Users
-                      </Link>
-                    </li>
-                    <li>
-                      <Link className={`locallink`} href={"/scopes"}>
-                        Scopes
-                      </Link>
-                    </li>
-                    <li>
-                      <Link className={`locallink`} href={"/services"}>
-                        Services
-                      </Link>
-                    </li>
-                  </ul>
+                {showMenus["users"] && (
+                  <div className={`${style.submenu}`}>
+                    <ul>
+                      <li>
+                        <Link className={`locallink`} href={"/users"}>
+                          Users
+                        </Link>
+                      </li>
+                      <li>
+                        <Link className={`locallink`} href={"/scopes"}>
+                          Scopes
+                        </Link>
+                      </li>
+                      <li>
+                        <Link className={`locallink`} href={"/services"}>
+                          Services
+                        </Link>
+                      </li>
+                    </ul>
+                  </div>
                 )}
               </div>
             )}
@@ -138,8 +138,8 @@ export default function NavDrawer() {
                     </span>
                   </strong>
                   {showMenus["gallery"] && (
-                    <div>
-                      <ul className={`${style.submenu}`}>
+                    <div className={`${style.submenu}`}>
+                      <ul>
                         <li>
                           <span className={`highlight`}>Coming Soon!</span>
                         </li>
@@ -164,8 +164,8 @@ export default function NavDrawer() {
                   </strong>
                 </button>
                 {showMenus["blog"] && (
-                  <div>
-                    <ul className={`${style.submenu}`}>
+                  <div className={`${style.submenu}`}>
+                    <ul>
                       <li>
                         <span className={`highlight`}>Coming Soon!</span>
                       </li>
@@ -191,8 +191,8 @@ export default function NavDrawer() {
                   </strong>
                 </button>
                 {showMenus["allowance"] && (
-                  <div>
-                    <ul className={`${style.submenu}`}>
+                  <div className={`${style.submenu}`}>
+                    <ul>
                       <li>
                         <span className={`highlight`}>Coming Soon!</span>
                       </li>

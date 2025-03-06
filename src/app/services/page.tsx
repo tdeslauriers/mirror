@@ -67,28 +67,28 @@ export default async function ServicesPage() {
   return (
     <>
       <main className="main main-drawer">
-        <div className="center">
-          <div className="page-title">
-            <div
-              className="actions"
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                paddingRight: "1rem",
-              }}
-            >
-              <h1>Services</h1>
-              <Link href="/services/register">
-                <button>Register Service</button>
-              </Link>
-            </div>
-          </div>
-          <hr className="page-title" />
-          <div style={{ fontStyle: "italic" }}>
-            To navigate to a specifc service record, click on the service in the
-            table below:
+        <div className="center"></div>
+        <div className="page-title">
+          <div
+            className="actions"
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              paddingRight: "1rem",
+            }}
+          >
+            <h1>Services</h1>
+            <Link href="/services/register">
+              <button>Register Service</button>
+            </Link>
           </div>
         </div>
+        <hr className="page-title" />
+        <div style={{ fontStyle: "italic" }}>
+          To navigate to a specifc service record, click on the service in the
+          table below:
+        </div>
+
         <Suspense fallback={<Loading />}>
           <ServicesTable data={clients} />
         </Suspense>

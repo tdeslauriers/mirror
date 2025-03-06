@@ -12,11 +12,11 @@ export default async function Home() {
   return (
     <>
       <main className={`main ${hasIdentity ? "main-drawer" : null}`}>
-        <div className={`center`}>
-          <div className={`page-title`}>
-            <Welcome />
-          </div>
+        <div className={`center`}></div>
+        <div className={`page-title`}>
+          <Welcome />
         </div>
+        <hr className="page-title" />
         <div className={`content`}>
           <p>
             This site is my personal passion project, featuring a growing photo

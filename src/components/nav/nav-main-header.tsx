@@ -12,11 +12,9 @@ export default async function NavMainHeader() {
     <>
       <header className={style.header}>
         <div className={style.left}>
-          <div className={style.logo}>
-            <Link className={style.locallink} href="/">
-              <Image src={logo256} alt="Laurels Logo" />
-            </Link>
-          </div>
+          <Link className={style.logo} href="/">
+            <Image src={logo256} alt="Laurels Logo" />
+          </Link>
 
           {/* mobile nave menu */}
           <div className={style.mobilenav}>

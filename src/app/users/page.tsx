@@ -66,16 +66,16 @@ export default async function UsersPage() {
   return (
     <>
       <main className={`main main-drawer`}>
-        <div className={`center`}>
-          <div className={`page-title`}>
-            <h1>Users</h1>
-          </div>
-          <hr className={`page-title`} />
-          <div style={{ fontStyle: "italic" }}>
-            To navigate to a specifc user record, click on their username in the
-            table below:
-          </div>
+        <div className={`center`}></div>
+        <div className={`page-title`}>
+          <h1>Users</h1>
         </div>
+        <hr className={`page-title`} />
+        <div style={{ fontStyle: "italic" }}>
+          To navigate to a specifc user record, click on their username in the
+          table below:
+        </div>
+
         <Suspense fallback={<Loading />}>
           <UserTable data={users} />
         </Suspense>

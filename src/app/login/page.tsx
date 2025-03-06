@@ -82,18 +82,15 @@ export default async function LoginPage({
   return (
     <>
       <main className={`main`}>
-        <div className={`center`}>
-          <h1>
-            <span className={`highlight`}>Login</span> to view restricted
-            content.
-          </h1>
-        </div>
+        <div className={`center`}></div>
+        <h1>
+          <span className={`highlight`}>Login</span> to view restricted content.
+        </h1>
         <Suspense fallback={<Loading />}>
           <div className={`card`}>
             <LoginForm csrf={csrf} oauth={oauth} />
           </div>
         </Suspense>
-
       </main>
     </>
   );

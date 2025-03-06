@@ -80,24 +80,24 @@ export default async function ProfilePage() {
   return (
     <>
       <main className={`main main-drawer`}>
-        <div className={`center`}>
-          <div className="page-title">
-            <h1>
-              Username: <span className={`highlight`}>{profile?.username}</span>
-            </h1>
-          </div>
-          <hr className={`page-title`} />
-          {profile && profile.created_at && (
-            <p style={{ fontStyle: "italic" }}>
-              Registered since{" "}
-              {new Date(profile.created_at).toLocaleDateString("en-US", {
-                year: "numeric",
-                month: "long",
-                day: "numeric",
-              })}
-            </p>
-          )}
+        <div className={`center`}></div>
+        <div className="page-title">
+          <h1>
+            Username: <span className={`highlight`}>{profile?.username}</span>
+          </h1>
         </div>
+        <hr className={`page-title`} />
+        {profile && profile.created_at && (
+          <p style={{ fontStyle: "italic" }}>
+            Registered since{" "}
+            {new Date(profile.created_at).toLocaleDateString("en-US", {
+              year: "numeric",
+              month: "long",
+              day: "numeric",
+            })}
+          </p>
+        )}
+
         <div className="card-title">
           <h2>Identity</h2>
         </div>

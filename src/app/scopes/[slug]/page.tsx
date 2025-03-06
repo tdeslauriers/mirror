@@ -94,39 +94,39 @@ export default async function Page({
   return (
     <>
       <main className={`main main-drawer`}>
-        <div className={`center`}>
-          <div className={`page-title`}>
-            <div
-              className="actions"
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                paddingRight: "1rem",
-              }}
-            >
-              <h1>
-                Scope:{" "}
-                {scope && scope.scope && (
-                  <span className="highlight">{scope.scope}</span>
-                )}
-              </h1>
-              <Link href={`/scopes`}>
-                <button>Scopes Table</button>
-              </Link>
-            </div>
+        <div className={`center`}></div>
+        <div className={`page-title`}>
+          <div
+            className="actions"
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              paddingRight: "1rem",
+            }}
+          >
+            <h1>
+              Scope:{" "}
+              {scope && scope.scope && (
+                <span className="highlight">{scope.scope}</span>
+              )}
+            </h1>
+            <Link href={`/scopes`}>
+              <button>Scopes Table</button>
+            </Link>
           </div>
-          <hr className={`page-title`} />
-          {scope && scope.created_at && (
-            <p style={{ fontStyle: "italic" }}>
-              Scope created{" "}
-              {new Date(scope.created_at).toLocaleDateString("en-US", {
-                year: "numeric",
-                month: "long",
-                day: "numeric",
-              })}
-            </p>
-          )}
         </div>
+        <hr className={`page-title`} />
+        {scope && scope.created_at && (
+          <p style={{ fontStyle: "italic" }}>
+            Scope created{" "}
+            {new Date(scope.created_at).toLocaleDateString("en-US", {
+              year: "numeric",
+              month: "long",
+              day: "numeric",
+            })}
+          </p>
+        )}
+
         <div className="card-title">
           <h2>
             Scope Id:{" "}

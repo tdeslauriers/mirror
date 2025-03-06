@@ -82,26 +82,25 @@ export default async function Page() {
   return (
     <>
       <main className="main main-drawer">
-        <div className="center">
-          <div className="page-title">
-            <div
-              className="actions"
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                paddingRight: "1rem",
-              }}
-            >
-              <h1>
-                Allowances: <span className="highlight">add account</span>
-              </h1>
-              <Link href="/allowances">
-                <button>Allowances Table</button>
-              </Link>
-            </div>
+        <div className="center"></div>
+        <div className="page-title">
+          <div
+            className="actions"
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              paddingRight: "1rem",
+            }}
+          >
+            <h1>
+              Allowances: <span className="highlight">add account</span>
+            </h1>
+            <Link href="/allowances">
+              <button>Allowances Table</button>
+            </Link>
           </div>
-          <hr className="page-title" />
         </div>
+        <hr className="page-title" />
         <div className="card-title">
           <h2>New Account</h2>
         </div>

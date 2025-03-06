@@ -3,7 +3,6 @@ import Link from "next/link";
 
 export function useMDXComponents(components: MDXComponents): MDXComponents {
   return {
-
     strong: ({ children }) => <span className="highlight">{children}</span>,
     a: ({ href, children, ...props }) => {
       // check for href
@@ -19,6 +18,7 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
         </Link>
       );
     },
+
     ...components,
   };
 }

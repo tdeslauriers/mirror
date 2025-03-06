@@ -11,6 +11,7 @@ export default async function AboutPage() {
     <>
       <main className={`main ${hasIdentity ? "main-drawer" : null}`}>
         <div className={`center`}>
+        </div>
           <div className={`page-title`}>
             <h1 id="summary">
               About{" "}
@@ -20,13 +21,12 @@ export default async function AboutPage() {
             </h1>
           </div>
           <hr className="page-title" />
-        </div>
         <div className={`content`}>
           <About />
         </div>
 
         <div className={`content`} style={{ marginTop: "2rem" }}>
-          <h1 id="techstack">The Current Tech Stack</h1>
+          <h1 id="techstack">Current Tech Stack</h1>
           <hr className="page-title" />
           <Techstack />
         </div>

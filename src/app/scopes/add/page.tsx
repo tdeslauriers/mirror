@@ -54,26 +54,26 @@ export default async function ScopesAddPage() {
   return (
     <>
       <main className="main main-drawer">
-        <div className="center">
-          <div className="page-title">
-            <div
-              className="actions"
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                paddingRight: "1rem",
-              }}
-            >
-              <h1>
-                Scope: <span className="highlight">add</span>
-              </h1>
-              <Link href="/scopes">
-                <button>Scopes Table</button>
-              </Link>
-            </div>
+        <div className="center"></div>
+        <div className="page-title">
+          <div
+            className="actions"
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              paddingRight: "1rem",
+            }}
+          >
+            <h1>
+              Scope: <span className="highlight">add</span>
+            </h1>
+            <Link href="/scopes">
+              <button>Scopes Table</button>
+            </Link>
           </div>
-          <hr className={`page-title`} />
         </div>
+        <hr className={`page-title`} />
+
         <div className="card-title">
           <h2>Add Scope</h2>
         </div>

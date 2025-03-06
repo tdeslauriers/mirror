@@ -3,10 +3,11 @@
   flex-direction: column;
   justify-content: left;
   align-items: center;
-  padding: 2rem 6rem;
+  padding: 0rem 6rem;
   min-height: 90vh;
   width: 75vw;
   margin: auto;
+  margin-top: 7rem;
 }
 
 .main-drawer {
@@ -21,6 +22,12 @@
   position: relative;
   padding: 2rem 0;
   width: 75vw;
+
+  z-index: -1;
+  position: absolute;
+  top: 20%;
+  left: 50%;
+  transform: translate(-50%, 0%);
 }
 
 .center::before {
@@ -50,21 +57,18 @@
 
 /* used to left justify the title of a page if makes sense visually */
 .page-title {
-  padding-left: 1rem;
+  margin-top: 1rem;
   width: 100%;
   align-items: left;
+  flex-direction: column;
+  width: 75vw;
+  font-family: "Montserrat", sans-serif;
 }
 
 hr.page-title {
   margin: 1rem 0;
   height: 2px;
   background: var(--primary-site-color);
-  -webkit-mask-image: linear-gradient(
-    to right,
-    var(--primary-site-color),
-    transparent
-  );
-  mask-image: linear-gradient(to right, var(--primary-site-color), transparent);
 }
 
 .card {
@@ -186,7 +190,7 @@ hr.page-title {
 /* Tablet */
 @media (min-width: 700px) and (max-width: 1500px) {
   .center {
-    padding: 8rem 0 6rem;
+    padding: 0rem 0 6rem;
   }
 
   .center::before {

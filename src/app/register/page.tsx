@@ -46,16 +46,16 @@ export default async function Registration() {
   return (
     <>
       <main className={`main`}>
-        <div className={`center`}>
-          <h1>
-            <span className={`highlight`}>Sign up</span> for an account.
-          </h1>
-          <p>
-            <Link className="locallink" href="/login">
-              Already Registered?
-            </Link>
-          </p>
-        </div>
+        <div className={`center`}></div>
+        <h1>
+          <span className={`highlight`}>Sign up</span> for an account.
+        </h1>
+        <p>
+          <Link className="locallink" href="/login">
+            Already Registered?
+          </Link>
+        </p>
+
         <Suspense fallback={<Loading />}>
           <div className={`card`}>
             <RegistrationForm

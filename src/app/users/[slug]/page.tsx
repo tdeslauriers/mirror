@@ -121,36 +121,35 @@ export default async function Page({
   return (
     <>
       <main className={`main main-drawer`}>
-        <div className="center">
-          <div className="page-title">
-            <div
-              className="actions"
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                paddingRight: "1rem",
-              }}
-            >
-              <h1>
-                User: <span className="highlight">{user?.username}</span>
-              </h1>
-              <Link href={`/users`}>
-                <button>Users Table</button>
-              </Link>
-            </div>
+        <div className="center"></div>
+        <div className="page-title">
+          <div
+            className="actions"
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              paddingRight: "1rem",
+            }}
+          >
+            <h1>
+              User: <span className="highlight">{user?.username}</span>
+            </h1>
+            <Link href={`/users`}>
+              <button>Users Table</button>
+            </Link>
           </div>
-          <hr className="page-title" />
-          {user?.created_at && (
-            <p style={{ fontStyle: "italic" }}>
-              Registered since{" "}
-              {new Date(user.created_at).toLocaleDateString("en-US", {
-                year: "numeric",
-                month: "long",
-                day: "numeric",
-              })}
-            </p>
-          )}
         </div>
+        <hr className="page-title" />
+        {user?.created_at && (
+          <p style={{ fontStyle: "italic" }}>
+            Registered since{" "}
+            {new Date(user.created_at).toLocaleDateString("en-US", {
+              year: "numeric",
+              month: "long",
+              day: "numeric",
+            })}
+          </p>
+        )}
         <div className="card-title">
           <h2>Uuid: {<span className="highlight">{user?.id}</span>}</h2>
           <h2>Slug: {<span className="highlight">{user?.slug}</span>}</h2>

@@ -41,27 +41,26 @@ export default async function AllowancesPage() {
   return (
     <>
       <main className="main main-drawer">
-        <div className="center">
-          <div className="page-title">
-            <div
-              className="actions"
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                paddingRight: "1rem",
-              }}
-            >
-              <h1>Allowances</h1>
-              <Link href="/allowances/add">
-                <button>Add Allowance Remitee</button>
-              </Link>
-            </div>
+        <div className="center"></div>
+        <div className="page-title">
+          <div
+            className="actions"
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              paddingRight: "1rem",
+            }}
+          >
+            <h1>Allowances</h1>
+            <Link href="/allowances/add">
+              <button>Add Allowance Remitee</button>
+            </Link>
           </div>
-          <hr className="page-title" />
-          <div style={{ fontStyle: "italic" }}>
-            To navigate to a specifc allowance record, click on the remitee in
-            the table below:
-          </div>
+        </div>
+        <hr className="page-title" />
+        <div style={{ fontStyle: "italic" }}>
+          To navigate to a specifc allowance record, click on the remitee in the
+          table below:
         </div>
       </main>
     </>
