@@ -208,7 +208,7 @@ export default function UserForm({
 
         <div className={`row`} style={{ marginTop: "1.5rem" }}>
           <FormSubmit
-            buttonLabel="update profile data"
+            buttonLabel="update profile"
             pendingLabel="updating profile record..."
           />
         </div>

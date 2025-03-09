@@ -58,7 +58,7 @@ export default async function AllowancesPage() {
           </div>
         </div>
         <hr className="page-title" />
-        <div style={{ fontStyle: "italic" }}>
+        <div className="banner">
           To navigate to a specifc allowance record, click on the remitee in the
           table below:
         </div>

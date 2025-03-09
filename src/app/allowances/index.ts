@@ -101,6 +101,9 @@ export function handleAllowanceAddErrors(gatewayError: GatewayError) {
     case 405:
       errors.server = [gatewayError.message];
       return errors;
+    case 409:
+      errors.server = [gatewayError.message];
+      return errors;
     default:
       errors.server = ["Unhandled error calling gateway service."];
       return errors;

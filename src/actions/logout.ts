@@ -2,7 +2,7 @@
 
 import { LogoutCmd } from "./index";
 import { RequestCookie } from "next/dist/compiled/@edge-runtime/cookies";
-import { permanentRedirect, redirect } from "next/navigation";
+import {  redirect } from "next/navigation";
 import { cookies } from "next/headers";
 import { GatewayError, isGatewayError } from "@/app/api";
 

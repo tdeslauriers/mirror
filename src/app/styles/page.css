@@ -67,8 +67,18 @@
 
 hr.page-title {
   margin: 1rem 0;
-  height: 2px;
-  background: var(--primary-site-color);
+  height: 1px;
+
+}
+
+.banner {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 75vw;
+  padding-bottom: 1rem;
+  font-style: italic;
 }
 
 .card {
@@ -93,7 +103,7 @@ hr.page-title {
 }
 
 .card-title {
-  width: 50%;
+  width: 35vw;
   font-size: 1rem;
   font-family: "Montserrat", sans-serif;
 }
@@ -169,49 +179,52 @@ hr.page-title {
 
 /* Mobile */
 @media (max-width: 700px) {
-  .center {
-    padding: 8rem 0 6rem;
+  .main-drawer {
+    margin-left: auto;
   }
 
-  .center::before {
-    transform: none;
-    height: 300px;
-  }
-
-  .content,
-  .page-title,
-  .card,
-  .card-title {
+  .page-title {
     flex-direction: column;
     width: 75vw;
   }
-}
 
-/* Tablet */
-@media (min-width: 700px) and (max-width: 1500px) {
-  .center {
-    padding: 0rem 0 6rem;
+  .content {
+    flex-direction: column;
+    width: 85vw;
   }
 
-  .center::before {
-    transform: none;
-    height: 300px;
+  .content h2 {
+    padding: 1rem 0rem 0.5rem;
   }
 
-  .content,
-  .page-title,
+  .content h3 {
+    padding: 1rem 1rem 1rem;
+  }
+
+  .content p {
+    padding: 0rem 1rem 1rem;
+  }
+
+  .content li {
+    list-style-position: inside;
+    padding: 0rem 1rem 0.5rem;
+    font-size: 1rem;
+    font-family: "Montserrat", sans-serif;
+  }
+
   .card,
   .card-title {
-    flex-direction: column;
     width: 85vw;
   }
 }
 
-@keyframes rotate {
-  from {
-    transform: rotate(360deg);
+@media (min-width: 700px) and (max-width: 1500px) {
+  .main-drawer {
+    margin-left: calc(var(--drawer-width-tablet) + 2rem);
   }
-  to {
-    transform: rotate(0deg);
+
+  .card,
+  .card-title {
+    width: 65vw;
   }
 }

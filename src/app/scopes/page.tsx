@@ -84,7 +84,7 @@ export default async function ScopesPage() {
           </div>
         </div>
         <hr className={`page-title`} />
-        <div style={{ fontStyle: "italic" }}>
+        <div className="banner">
           To navigate to a specifc scope record, click on the scope in the table
           below:
         </div>

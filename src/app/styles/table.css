@@ -1,5 +1,5 @@
 table {
-  width: auto;
+  display: block;
   border-collapse: collapse; /* Ensures no extra spacing between cells */
   margin: 1rem 0;
 

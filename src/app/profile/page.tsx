@@ -88,14 +88,16 @@ export default async function ProfilePage() {
         </div>
         <hr className={`page-title`} />
         {profile && profile.created_at && (
-          <p style={{ fontStyle: "italic" }}>
-            Registered since{" "}
-            {new Date(profile.created_at).toLocaleDateString("en-US", {
-              year: "numeric",
-              month: "long",
-              day: "numeric",
-            })}
-          </p>
+          <div className="banner">
+            
+              Registered since{" "}
+              {new Date(profile.created_at).toLocaleDateString("en-US", {
+                year: "numeric",
+                month: "long",
+                day: "numeric",
+              })}
+            
+          </div>
         )}
 
         <div className="card-title">

@@ -80,8 +80,6 @@ export default function NavDrawer() {
 
   return (
     <>
-      {/* mobile drawer and drawer button  */}
-
       {hasIdentity ? (
         <>
           <div className={`${style.drawer} `}>

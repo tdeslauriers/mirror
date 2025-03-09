@@ -12,6 +12,7 @@
   --test-rbg: rgb(196, 196, 196);
 
   --drawer-width: 10vw;
+  --drawer-width-tablet: 20vw;
 
   --primary-border-color: rgb(188, 193, 188);
   --primary-border-fade: rgb(183, 185, 183);
@@ -50,6 +51,7 @@
   --background-end-rgb: 44, 43, 43;
 
   --drawer-width: 15vw;
+  --drawer-width-tablet: 20vw;
 
   --primary-border-color: rgb(76, 79, 76);
   --primary-border-fade: rgb(23, 24, 23);

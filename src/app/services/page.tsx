@@ -84,7 +84,7 @@ export default async function ServicesPage() {
           </div>
         </div>
         <hr className="page-title" />
-        <div style={{ fontStyle: "italic" }}>
+        <div className="banner">
           To navigate to a specifc service record, click on the service in the
           table below:
         </div>

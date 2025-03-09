@@ -141,14 +141,14 @@ export default async function Page({
         </div>
         <hr className="page-title" />
         {user?.created_at && (
-          <p style={{ fontStyle: "italic" }}>
+          <div className="banner">
             Registered since{" "}
             {new Date(user.created_at).toLocaleDateString("en-US", {
               year: "numeric",
               month: "long",
               day: "numeric",
             })}
-          </p>
+          </div>
         )}
         <div className="card-title">
           <h2>Uuid: {<span className="highlight">{user?.id}</span>}</h2>

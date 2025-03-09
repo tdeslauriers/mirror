@@ -166,7 +166,7 @@ export default function AddAllowanceForm({
             {" "}
             User{" "}
             <span className="highlight">
-              {addAllowanceState?.username}'s
+              {addAllowanceState?.username}&apos;s
             </span>{" "}
             account created!
           </h2>

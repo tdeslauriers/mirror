@@ -117,14 +117,14 @@ export default async function Page({
         </div>
         <hr className={`page-title`} />
         {scope && scope.created_at && (
-          <p style={{ fontStyle: "italic" }}>
+          <div className="banner">
             Scope created{" "}
             {new Date(scope.created_at).toLocaleDateString("en-US", {
               year: "numeric",
               month: "long",
               day: "numeric",
             })}
-          </p>
+          </div>
         )}
 
         <div className="card-title">

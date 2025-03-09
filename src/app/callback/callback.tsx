@@ -2,7 +2,6 @@
 
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
-import { pageError } from ".";
 import { State } from "../api";
 import Loading from "@/components/loading";
 

@@ -71,7 +71,7 @@ export default async function UsersPage() {
           <h1>Users</h1>
         </div>
         <hr className={`page-title`} />
-        <div style={{ fontStyle: "italic" }}>
+        <div className="banner">
           To navigate to a specifc user record, click on their username in the
           table below:
         </div>

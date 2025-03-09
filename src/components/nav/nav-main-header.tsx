@@ -5,7 +5,8 @@ import style from "./nav-main-header.module.css";
 import NavLogin from "./nav-login";
 import NavDrawer from "./nav-drawer";
 import ExtendedNav from "./nav-extended";
-import MobileMenu from "./nav-mobile-main-header";
+import MobileMenu from "./nav-main-header-mobile";
+import MobileDrawer from "./nav-drawer-mobile";
 
 export default async function NavMainHeader() {
   return (
@@ -16,7 +17,7 @@ export default async function NavMainHeader() {
             <Image src={logo256} alt="Laurels Logo" />
           </Link>
 
-          {/* mobile nave menu */}
+          {/* mobile nav menu */}
           <div className={style.mobilenav}>
             <MobileMenu />
           </div>
@@ -55,6 +56,11 @@ export default async function NavMainHeader() {
 
         <div className={style.right}>
           <NavLogin />
+        </div>
+
+        {/* mobile drawer */}
+        <div className={style.mobiledrawer}>
+          <MobileDrawer />
         </div>
 
         <NavDrawer />
