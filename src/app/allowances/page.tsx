@@ -36,7 +36,33 @@ export default async function AllowancesPage() {
     throw new Error(pageError + "session cookie is missing");
   }
 
-  // TODO: get allowances data from gateway
+  // get allowances data from gateway
+  const response = await fetch(
+    `${process.env.GATEWAY_SERVICE_URL}/allowances`,
+    {
+      headers: {
+        Authorization: `${hasSession?.value}`,
+      },
+    }
+  );
+
+  if (!response.ok) {
+    if (response.status === 401) {
+      const oauth = await GetOauthExchange(hasSession?.value, "/allowances");
+      if (oauth) {
+        redirect(
+          `/login?client_id=${oauth.client_id}&response_type=${oauth.response_type}&state=${oauth.state}&nonce=${oauth.nonce}&redirect_url=${oauth.redirect_url}`
+        );
+      } else {
+        redirect("/login");
+      }
+    } else {
+      const fail = await response.json();
+      throw new Error(fail.message);
+    }
+  }
+  const allowances = await response.json();
+  console.log(allowances);
 
   return (
     <>

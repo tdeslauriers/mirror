@@ -9,7 +9,7 @@ type Render = {
   gallery_read?: boolean;
   blog_read?: boolean;
   task_read?: boolean;
-  payroll_read?: boolean;
+  allowances_read?: boolean;
 };
 
 interface ShowMenu {
@@ -172,7 +172,7 @@ export default function NavDrawer() {
                 )}
               </div>
             )}
-            {render && (render.task_read || render.payroll_read) && (
+            {render && (render.task_read || render.allowances_read) && (
               <div className={`${style.section}`}>
                 <button
                   className={`${style.menubutton}`}
@@ -184,7 +184,7 @@ export default function NavDrawer() {
                         showMenus["allowance"] ? "highlight" : "base"
                       }`}
                     >
-                      Allowance
+                      Tasks
                     </span>
                   </strong>
                 </button>
@@ -192,7 +192,9 @@ export default function NavDrawer() {
                   <div className={`${style.submenu}`}>
                     <ul>
                       <li>
-                        <span className={`highlight`}>Coming Soon!</span>
+                        <Link className={`locallink`} href={"/allowances"}>
+                          Allowances
+                        </Link>
                       </li>
                     </ul>
                   </div>

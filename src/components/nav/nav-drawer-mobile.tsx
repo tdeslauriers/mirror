@@ -207,7 +207,7 @@ export default function MobileDrawer() {
                             showMenus["allowance"] ? "highlight" : "base"
                           }`}
                         >
-                          Allowance
+                          Tasks
                         </span>
                       </strong>
                     </button>
@@ -215,7 +215,9 @@ export default function MobileDrawer() {
                       <div className={`${style.submenu}`}>
                         <ul>
                           <li>
-                            <span className={`highlight`}>Coming Soon!</span>
+                            <Link className={`locallink`} href={"/allowances"}>
+                              Allowances
+                            </Link>
                           </li>
                         </ul>
                       </div>
