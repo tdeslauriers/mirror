@@ -124,6 +124,10 @@
     var(--error-site-color),
     var(--error-site-fade)
   );
+
+  --highlight-error-glow: 0 0 10px var(--error-site-color),
+    0 0 20px var(--error-site-color), 0 0 30px var(--error-site-color),
+    0 0 40px var(--error-site-color);
 }
 
 * {

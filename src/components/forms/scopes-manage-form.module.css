@@ -9,11 +9,13 @@
 
 .row {
   display: flex;
+
   justify-content: space-between;
 }
 
 .box {
   display: flex;
+
   align-items: center;
   justify-content: left;
   width: 100%;
@@ -26,4 +28,15 @@
   justify-content: right;
 }
 
+@media(max-width: 700px) {
+  .row {
+    flex-direction: column;
+  }
 
+  .box {
+    justify-content: left;
+    align-items: left;
+    margin-bottom: 1rem;
+  }
+  
+}

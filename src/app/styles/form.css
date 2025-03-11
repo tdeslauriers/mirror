@@ -111,6 +111,7 @@ input[type="checkbox"]:focus {
 
 .checkbox-row {
   display: flex;
+  flex-direction: column;
   align-items: center;
 }
 
@@ -120,6 +121,7 @@ input[type="checkbox"]:focus {
 
 .daterow {
   display: flex;
+  flex-direction: column;
   justify-content: space-between;
 }
 
@@ -246,5 +248,11 @@ span.highlightError {
     box-shadow: 0 0 10px var(--error-site-color),
       0 0 20px var(--error-site-color), 0 0 30px var(--error-site-color),
       0 0 40px var(--error-site-color);
+  }
+}
+
+@media (max-width: 700px) {
+  .daterow input {
+    margin-bottom: 0.5rem;
   }
 }

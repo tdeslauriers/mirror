@@ -1,6 +1,7 @@
 "use client";
 
 import { Scope } from "@/components/forms";
+import Loading from "@/components/loading";
 import Table, { TableColumn } from "@/components/table";
 import Link from "next/link";
 import { Suspense, useState } from "react";
@@ -56,7 +57,7 @@ export default function ScopesTable({ data }: ScopesTableProps) {
           {value ? (
             <span>Active</span>
           ) : (
-            <span className="highlight-error">Inactive</span>
+            <span className="highlight-error no-hover">Inactive</span>
           )}
         </>
       ),
@@ -71,7 +72,13 @@ export default function ScopesTable({ data }: ScopesTableProps) {
         onChange={(e) => setSearch(e.target.value)}
         placeholder="Search"
       />
-      <Suspense fallback={<div>Loading...</div>}>
+      <Suspense
+        fallback={
+          <div>
+            <Loading />
+          </div>
+        }
+      >
         <Table
           data={data}
           columns={columns}

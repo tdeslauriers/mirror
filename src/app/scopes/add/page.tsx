@@ -5,6 +5,8 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { handleScopeAdd } from "./actions";
 import Link from "next/link";
+import { Suspense } from "react";
+import Loading from "@/components/loading";
 
 export const metadata = {
   robots: "noindex, nofollow",
@@ -77,14 +79,17 @@ export default async function ScopesAddPage() {
         <div className="card-title">
           <h2>Add Scope</h2>
         </div>
-        <div className="card">
-          <ScopeForm
-            csrf={csrf}
-            slug={null}
-            scope={null}
-            scopeFormUpdate={handleScopeAdd}
-          />
-        </div>
+
+        <Suspense fallback={<Loading />}>
+          <div className="card">
+            <ScopeForm
+              csrf={csrf}
+              slug={null}
+              scope={null}
+              scopeFormUpdate={handleScopeAdd}
+            />
+          </div>
+        </Suspense>
       </main>
     </>
   );

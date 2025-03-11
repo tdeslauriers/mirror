@@ -41,6 +41,18 @@ export type AllowanceUser = {
   account_locked?: boolean;
 };
 
+export type Allowance = {
+  id?: string;
+  balance?: number;
+  username?: string;
+  slug?: string;
+  created_at?: string;
+  updated_at?: string;
+  is_archived?: boolean;
+  is_active?: boolean;
+  is_calculated?: boolean;
+};
+
 export function validateAddAllowanceCmd(cmd: AddAllowanceCmd) {
   let errors: { [key: string]: string[] } = {};
 
@@ -109,3 +121,12 @@ export function handleAllowanceAddErrors(gatewayError: GatewayError) {
       return errors;
   }
 }
+
+export type AllowanceActionCmd = {
+  csrf?: string;
+  slug?: string | null;
+  allowance?: Allowance | null;
+  errors: {
+    [key: string]: string[];
+  };
+};

@@ -101,7 +101,7 @@ export default function ScopesManageForm({
         <sub style={{ fontSize: ".75rem" }}>
           * A scope may only be added once below.
         </sub>
-        <hr className="page-title" style={{ marginTop: "2rem" }} />
+        <hr style={{ marginTop: "2rem" }} />
 
         {(!currentScopes || currentScopes.length < 1) && (
           <>

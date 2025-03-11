@@ -219,8 +219,8 @@ export default async function Page({
             </sup>
           </h2>
         </div>
-        <div className="card">
-          <Suspense fallback={<Loading />}>
+        <Suspense fallback={<Loading />}>
+          <div className="card">
             <ScopesManageForm
               csrf={csrf}
               slug={slug}
@@ -228,8 +228,8 @@ export default async function Page({
               menuScopes={allScopes}
               updateScopes={handleScopesUpdate}
             />
-          </Suspense>
-        </div>
+          </div>
+        </Suspense>
       </main>
     </>
   );

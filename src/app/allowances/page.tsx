@@ -2,6 +2,9 @@ import GetOauthExchange from "@/components/oauth-exchange";
 import { redirect } from "next/navigation";
 import { cookies } from "next/headers";
 import Link from "next/link";
+import { Suspense } from "react";
+import Loading from "@/components/loading";
+import AllowancesTable from "./allowances-table";
 
 export const metadata = {
   robots: "noindex, nofollow",
@@ -88,6 +91,9 @@ export default async function AllowancesPage() {
           To navigate to a specifc allowance record, click on the remitee in the
           table below:
         </div>
+        <Suspense fallback={<Loading />}>
+          <AllowancesTable data={allowances} />
+        </Suspense>
       </main>
     </>
   );

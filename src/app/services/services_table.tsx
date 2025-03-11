@@ -50,7 +50,7 @@ export default function ServicesTable({ data }: ServicesTableProps) {
           {value ? (
             <span>Enabled</span>
           ) : (
-            <span className="highlight-error">Disabled</span>
+            <span className="highlight-error no-hover">Disabled</span>
           )}
         </>
       ),
@@ -62,7 +62,7 @@ export default function ServicesTable({ data }: ServicesTableProps) {
       render: (value: ServiceClient[keyof ServiceClient]) => (
         <>
           {value ? (
-            <span className="highlight-error">Expired</span>
+            <span className="highlight-error no-hover">Expired</span>
           ) : (
             <span>Active</span>
           )}
@@ -76,7 +76,7 @@ export default function ServicesTable({ data }: ServicesTableProps) {
       render: (value: ServiceClient[keyof ServiceClient]) => (
         <>
           {value ? (
-            <span className="highlight-error">Locked</span>
+            <span className="highlight-error no-hover">Locked</span>
           ) : (
             <span>Unlocked</span>
           )}

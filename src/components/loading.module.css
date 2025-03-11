@@ -3,11 +3,10 @@
   width: 20vmin;
   pointer-events: none;
   display: block;
-  margin-left: auto;
-  margin-right: auto;
 }
 
 .banner {
+  margin-top: 2rem;
   padding-left: 2rem;
 }
 

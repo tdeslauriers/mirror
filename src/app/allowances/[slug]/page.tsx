@@ -1,18 +1,17 @@
+import GetCsrf from "@/components/csrf-token";
+import AllowanceForm from "@/components/forms/allowance-form";
+import Loading from "@/components/loading";
 import GetOauthExchange from "@/components/oauth-exchange";
 import { cookies } from "next/headers";
-import { redirect } from "next/navigation";
-import ScopeForm from "@/components/forms/scope-form";
-import GetCsrf from "@/components/csrf-token";
-import { handleScopeEdit } from "./actions";
-import { Suspense } from "react";
-import Loading from "@/components/loading";
 import Link from "next/link";
+import { redirect } from "next/navigation";
+import { Suspense } from "react";
 
 export const metadata = {
   robots: "noindex, nofollow",
 };
 
-const pageError = "Failed to load scope record page: ";
+const pageError = "Failed to load allowance record page: ";
 
 export default async function Page({
   params,
@@ -32,7 +31,10 @@ export default async function Page({
     : null;
 
   if (!hasIdentity) {
-    const oauth = await GetOauthExchange(hasSession?.value, `/scopes/${slug}`);
+    const oauth = await GetOauthExchange(
+      hasSession?.value,
+      `/allowances/${slug}`
+    );
     if (oauth) {
       redirect(
         `/login?client_id=${oauth.client_id}&response_type=${oauth.response_type}&state=${oauth.state}&nonce=${oauth.nonce}&redirect_url=${oauth.redirect_url}`
@@ -48,7 +50,7 @@ export default async function Page({
     throw new Error(pageError + "session cookie is missing");
   }
 
-  // get csrf token from gateway for scope form
+  // get csrf token from gateway for allowance form
   const csrf = await GetCsrf(hasSession.value);
 
   if (!csrf) {
@@ -62,7 +64,7 @@ export default async function Page({
 
   // get scope record data from gateway
   const response = await fetch(
-    `${process.env.GATEWAY_SERVICE_URL}/scopes/${slug}`,
+    `${process.env.GATEWAY_SERVICE_URL}/allowances/${slug}`,
     {
       headers: {
         Authorization: `${hasSession?.value}`,
@@ -74,7 +76,7 @@ export default async function Page({
     if (response.status === 401) {
       const oauth = await GetOauthExchange(
         hasSession?.value,
-        `/scopes/${slug}`
+        `/allowances/${slug}`
       );
       if (oauth) {
         redirect(
@@ -89,13 +91,14 @@ export default async function Page({
     }
   }
 
-  const scope = await response.json();
+  const allowance = await response.json();
+  console.log(allowance);
 
   return (
     <>
-      <main className={`main main-drawer`}>
-        <div className={`center`}></div>
-        <div className={`page-title`}>
+      <main className="main main-drawer">
+        <div className="center"></div>
+        <div className="page-title">
           <div
             className="actions"
             style={{
@@ -105,44 +108,47 @@ export default async function Page({
             }}
           >
             <h1>
-              Scope:{" "}
-              {scope && scope.scope && (
-                <span className="highlight">{scope.scope}</span>
-              )}
+              Allowance Account:{" "}
+              <span className="highlight">{allowance?.username}</span>
             </h1>
-            <Link href={`/scopes`}>
-              <button>Scopes Table</button>
+            <Link href={`/allowances`}>
+              <button>Allowances Table</button>
             </Link>
           </div>
         </div>
-        <hr className={`page-title`} />
-        {scope && scope.created_at && (
+        <hr className="page-title" />
+        {allowance && allowance.created_at && (
           <div className="banner">
-            Scope created{" "}
-            {new Date(scope.created_at).toLocaleDateString("en-US", {
+            Allowance account created{" "}
+            {new Date(allowance.created_at).toLocaleDateString("en-US", {
               year: "numeric",
               month: "long",
               day: "numeric",
             })}
           </div>
         )}
-
         <div className="card-title">
           <h2>
-            Scope Id:{" "}
-            {scope && scope.scope_id && (
-              <span className="highlight">{scope.scope_id}</span>
+            Uuid:{" "}
+            {allowance && allowance.id && (
+              <span className="highlight">{allowance.id}</span>
+            )}
+          </h2>
+          <h2>
+            Slug:{" "}
+            {allowance && allowance.id && (
+              <span className="highlight">{allowance.slug}</span>
             )}
           </h2>
         </div>
 
         <Suspense fallback={<Loading />}>
           <div className="card">
-            <ScopeForm
+            <AllowanceForm
               csrf={csrf}
               slug={slug}
-              scope={scope}
-              scopeFormUpdate={handleScopeEdit}
+              allowance={allowance}
+              allowanceFormUpdate={null}
             />
           </div>
         </Suspense>

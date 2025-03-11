@@ -22,12 +22,9 @@ export default async function CallbackPage() {
   }
   return (
     <>
-      <main className={`main`}>
-        <div className={`center`}></div>
-        <Suspense fallback={<Loading />}>
-          <Callback />
-        </Suspense>
-      </main>
+      <Suspense fallback={<Loading />}>
+        <Callback />
+      </Suspense>
     </>
   );
 }

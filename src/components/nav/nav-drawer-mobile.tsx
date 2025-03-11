@@ -10,7 +10,7 @@ type Render = {
   gallery_read?: boolean;
   blog_read?: boolean;
   task_read?: boolean;
-  payroll_read?: boolean;
+  allowances_read?: boolean;
 };
 
 interface ShowMenu {
@@ -195,8 +195,8 @@ export default function MobileDrawer() {
                     )}
                   </div>
                 )}
-                {render && (render.task_read || render.payroll_read) && (
-                  <div className={`${style.mobilesection}`}>
+                {render && (render.task_read || render.allowances_read) && (
+                  <div className={`${style.section}`}>
                     <button
                       className={`${style.menubutton}`}
                       onClick={() => toggleSubmenu("allowance")}

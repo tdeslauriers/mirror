@@ -104,15 +104,15 @@ export default async function Page() {
         <div className="card-title">
           <h2>New Account</h2>
         </div>
-        <div className="card">
-          <Suspense fallback={<Loading />}>
+        <Suspense fallback={<Loading />}>
+          <div className="card">
             <AddAllowanceForm
               csrf={csrf}
               users={users}
               addAllowance={handleAddAllowance}
             />
-          </Suspense>
-        </div>
+          </div>
+        </Suspense>
       </main>
     </>
   );

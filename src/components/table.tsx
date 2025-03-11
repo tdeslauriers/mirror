@@ -97,7 +97,7 @@ export default function Table<T>({
     const startIndex = (currentPage - 1) * pageSize;
     const endIndex = startIndex + pageSize;
     return sortedData.slice(startIndex, endIndex);
-  }, [sortedData, currentPage, pageSize]);
+  }, [sortedData, currentPage, pageSize, totalPages]);
 
   const handleSort = (key: keyof T) => {
     setSortConfig((prev) => {
@@ -136,7 +136,7 @@ export default function Table<T>({
           {paginatedData.map((row, index) => (
             <tr key={index}>
               {columns.map((column) => (
-                <td key={String(column.accessor)}>
+                <td key={String(column.accessor)} data-label={column.header}>
                   {column.render
                     ? column.render(row[column.accessor], row)
                     : String(row[column.accessor])}
