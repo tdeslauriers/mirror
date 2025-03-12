@@ -1,18 +1,22 @@
 "use client";
 
-import { Allowance, AllowanceActionCmd } from "@/app/allowances";
 import { useActionState } from "react";
 import style from "./allowance-form.module.css";
 import FormSubmit from "./form-submit";
+import { Allowance, AllowanceActionCmd } from ".";
 
 export default function AllowanceForm({
   csrf,
   slug,
+  credit,
+  debit,
   allowance,
   allowanceFormUpdate,
 }: {
   csrf: string;
   slug: string | null;
+  credit?: number;
+  debit?: number;
   allowance: Allowance | null;
   allowanceFormUpdate: (
     prevState: AllowanceActionCmd,
@@ -22,6 +26,8 @@ export default function AllowanceForm({
   const [allowanceState, formAction] = useActionState(allowanceFormUpdate, {
     csrf: csrf,
     slug: slug,
+    credit: credit,
+    debit: debit,
     allowance: allowance,
     errors: {},
   });
@@ -59,30 +65,42 @@ export default function AllowanceForm({
       <div className={style.row}>
         <div className={style.left}>
           <label className="label" htmlFor="credit">
-            Credit
+            Credit{" "}
+            <sup>
+              <span className="highlight" style={{ fontSize: ".65rem" }}>
+                add to balance
+              </span>
+            </sup>
           </label>
           <input
             className={`${style.account}`}
             type="number"
-            title="input a number to add to the balance"
+            step="0.01"
+            title="Input a number to add to the balance"
             name="credit"
             min={0}
-            placeholder="add $..."
+            defaultValue={allowanceState?.credit || 0}
           />
         </div>
 
         <div className={style.right}>
           <label className="label" htmlFor="debit">
-            Debit
+            Debit{" "}
+            <sup>
+              <span className="highlight" style={{ fontSize: ".65rem" }}>
+                subtract from balance
+              </span>
+            </sup>
           </label>
           <input
             className={`${style.account}`}
             type="number"
+            step="0.01"
             title="Input a number to subtract from the balance"
             name="debit"
             min={0}
             max={allowanceState.allowance?.balance}
-            placeholder="subtract $..."
+            defaultValue={allowanceState?.debit || 0}
           />
         </div>
       </div>

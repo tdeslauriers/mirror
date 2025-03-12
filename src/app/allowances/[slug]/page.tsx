@@ -6,6 +6,7 @@ import { cookies } from "next/headers";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { Suspense } from "react";
+import { handleAllowanceEdit } from "./actions";
 
 export const metadata = {
   robots: "noindex, nofollow",
@@ -148,7 +149,7 @@ export default async function Page({
               csrf={csrf}
               slug={slug}
               allowance={allowance}
-              allowanceFormUpdate={null}
+              allowanceFormUpdate={handleAllowanceEdit}
             />
           </div>
         </Suspense>

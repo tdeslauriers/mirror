@@ -156,8 +156,8 @@ export default function UserForm({
         </div>
 
         {profileState.slug && (
-          <>
-            <div className="checkbox-row">
+          <div className="checkbox-row">
+            
               <div className="field">
                 <label className="label" htmlFor="enabled">
                   Enabled
@@ -202,13 +202,13 @@ export default function UserForm({
                   defaultChecked={profileState.profile?.account_locked}
                 />
               </div>
-            </div>
-          </>
+            
+          </div>
         )}
 
         <div className={`row`} style={{ marginTop: "1.5rem" }}>
           <FormSubmit
-            buttonLabel="update profile"
+            buttonLabel="update profile data"
             pendingLabel="updating profile record..."
           />
         </div>

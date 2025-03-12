@@ -1,10 +1,10 @@
 "use client";
 
 import { Suspense, useState } from "react";
-import { Allowance } from ".";
 import Table, { TableColumn } from "@/components/table";
 import Link from "next/link";
 import Loading from "@/components/loading";
+import { Allowance } from "@/components/forms";
 
 interface AllowanceTableProps {
   data: Allowance[];

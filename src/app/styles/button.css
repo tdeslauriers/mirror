@@ -66,3 +66,14 @@
       0 0 30px var(--info-site-color), 0 0 40px var(--info-site-color);
   }
 }
+
+@media (max-width: 700px) {
+  .actions {
+    flex-direction: column;
+  }
+
+  .actions button {
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+  }
+}

@@ -103,8 +103,7 @@ tr.no-hover:hover {
 
 .table-wrapper {
   display: inline-block;
-  width: 85%;
-  overflow-x: auto; /* Enables horizontal scrolling */
+  width: auto;
 }
 
 .table-wrapper input {
@@ -217,6 +216,7 @@ tr.no-hover:hover {
     width: 95vw;
   }
 
+  /* turns the table into cards */
   table {
     display: block;
   }
@@ -251,5 +251,12 @@ tr.no-hover:hover {
     color: transparent;
     -webkit-text-fill-color: transparent;
     font-weight: bold;
+  }
+}
+
+@media (min-width: 700px) and (max-width: 1500px) {
+  .table-wrapper {
+    width: 100%;
+    overflow-x: auto;
   }
 }

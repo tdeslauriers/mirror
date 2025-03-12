@@ -160,3 +160,75 @@ export type RegisterClient = {
   slug?: string;
   enabled?: boolean;
 };
+
+export type AddAllowanceActionCmd = {
+  csrf?: string;
+  complete: boolean;
+
+  username?: string;
+  slug?: string;
+  birth_date?: string;
+
+  allowance_account?: string;
+
+  errors: {
+    [key: string]: string[];
+  };
+};
+
+export type AddAllowanceCmd = {
+  csrf?: string;
+
+  username?: string;
+  slug?: string;
+  birth_date?: string;
+};
+
+export type AllowanceUser = {
+  id?: string;
+  username?: string;
+  firstname?: string;
+  lastname?: string;
+  slug?: string;
+  created_at?: string;
+  birth_date?: string;
+  enabled?: boolean;
+  account_expired?: boolean;
+  account_locked?: boolean;
+};
+
+export type Allowance = {
+  id?: string;
+  balance?: number;
+  username?: string;
+  slug?: string;
+  created_at?: string;
+  updated_at?: string;
+  is_archived?: boolean;
+  is_active?: boolean;
+  is_calculated?: boolean;
+};
+
+export type AllowanceActionCmd = {
+  csrf?: string;
+  slug?: string | null;
+
+  credit?: number;
+  debit?: number;
+
+  allowance?: Allowance | null;
+  errors: {
+    [key: string]: string[];
+  };
+};
+
+export type UpdateAllowanceCmd = {
+  csrf?: string;
+
+  credit?: number;
+  debit?: number;
+
+  is_archived?: boolean;
+  is_active?: boolean;
+  is_calculated?: boolean;
+};
