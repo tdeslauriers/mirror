@@ -65,7 +65,6 @@ export default async function AllowancesPage() {
     }
   }
   const allowances = await response.json();
-  console.log(allowances);
 
   return (
     <>
@@ -92,7 +91,7 @@ export default async function AllowancesPage() {
           table below:
         </div>
         <Suspense fallback={<Loading />}>
-          <AllowancesTable data={allowances} />
+          {allowances && <AllowancesTable data={allowances} />}
         </Suspense>
       </main>
     </>

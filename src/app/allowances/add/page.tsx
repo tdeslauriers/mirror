@@ -7,7 +7,8 @@ import { redirect } from "next/navigation";
 import { Suspense } from "react";
 import AddAllowanceForm from "./add-allowance-form";
 import { handleAddAllowance } from "./actions";
-import { AllowanceUser } from "..";
+import { AllowanceUser } from "@/components/forms";
+
 
 export const metadata = {
   robots: "noindex, nofollow",

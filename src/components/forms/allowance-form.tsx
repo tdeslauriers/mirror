@@ -4,6 +4,9 @@ import { useActionState } from "react";
 import style from "./allowance-form.module.css";
 import FormSubmit from "./form-submit";
 import { Allowance, AllowanceActionCmd } from ".";
+import { all } from "axios";
+import ErrorField from "../errors/error-field";
+import { convertCentsToDollars } from "@/app/allowances";
 
 export default function AllowanceForm({
   csrf,
@@ -32,8 +35,6 @@ export default function AllowanceForm({
     errors: {},
   });
 
-  console.log(allowanceState);
-
   return (
     <form className="form" action={formAction}>
       <div className={style.row}>
@@ -41,7 +42,9 @@ export default function AllowanceForm({
           <h2>
             Balance:{" "}
             <span className="highlight">
-              {allowanceState.allowance?.balance}
+              {allowanceState.allowance?.balance
+                ? convertCentsToDollars(allowanceState.allowance?.balance)
+                : 0}
             </span>
           </h2>
         </div>
@@ -62,24 +65,45 @@ export default function AllowanceForm({
       </div>
 
       <hr style={{ marginBottom: "2rem" }} />
+
+      {allowanceState.errors.server && (
+        <ErrorField errorMsgs={allowanceState.errors.server} />
+      )}
+
       <div className={style.row}>
         <div className={style.left}>
           <label className="label" htmlFor="credit">
             Credit{" "}
             <sup>
-              <span className="highlight" style={{ fontSize: ".65rem" }}>
+              <span
+                className={
+                  isDisabled(allowanceState.allowance)
+                    ? "highlight-error"
+                    : "highlight"
+                }
+                style={{ fontSize: ".65rem" }}
+              >
                 add to balance
               </span>
             </sup>
           </label>
+          {allowanceState.errors.credit && (
+            <ErrorField errorMsgs={allowanceState.errors.credit} />
+          )}
           <input
-            className={`${style.account}`}
+            className={`${
+              isDisabled(allowanceState.allowance)
+                ? style.disabled
+                : style.account
+            }`}
             type="number"
             step="0.01"
             title="Input a number to add to the balance"
             name="credit"
             min={0}
+            max={10000}
             defaultValue={allowanceState?.credit || 0}
+            disabled={isDisabled(allowanceState.allowance)}
           />
         </div>
 
@@ -87,20 +111,44 @@ export default function AllowanceForm({
           <label className="label" htmlFor="debit">
             Debit{" "}
             <sup>
-              <span className="highlight" style={{ fontSize: ".65rem" }}>
-                subtract from balance
+              <span
+                className={
+                  isDisabled(allowanceState.allowance)
+                    ? "highlight-error"
+                    : "highlight"
+                }
+                style={{ fontSize: ".65rem" }}
+              >
+                {allowanceState.allowance?.balance
+                  ? `subtract from balance`
+                  : `balance is zero`}
               </span>
             </sup>
           </label>
+          {allowanceState.errors.debit && (
+            <ErrorField errorMsgs={allowanceState.errors.debit} />
+          )}
           <input
-            className={`${style.account}`}
+            className={`${
+              isDisabled(allowanceState.allowance)
+                ? style.disabled
+                : style.account
+            }`}
             type="number"
             step="0.01"
             title="Input a number to subtract from the balance"
             name="debit"
             min={0}
-            max={allowanceState.allowance?.balance}
+            max={
+              allowanceState.allowance?.balance
+                ? convertCentsToDollars(allowanceState.allowance?.balance) >
+                  10000
+                  ? 10000
+                  : convertCentsToDollars(allowanceState.allowance?.balance)
+                : 0
+            }
             defaultValue={allowanceState?.debit || 0}
+            disabled={isDisabled(allowanceState.allowance)}
           />
         </div>
       </div>
@@ -110,6 +158,12 @@ export default function AllowanceForm({
           <label className="label" htmlFor="is_archived">
             Archived
           </label>
+          {allowanceState.errors.is_archived && (
+            <div style={{ marginRight: "1rem" }}>
+              {" "}
+              <ErrorField errorMsgs={allowanceState.errors.is_archived} />
+            </div>
+          )}
           <input
             className="form"
             name="is_archived"
@@ -122,6 +176,11 @@ export default function AllowanceForm({
           <label className="label" htmlFor="is_active">
             Active
           </label>
+          {allowanceState.errors.is_active && (
+            <div style={{ marginRight: "1rem" }}>
+              <ErrorField errorMsgs={allowanceState.errors.is_active} />
+            </div>
+          )}
           <input
             className="form"
             name="is_active"
@@ -134,6 +193,11 @@ export default function AllowanceForm({
           <label className="label" htmlFor="is_calculated">
             Calculated
           </label>
+          {allowanceState.errors.is_calculated && (
+            <div style={{ marginRight: "1rem" }}>
+              <ErrorField errorMsgs={allowanceState.errors.is_calculated} />
+            </div>
+          )}
           <input
             className="form"
             name="is_calculated"
@@ -150,4 +214,23 @@ export default function AllowanceForm({
       </div>
     </form>
   );
+}
+
+function isDisabled(allowance: Allowance | undefined | null) {
+  if (!allowance) {
+    return true;
+  }
+  if (!allowance.balance) {
+    return false;
+  }
+  if (allowance.is_archived) {
+    return true;
+  }
+  if (!allowance.is_active) {
+    return true;
+  }
+  if (!allowance.is_calculated) {
+    return true;
+  }
+  return false;
 }

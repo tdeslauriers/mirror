@@ -93,7 +93,6 @@ export default async function Page({
   }
 
   const allowance = await response.json();
-  console.log(allowance);
 
   return (
     <>

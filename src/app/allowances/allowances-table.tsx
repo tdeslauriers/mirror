@@ -5,6 +5,7 @@ import Table, { TableColumn } from "@/components/table";
 import Link from "next/link";
 import Loading from "@/components/loading";
 import { Allowance } from "@/components/forms";
+import { convertCentsToDollars } from ".";
 
 interface AllowanceTableProps {
   data: Allowance[];
@@ -28,6 +29,11 @@ export default function AllowancesTable({ data }: AllowanceTableProps) {
       header: "Balance",
       accessor: "balance" as keyof Allowance,
       sortable: true,
+      render: (value: Allowance[keyof Allowance], row: Allowance) => (
+        <span className="highlight">
+          {convertCentsToDollars(value as number)}
+        </span>
+      ),
     },
     {
       header: "Created At",
@@ -43,6 +49,20 @@ export default function AllowancesTable({ data }: AllowanceTableProps) {
       sortable: true,
       render: (value: Allowance[keyof Allowance], row: Allowance) => (
         <>{(value as string).split("T")[0]}</>
+      ),
+    },
+    {
+      header: "Archived",
+      accessor: "is_archived" as keyof Allowance,
+      sortable: false,
+      render: (value: Allowance[keyof Allowance]) => (
+        <>
+          {value ? (
+            <span className="highlight-error no-hover">Archived</span>
+          ) : (
+            <span>Unarchived</span>
+          )}
+        </>
       ),
     },
     {
@@ -101,3 +121,5 @@ export default function AllowancesTable({ data }: AllowanceTableProps) {
     </div>
   );
 }
+
+

@@ -2,7 +2,12 @@
 
 import { AllowanceActionCmd, UpdateAllowanceCmd } from "@/components/forms";
 import { cookies } from "next/headers";
-import { handleAllowanceUpdateErrors, validateUpdateAllowanceCmd } from "..";
+import {
+  convertCentsToDollars,
+  convertDollarsToCents,
+  handleAllowanceUpdateErrors,
+  validateUpdateAllowanceCmd,
+} from "..";
 import { isGatewayError } from "@/app/api";
 export async function handleAllowanceEdit(
   previousState: AllowanceActionCmd,
@@ -44,103 +49,38 @@ export async function handleAllowanceEdit(
   let updated: UpdateAllowanceCmd = {
     csrf: csrf,
 
-    credit: parseFloat(formData.get("credit") as string),
-    debit: parseFloat(formData.get("debit") as string),
+    credit: convertDollarsToCents(formData.get("credit") as string),
+    debit: convertDollarsToCents(formData.get("debit") as string),
     is_archived: formData.get("is_archived") === "on" ? true : false,
     is_active: formData.get("is_active") === "on" ? true : false,
     is_calculated: formData.get("is_calculated") === "on" ? true : false,
   };
 
-  // field level validation: does not include business logic validation.
+  // field level validation including business logic validation.
   const errors = validateUpdateAllowanceCmd(updated);
   if (Object.keys(errors).length > 0) {
     return {
       csrf: csrf,
       slug: slug,
-      credit: updated.credit,
-      debit: updated.debit,
-      allowance: previousState.allowance,
-      errors: errors,
-    } as AllowanceActionCmd;
-  }
-
-  // business logic checks
-  // eg. debit cannot be more than credit.
-  if (updated.debit && updated.credit && updated.debit > updated.credit) {
-    errors.debit = ["Debit cannot be greater than credit."];
-    return {
-      csrf: csrf,
-      slug: slug,
-      credit: updated.credit,
-      debit: updated.debit,
-      allowance: previousState.allowance,
-      errors: errors,
-    } as AllowanceActionCmd;
-  }
-
-  if (
-    updated.debit &&
-    previousState.allowance?.balance &&
-    updated.debit > previousState.allowance.balance
-  ) {
-    errors.debit = ["Debit cannot be greater than balance."];
-    return {
-      csrf: csrf,
-      slug: slug,
-      credit: updated.credit,
-      debit: updated.debit,
-      allowance: previousState.allowance,
-      errors: errors,
-    } as AllowanceActionCmd;
-  }
-
-  if (updated.is_archived && (updated.is_active || updated.is_calculated)) {
-    errors.is_archived = ["Cannot archive an active or calculated allowance."];
-    return {
-      csrf: csrf,
-      slug: slug,
-      credit: updated.credit,
-      debit: updated.debit,
-      allowance: previousState.allowance,
-      errors: errors,
-    } as AllowanceActionCmd;
-  }
-
-  if (updated.is_active && updated.is_archived) {
-    errors.is_active = ["Cannot archive an active allowance."];
-    return {
-      csrf: csrf,
-      slug: slug,
-      credit: updated.credit,
-      debit: updated.debit,
-      allowance: previousState.allowance,
-      errors: errors,
-    } as AllowanceActionCmd;
-  }
-
-  if (updated.is_calculated && (updated.is_archived || !updated.is_active)) {
-    errors.is_calculated = [
-      "Cannot archive or deactivate a calculated allowance.",
-    ];
-    return {
-      csrf: csrf,
-      slug: slug,
-      credit: updated.credit,
-      debit: updated.debit,
+      credit: convertCentsToDollars(updated.credit),
+      debit: convertCentsToDollars(updated.debit),
       allowance: previousState.allowance,
       errors: errors,
     } as AllowanceActionCmd;
   }
 
   try {
-    const apiResponse = await fetch(`/api/allowances/${slug}`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `${hasSession?.value}`,
-      },
-      body: JSON.stringify(updated),
-    });
+    const apiResponse = await fetch(
+      `${process.env.GATEWAY_SERVICE_URL}/allowances/${slug}`,
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `${hasSession?.value}`,
+        },
+        body: JSON.stringify(updated),
+      }
+    );
 
     if (apiResponse.ok) {
       const success = await apiResponse.json();
@@ -158,9 +98,15 @@ export async function handleAllowanceEdit(
         return {
           csrf: csrf,
           slug: slug,
-          allowance: updated,
+          credit: convertCentsToDollars(updated.credit),
+          debit: convertCentsToDollars(updated.debit),
+          allowance: previousState.allowance,
           errors: errors,
         } as AllowanceActionCmd;
+      } else {
+        throw new Error(
+          "An unhandled gateway error occurred when trying to update allowance."
+        );
       }
     }
   } catch (error: any) {
@@ -169,13 +115,4 @@ export async function handleAllowanceEdit(
       `Unable to call gateway successfully to update allowance account`
     );
   }
-
-  return {
-    csrf: csrf,
-    slug: slug,
-    credit: updated.credit,
-    debit: updated.debit,
-    allowance: previousState.allowance,
-    errors: {},
-  } as AllowanceActionCmd;
 }

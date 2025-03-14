@@ -113,51 +113,49 @@ export default function ScopesManageForm({
 
         {currentScopes &&
           currentScopes.map((scope) => (
-            <>
-              <div className={styles.scopecard}>
-                <div className={styles.row} style={{ fontSize: "2rem" }}>
-                  <div className={styles.box}>
-                    <Link
-                      className="locallink no-hover"
-                      href={`/scopes/${scope.slug}`}
-                    >
-                      {scope.scope}
-                    </Link>
-                  </div>
-                  <div className={`${styles.box} ${styles.right}`}>
-                    <h3>
-                      <span className="highlight">{scope.service_name}</span>
-                    </h3>
-                  </div>
+            <div key={scope.slug} className={styles.scopecard}>
+              <div className={styles.row} style={{ fontSize: "2rem" }}>
+                <div className={styles.box}>
+                  <Link
+                    className="locallink no-hover"
+                    href={`/scopes/${scope.slug}`}
+                  >
+                    {scope.scope}
+                  </Link>
                 </div>
-                {/* <hr className="page-title" /> */}
-                <div
-                  className={styles.row}
-                  style={{ marginTop: "0.5rem", fontWeight: "bold" }}
-                >
-                  <div className={styles.box}>{scope.name}</div>
+                <div className={`${styles.box} ${styles.right}`}>
+                  <h3>
+                    <span className="highlight">{scope.service_name}</span>
+                  </h3>
                 </div>
-                <div className={styles.row}>
-                  <div className={styles.box} style={{}}>
-                    {scope.description}
-                  </div>
-                  <div className={`${styles.box} ${styles.right}`}>
-                    <div
-                      style={{ width: "auto", alignItems: "right" }}
-                      className={`actions  ${styles.right}`}
-                    >
-                      <button
-                        type="button"
-                        onClick={() => removeScope(scope.slug)}
-                      >
-                        Remove
-                      </button>
-                    </div>
-                  </div>
-                </div>
-                <input type="hidden" name="scopes[]" value={scope.slug} />
               </div>
-            </>
+              {/* <hr className="page-title" /> */}
+              <div
+                className={styles.row}
+                style={{ marginTop: "0.5rem", fontWeight: "bold" }}
+              >
+                <div className={styles.box}>{scope.name}</div>
+              </div>
+              <div className={styles.row}>
+                <div className={styles.box} style={{}}>
+                  {scope.description}
+                </div>
+                <div className={`${styles.box} ${styles.right}`}>
+                  <div
+                    style={{ width: "auto", alignItems: "right" }}
+                    className={`actions  ${styles.right}`}
+                  >
+                    <button
+                      type="button"
+                      onClick={() => removeScope(scope.slug)}
+                    >
+                      Remove
+                    </button>
+                  </div>
+                </div>
+              </div>
+              <input type="hidden" name="scopes[]" value={scope.slug} />
+            </div>
           ))}
         <div className={`row`}>
           <FormSubmit
