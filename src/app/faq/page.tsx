@@ -12,7 +12,7 @@ export default async function FaqPage() {
           <h1>Frequently Asked Questions</h1>
         </div>
         <hr className="page-title" />
-        <div style={{ fontStyle: "italic" }}>
+        <div className=" banner">
           None of these questions are frequently asked because no one visits
           this website.
         </div>

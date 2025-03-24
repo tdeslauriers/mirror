@@ -1,3 +1,4 @@
+import { TaskTemplate } from "@/app/templates";
 import {
   checkPassword,
   FieldValidation,
@@ -231,4 +232,11 @@ export type UpdateAllowanceCmd = {
   is_archived?: boolean;
   is_active?: boolean;
   is_calculated?: boolean;
+};
+
+export type TemplateActionCmd = {
+  csrf?: string;
+  slug?: string | null;
+  template?: TaskTemplate | null;
+  errors: { [key: string]: string[] };
 };

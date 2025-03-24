@@ -191,11 +191,20 @@ export default function NavDrawer() {
                 {showMenus["allowance"] && (
                   <div className={`${style.submenu}`}>
                     <ul>
-                      <li>
-                        <Link className={`locallink`} href={"/allowances"}>
-                          Allowances
-                        </Link>
-                      </li>
+                      {render && render.allowances_read && (
+                        <li>
+                          <Link className={`locallink`} href={"/allowances"}>
+                            Allowances
+                          </Link>
+                        </li>
+                      )}
+                      {render && render.task_read && (
+                        <li>
+                          <Link className={`locallink`} href={"/templates"}>
+                            Task Templates
+                          </Link>
+                        </li>
+                      )}
                     </ul>
                   </div>
                 )}

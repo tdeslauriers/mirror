@@ -3,8 +3,8 @@
 import FormSubmit from "@/components/forms/form-submit";
 import Link from "next/link";
 import { useActionState, useState } from "react";
-import { AddAllowanceActionCmd, AllowanceUser } from "..";
 import ErrorField from "@/components/errors/error-field";
+import { AddAllowanceActionCmd, AllowanceUser } from "@/components/forms";
 
 type Err = { [key: string]: string[] };
 

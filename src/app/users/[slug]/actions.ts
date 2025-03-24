@@ -3,21 +3,29 @@
 import { ProfileActionCmd, validateUpdateProfile } from "@/app/profile";
 import { User, UserScopesCmd } from "..";
 import { cookies } from "next/headers";
-import { log } from "console";
 import { ErrMsgGeneric, GatewayError, isGatewayError } from "@/app/api";
-import {
-  EntityScopesActionCmd,
-  ErrNewConfirmPwMismatch,
-  ErrPasswordInvalid,
-  ErrPasswordInvalidContains,
-  ErrPasswordUsedPreviously,
-} from "@/components/forms";
+import { EntityScopesActionCmd } from "@/components/forms";
 import { validateScopeSlugs } from "@/app/services";
 
 export async function handleUserEdit(
   previousState: ProfileActionCmd,
   formData: FormData
 ) {
+  // get session token
+  const cookieStore = await cookies();
+  const hasSession = cookieStore.has("session_id")
+    ? cookieStore.get("session_id")
+    : null;
+  if (
+    !hasSession ||
+    hasSession.value.trim().length < 16 ||
+    hasSession.value.trim().length > 64
+  ) {
+    throw new Error(
+      "Session cookie is missing or not well formed.  This value is required and cannot be tampered with."
+    );
+  }
+
   // light-weight validation of csrf token
   // true validation happpens in the gateway
   const csrf = previousState.csrf;
@@ -51,21 +59,6 @@ export async function handleUserEdit(
   const errors = validateUpdateProfile(updated);
   if (errors && Object.keys(errors).length > 0) {
     return { csrf: csrf, profile: updated, errors: errors } as ProfileActionCmd;
-  }
-
-  // get session token
-  const cookieStore = await cookies();
-  const hasSession = cookieStore.has("session_id")
-    ? cookieStore.get("session_id")
-    : null;
-  if (
-    !hasSession ||
-    hasSession.value.trim().length < 16 ||
-    hasSession.value.trim().length > 64
-  ) {
-    throw new Error(
-      "Session cookie is missing or not well formed.  This value is required and cannot be tampered with."
-    );
   }
 
   try {

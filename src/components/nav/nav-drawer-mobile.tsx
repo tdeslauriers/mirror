@@ -211,14 +211,48 @@ export default function MobileDrawer() {
                         </span>
                       </strong>
                     </button>
-                    {showMenus["allowance"] && (
+                    {render &&
+                      render.allowances_read &&
+                      showMenus["allowance"] && (
+                        <div className={`${style.submenu}`}>
+                          <ul>
+                            <li>
+                              <Link
+                                className={`locallink`}
+                                href={"/allowances"}
+                              >
+                                Allowances
+                              </Link>
+                            </li>
+                          </ul>
+                        </div>
+                      )}
+
+                    {render && render.task_read && showMenus["templates"] && (
                       <div className={`${style.submenu}`}>
                         <ul>
-                          <li>
-                            <Link className={`locallink`} href={"/allowances"}>
-                              Allowances
-                            </Link>
-                          </li>
+                          {render && render.allowances_read && (
+                            <li>
+                              <Link
+                                className={`locallink`}
+                                href={"/allowances"}
+                                onClick={closeMenu}
+                              >
+                                Allowances
+                              </Link>
+                            </li>
+                          )}
+                          {render && render.task_read && (
+                            <li>
+                              <Link
+                                className={`locallink`}
+                                href={"/templates"}
+                                onClick={closeMenu}
+                              >
+                                Task Templates
+                              </Link>
+                            </li>
+                          )}
                         </ul>
                       </div>
                     )}

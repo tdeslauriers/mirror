@@ -1,13 +1,9 @@
 "use server";
 
 import { cookies } from "next/headers";
-import {
-  AddAllowanceActionCmd,
-  AddAllowanceCmd,
-  handleAllowanceAddErrors,
-  validateAddAllowanceCmd,
-} from "..";
+import { handleAllowanceAddErrors, validateAddAllowanceCmd } from "..";
 import { isGatewayError } from "@/app/api";
+import { AddAllowanceActionCmd, AddAllowanceCmd } from "@/components/forms";
 
 const ErrMsgGeneric =
   "An error occurred: failed to add new allowance account. Please try again.";
