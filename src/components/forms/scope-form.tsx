@@ -15,7 +15,6 @@ import {
   SERVICENAME_MAX_LENGTH,
   SERVICENAME_MIN_LENGTH,
 } from "@/validation/service_client_field";
-import { useParams } from "next/navigation";
 
 export default function ScopeForm({
   csrf,
@@ -37,9 +36,6 @@ export default function ScopeForm({
     scope: scope,
     errors: {},
   });
-
-  // used to determine update vs add: if a slug is present, we are updating, otherwise adding
-  const params = useParams();
 
   return (
     <>
@@ -78,7 +74,7 @@ export default function ScopeForm({
           <div className="field">
             <label className="label" htmlFor="scope">
               Scope{" "}
-              {params.slug && (
+              {slug && (
                 <sup style={{ fontSize: ".7rem" }}>
                   <span className="highlight">
                     *Be very careful changing this field
@@ -162,9 +158,13 @@ export default function ScopeForm({
 
         <div className={`row`}>
           <FormSubmit
-            buttonLabel={params.slug ? "Update scope data" : "Add scope"}
+            buttonLabel={
+              scopeState.scope?.slug ? "Update scope data" : "Add scope"
+            }
             pendingLabel={
-              params.slug ? "Updating scope record..." : "Adding scope..."
+              scopeState.scope?.slug
+                ? "Updating scope record..."
+                : "Adding scope..."
             }
           />
         </div>

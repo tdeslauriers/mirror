@@ -220,6 +220,7 @@ export default function MobileDrawer() {
                               <Link
                                 className={`locallink`}
                                 href={"/allowances"}
+                                onClick={closeMenu}
                               >
                                 Allowances
                               </Link>
@@ -249,7 +250,7 @@ export default function MobileDrawer() {
                                 href={"/templates"}
                                 onClick={closeMenu}
                               >
-                                Task Templates
+                                Assignments
                               </Link>
                             </li>
                           )}

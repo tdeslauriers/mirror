@@ -201,7 +201,7 @@ export default function NavDrawer() {
                       {render && render.task_read && (
                         <li>
                           <Link className={`locallink`} href={"/templates"}>
-                            Task Templates
+                            Assignments
                           </Link>
                         </li>
                       )}

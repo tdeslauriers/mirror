@@ -106,6 +106,7 @@ export async function templateFormUpdate(
     );
     if (apiResponse.ok) {
       const success = await apiResponse.json();
+      console.log("success", success);
       return {
         csrf: csrf,
         slug: success.slug,

@@ -31,6 +31,7 @@ export default async function Registration() {
   const hasSession = cookieStore.has("session_id")
     ? cookieStore.get("session_id")
     : null;
+
   if (!hasSession) {
     console.log("Session cookie is missing");
     throw new Error(pageError);

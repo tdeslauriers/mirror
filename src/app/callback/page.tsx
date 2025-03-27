@@ -1,6 +1,5 @@
 import { Suspense } from "react";
 import Callback from "./callback";
-
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import Loading from "@/components/loading";
@@ -20,6 +19,7 @@ export default async function CallbackPage() {
   if (hasIdentity) {
     return redirect("/");
   }
+
   return (
     <>
       <Suspense fallback={<Loading />}>

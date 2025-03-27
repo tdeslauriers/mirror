@@ -6,21 +6,20 @@ import Techstack from "@/markdown/techstack.mdx";
 export default async function AboutPage() {
   const cookieStore = await cookies();
   const hasIdentity = cookieStore.has("identity");
-  
+
   return (
     <>
       <main className={`main ${hasIdentity ? "main-drawer" : null}`}>
-        <div className={`center`}>
+        <div className={`center`}></div>
+        <div className={`page-title`}>
+          <h1 id="summary">
+            About{" "}
+            <span className={`highlight`}>
+              <strong>deslauriers.world</strong>
+            </span>
+          </h1>
         </div>
-          <div className={`page-title`}>
-            <h1 id="summary">
-              About{" "}
-              <span className={`highlight`}>
-                <strong>deslauriers.world</strong>
-              </span>
-            </h1>
-          </div>
-          <hr className="page-title" />
+        <hr className="page-title" />
         <div className={`content`}>
           <About />
         </div>

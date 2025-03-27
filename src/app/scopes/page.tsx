@@ -1,68 +1,20 @@
 import Loading from "@/components/loading";
-import GetOauthExchange from "@/components/oauth-exchange";
-import { cookies } from "next/headers";
-import { redirect } from "next/navigation";
 import { Suspense } from "react";
 import ScopesTable from "./scopes_table";
 import Link from "next/link";
+import checkForIdentityCookie from "@/components/check-for-id-cookie";
+import callGatewayData from "@/components/call-gateway-data";
 
 export const metadata = {
   robots: "noindex, nofollow",
 };
 
-const pageError: string = "Failed to load scopes page: ";
-
 export default async function ScopesPage() {
   // quick for redirect if auth'd cookies not present
-  const cookieStore = await cookies();
-  const hasIdentity = cookieStore.has("identity")
-    ? cookieStore.get("identity")
-    : null;
-  const hasSession = cookieStore.has("session_id")
-    ? cookieStore.get("session_id")
-    : null;
-
-  if (!hasIdentity) {
-    const oauth = await GetOauthExchange(hasSession?.value, "/scopes");
-    if (oauth) {
-      redirect(
-        `/login?client_id=${oauth.client_id}&response_type=${oauth.response_type}&state=${oauth.state}&nonce=${oauth.nonce}&redirect_url=${oauth.redirect_url}`
-      );
-    } else {
-      redirect("/login");
-    }
-  }
-
-  // check session cookie exists for api call
-  if (!hasSession) {
-    console.log(pageError + "session cookie is missing");
-    throw new Error(pageError + "session cookie is missing");
-  }
+  const cookies = await checkForIdentityCookie("/scopes");
 
   // get scoeps data from gateway
-  const response = await fetch(`${process.env.GATEWAY_SERVICE_URL}/scopes`, {
-    headers: {
-      Authorization: `${hasSession?.value}`,
-    },
-  });
-
-  if (!response.ok) {
-    if (response.status === 401) {
-      const oauth = await GetOauthExchange(hasSession?.value, "/scopes");
-      if (oauth) {
-        redirect(
-          `/login?client_id=${oauth.client_id}&response_type=${oauth.response_type}&state=${oauth.state}&nonce=${oauth.nonce}&redirect_url=${oauth.redirect_url}`
-        );
-      } else {
-        redirect("/login");
-      }
-    } else {
-      const fail = await response.json();
-      throw new Error(fail.message);
-    }
-  }
-
-  const scopes = await response.json();
+  const scopes = await callGatewayData("/scopes", cookies.session?.value);
 
   return (
     <>

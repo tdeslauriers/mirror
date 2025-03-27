@@ -4,6 +4,7 @@ import Faq from "@/markdown/faq.mdx";
 export default async function FaqPage() {
   const cookieStore = await cookies();
   const hasIdentity = cookieStore.has("identity");
+  
   return (
     <>
       <main className={`main ${hasIdentity ? "main-drawer" : null}`}>

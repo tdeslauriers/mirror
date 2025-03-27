@@ -310,8 +310,14 @@ export default function TemplateForm({
 
         <div className={`row`}>
           <FormSubmit
-            buttonLabel={slug ? "Update Task" : "Create Task"}
-            pendingLabel={slug ? "Updating Task..." : "Creating Task..."}
+            buttonLabel={
+              templateState.template?.slug ? "Update Task" : "Create Task"
+            }
+            pendingLabel={
+              templateState.template?.slug
+                ? "Updating Task..."
+                : "Creating Task..."
+            }
           />
         </div>
       </form>

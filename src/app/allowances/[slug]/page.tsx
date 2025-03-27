@@ -1,12 +1,14 @@
 import GetCsrf from "@/components/csrf-token";
 import AllowanceForm from "@/components/forms/allowance-form";
 import Loading from "@/components/loading";
-import GetOauthExchange from "@/components/oauth-exchange";
-import { cookies } from "next/headers";
 import Link from "next/link";
-import { redirect } from "next/navigation";
 import { Suspense } from "react";
 import { handleAllowanceEdit } from "./actions";
+import checkForIdentityCookie, {
+  UiCookies,
+} from "@/components/check-for-id-cookie";
+import callGatewayData from "@/components/call-gateway-data";
+import { Allowance } from "@/components/forms";
 
 export const metadata = {
   robots: "noindex, nofollow",
@@ -23,36 +25,14 @@ export default async function Page({
   const slug = (await params).slug;
 
   // quick for redirect if auth'd cookies not present
-  const cookieStore = await cookies();
-  const hasIdentity = cookieStore.has("identity")
-    ? cookieStore.get("identity")
-    : null;
-  const hasSession = cookieStore.has("session_id")
-    ? cookieStore.get("session_id")
-    : null;
+  const cookies: UiCookies = await checkForIdentityCookie(
+    `/allowances/${slug}`
+  );
 
-  if (!hasIdentity) {
-    const oauth = await GetOauthExchange(
-      hasSession?.value,
-      `/allowances/${slug}`
-    );
-    if (oauth) {
-      redirect(
-        `/login?client_id=${oauth.client_id}&response_type=${oauth.response_type}&state=${oauth.state}&nonce=${oauth.nonce}&redirect_url=${oauth.redirect_url}`
-      );
-    } else {
-      redirect("/login");
-    }
-  }
-
-  // check session cookie exists for api calls
-  if (!hasSession) {
-    console.log(pageError + "session cookie is missing");
-    throw new Error(pageError + "session cookie is missing");
-  }
-
-  // get csrf token from gateway for allowance form
-  const csrf = await GetCsrf(hasSession.value);
+  // get csrf token from gateway for allowance form updates
+  const csrf = await GetCsrf(
+    cookies.session?.value ? cookies.session.value : ""
+  );
 
   if (!csrf) {
     console.log(
@@ -63,36 +43,11 @@ export default async function Page({
     );
   }
 
-  // get scope record data from gateway
-  const response = await fetch(
-    `${process.env.GATEWAY_SERVICE_URL}/allowances/${slug}`,
-    {
-      headers: {
-        Authorization: `${hasSession?.value}`,
-      },
-    }
+  // get allowance account data from gateway
+  const allowance: Allowance = await callGatewayData(
+    `/allowances/${slug}`,
+    cookies.session?.value
   );
-
-  if (!response.ok) {
-    if (response.status === 401) {
-      const oauth = await GetOauthExchange(
-        hasSession?.value,
-        `/allowances/${slug}`
-      );
-      if (oauth) {
-        redirect(
-          `/login?client_id=${oauth.client_id}&response_type=${oauth.response_type}&state=${oauth.state}&nonce=${oauth.nonce}&redirect_url=${oauth.redirect_url}`
-        );
-      } else {
-        redirect("/login");
-      }
-    } else {
-      const fail = await response.json();
-      throw new Error(fail.message);
-    }
-  }
-
-  const allowance = await response.json();
 
   return (
     <>

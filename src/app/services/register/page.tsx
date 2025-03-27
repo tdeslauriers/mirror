@@ -8,6 +8,7 @@ import { Suspense } from "react";
 import ClientRegistrationForm from "@/components/forms/client-registration-form";
 import handleClientRegister from "./actions";
 import Link from "next/link";
+import checkForIdentityCookie from "@/components/check-for-id-cookie";
 
 export const metadata = {
   robots: "noindex, nofollow",
@@ -17,36 +18,12 @@ const pageError = "Failed to load /services/register page: ";
 
 export default async function Page() {
   // quick for redirect if auth'd cookies not present
-  const cookieStore = await cookies();
-  const hasIdentity = cookieStore.has("identity")
-    ? cookieStore.get("identity")
-    : null;
-  const hasSession = cookieStore.has("session_id")
-    ? cookieStore.get("session_id")
-    : null;
-
-  if (!hasIdentity) {
-    const oauth = await GetOauthExchange(
-      hasSession?.value,
-      "/services/register"
-    );
-    if (oauth) {
-      redirect(
-        `/login?client_id=${oauth.client_id}&response_type=${oauth.response_type}&state=${oauth.state}&nonce=${oauth.nonce}&redirect_url=${oauth.redirect_url}`
-      );
-    } else {
-      redirect("/login");
-    }
-  }
-
-  // check session cookie exists for api calls
-  if (!hasSession) {
-    console.log(pageError + "session cookie is missing");
-    throw new Error(pageError + "session cookie is missing");
-  }
+  const cookies = await checkForIdentityCookie("/services/register");
 
   // get csrf token from gateway for profile form
-  const csrf = await GetCsrf(hasSession.value);
+  const csrf = await GetCsrf(
+    cookies.session?.value ? cookies.session.value : ""
+  );
 
   if (!csrf) {
     console.log(
