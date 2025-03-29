@@ -13,7 +13,7 @@ export type TaskTemplate = {
   slug?: string;
   created_at?: string;
   is_archived?: boolean;
-  assignees?: AllowanceUser[];
+  assignees: AllowanceUser[];
 };
 
 export type TaskTemplateCmd = {
