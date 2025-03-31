@@ -23,7 +23,7 @@ export default async function Page({
   // get slug param from url
   const slug = (await params).slug;
 
-  // quick for redirect if auth'd cookies not present
+  // quick check for redirect if auth'd cookies not present
   const cookies = await checkForIdentityCookie(`/services/${slug}`);
 
   // get csrf token from gateway for service form
@@ -76,14 +76,14 @@ export default async function Page({
         <hr className="page-title" />
 
         {client && client.created_at && (
-          <p>
+          <div className="banner">
             Client created{" "}
             {new Date(client.created_at).toLocaleDateString("en-US", {
               year: "numeric",
               month: "long",
               day: "numeric",
             })}
-          </p>
+          </div>
         )}
 
         <div className="card-title">

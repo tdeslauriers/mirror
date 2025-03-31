@@ -61,7 +61,7 @@ export default async function AddPage() {
         </div>
         <hr className={`page-title`} />
         <div className="banner">
-          Use the cadence dropdown to create recurring tasks.
+          Use the ca  dence dropdown to create recurring tasks.
         </div>
         <div className="card-title">
           <h2>Add Task</h2>
