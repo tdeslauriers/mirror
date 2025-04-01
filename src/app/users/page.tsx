@@ -1,7 +1,7 @@
 import Loading from "@/components/loading";
 import { Suspense } from "react";
 import UserTable from "./user-table";
-import checkForIdentityCookie from "@/components/check-for-id-cookie";
+import { checkForIdentityCookie } from "@/components/checkCookies";
 import callGatewayData from "@/components/call-gateway-data";
 
 export const metadata = {

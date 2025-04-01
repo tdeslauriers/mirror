@@ -7,7 +7,7 @@ import { handleScopeAdd } from "./actions";
 import Link from "next/link";
 import { Suspense } from "react";
 import Loading from "@/components/loading";
-import checkForIdentityCookie from "@/components/check-for-id-cookie";
+import { checkForIdentityCookie } from "@/components/checkCookies";
 
 export const metadata = {
   robots: "noindex, nofollow",

@@ -245,7 +245,10 @@ export function isRealDob(dateString: string | undefined): FieldValidation {
 
   // Check if the parsedDate is a valid date
   if (isNaN(parsedDate.getTime())) {
-    return { isValid: false, messages: ["Date of birth must be a valid date."] };
+    return {
+      isValid: false,
+      messages: ["Date of birth must be a valid date."],
+    };
   }
 
   const today = new Date();
@@ -255,7 +258,10 @@ export function isRealDob(dateString: string | undefined): FieldValidation {
   // Ensure the date is within 100 years and not in the future
   const isRealDob = parsedDate >= hundredYearsAgo && parsedDate <= today;
   if (!isRealDob) {
-    return { isValid: false, messages: ["Date of birth must be a valid date."] };
+    return {
+      isValid: false,
+      messages: ["Date of birth must be a valid date."],
+    };
   }
 
   return { isValid: true, messages: [] };

@@ -1,9 +1,8 @@
 import callGatewayData from "@/components/call-gateway-data";
-import checkForIdentityCookie, {
-  UiCookies,
-} from "@/components/check-for-id-cookie";
+
 import Link from "next/link";
 import TemplatesTable from "./templates-table";
+import { checkForIdentityCookie, UiCookies } from "@/components/checkCookies";
 
 export const metadata = {
   robots: "noindex, nofollow",

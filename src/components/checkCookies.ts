@@ -4,6 +4,7 @@ import { cookies } from "next/headers";
 import GetOauthExchange from "./oauth-exchange";
 import { redirect } from "next/navigation";
 import { RequestCookie } from "next/dist/compiled/@edge-runtime/cookies";
+import { checkUuid } from "@/validation/user_fields";
 
 export type UiCookies = {
   identity: RequestCookie | null | undefined;
@@ -12,7 +13,7 @@ export type UiCookies = {
 
 // checks for identity cookie and if does not exist, redirects to login,
 // and sets the state var to the current page.
-export default async function checkForIdentityCookie(page: string) {
+export async function checkForIdentityCookie(page: string) {
   const cookieStore = await cookies();
 
   // identity cookie
@@ -24,6 +25,17 @@ export default async function checkForIdentityCookie(page: string) {
   const hasSession = cookieStore.has("session_id")
     ? cookieStore.get("session_id")
     : null;
+
+  // check session cookie exists
+  if (!hasSession) {
+    console.log(`Failed to load ${page} page: session cookie is missing`);
+    throw new Error(`Failed to load ${page} page: session cookie is missing`);
+  }
+
+  const checkSession = checkUuid(hasSession?.value);
+  if (!checkSession.isValid) {
+    throw new Error(`Failed to load ${page} page: session cookie is invalid`);
+  }
 
   // if identity cookie is missing, redirect to login page
   if (!hasIdentity) {
@@ -37,11 +49,28 @@ export default async function checkForIdentityCookie(page: string) {
     }
   }
 
-  // check session cookie exists
+  return { identity: hasIdentity, session: hasSession } as UiCookies;
+}
+
+export async function checkForSessionCookie() {
+  const cookieStore = await cookies();
+
+  const hasSession = cookieStore.has("session_id")
+    ? cookieStore.get("session_id")
+    : null;
+
   if (!hasSession) {
-    console.log(`Failed to load ${page} page: session cookie is missing`);
-    throw new Error(`Failed to load ${page} page: session cookie is missing`);
+    throw new Error(
+      "Session cookie is missing.  This value is required and cannot be tampered with."
+    );
   }
 
-  return { identity: hasIdentity, session: hasSession } as UiCookies;
+  const checkSession = checkUuid(hasSession?.value);
+  if (!checkSession.isValid) {
+    throw new Error(
+      "Session cookie is invalid.  This value is required and cannot be tampered with."
+    );
+  }
+
+  return hasSession;
 }

@@ -6,7 +6,7 @@ import { handleClientEdit, handleReset, handleScopesUpdate } from "./actions";
 import ResetForm from "@/components/forms/reset-form";
 import ScopesManageForm from "@/components/forms/scopes-manage-form";
 import Link from "next/link";
-import checkForIdentityCookie from "@/components/check-for-id-cookie";
+import { checkForIdentityCookie } from "@/components/checkCookies";
 import callGatewayData from "@/components/call-gateway-data";
 
 export const metadata = {
@@ -91,11 +91,6 @@ export default async function Page({
             Serivce Uuid:{" "}
             {client && client.id && (
               <span className="highlight">{client.id}</span>
-            )}
-            <br />
-            Service Slug:{" "}
-            {client && client.slug && (
-              <span className="highlight">{client.slug}</span>
             )}
           </h2>
         </div>

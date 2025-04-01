@@ -7,6 +7,7 @@ import {
   RegisterClient,
 } from "./../../../components/forms/index";
 import { isGatewayError } from "@/app/api";
+import { checkForSessionCookie } from "@/components/checkCookies";
 
 const ErrMsgGeneric =
   "An error occurred: failed to register service client. Please try again.";
@@ -35,19 +36,7 @@ export default async function handleClientRegister(
   }
 
   // get session token
-  const cookieStore = await cookies();
-  const hasSession = cookieStore.has("session_id")
-    ? cookieStore.get("session_id")
-    : null;
-
-  if (
-    !hasSession ||
-    hasSession.value.trim().length < 16 ||
-    hasSession.value.trim().length > 64
-  ) {
-    console.log(`Session cookie is missing or not well formed.`);
-    throw new Error(ErrMsgGeneric);
-  }
+  const sessionCookie = await checkForSessionCookie();
 
   try {
     const apiResponse = await fetch(
@@ -55,7 +44,7 @@ export default async function handleClientRegister(
       {
         method: "POST",
         headers: {
-          Authorization: `${hasSession?.value}`,
+          Authorization: `${sessionCookie?.value}`,
           "Content-Type": "application/json",
         },
         body: JSON.stringify(cmd),

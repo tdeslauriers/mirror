@@ -3,8 +3,6 @@ import { checkEmail } from "@/validation/user_fields";
 import { ErrMsgGeneric, GatewayError } from "../api";
 
 export type TaskTemplate = {
-  csrf?: string;
-
   id?: string;
   name?: string;
   description?: string;
@@ -13,7 +11,7 @@ export type TaskTemplate = {
   slug?: string;
   created_at?: string;
   is_archived?: boolean;
-  assignees: AllowanceUser[];
+  assignees?: AllowanceUser[]; // only the usernames sent to the gateway
 };
 
 export type TaskTemplateCmd = {

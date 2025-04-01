@@ -4,9 +4,9 @@ import TemplateForm from "@/components/forms/task-template-form";
 import Loading from "@/components/loading";
 import Link from "next/link";
 import { Suspense } from "react";
-import { templateFormUpdate } from "./actions";
-import checkForIdentityCookie from "@/components/check-for-id-cookie";
+import { checkForIdentityCookie } from "@/components/checkCookies";
 import callGatewayData from "@/components/call-gateway-data";
+import { handleTemplateAdd } from "./actions";
 
 export const metadata = {
   robots: "noindex, nofollow",
@@ -61,7 +61,7 @@ export default async function AddPage() {
         </div>
         <hr className={`page-title`} />
         <div className="banner">
-          Use the ca  dence dropdown to create recurring tasks.
+          Use the cadence dropdown to create recurring tasks.
         </div>
         <div className="card-title">
           <h2>Add Task</h2>
@@ -74,7 +74,7 @@ export default async function AddPage() {
               slug={null}
               assignees={assignees}
               template={null}
-              templateFormUpdate={templateFormUpdate}
+              templateFormUpdate={handleTemplateAdd}
             />
           </div>
         </Suspense>

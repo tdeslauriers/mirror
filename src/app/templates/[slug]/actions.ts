@@ -10,9 +10,8 @@ import {
   validateTaskTemplate,
 } from "..";
 import { isGatewayError } from "@/app/api";
-import { redirect } from "next/navigation";
 
-export async function handleTemplateAdd(
+export async function handleTemplateEdit(
   previousState: TemplateActionCmd,
   formData: FormData
 ) {
@@ -27,7 +26,16 @@ export async function handleTemplateAdd(
     );
   }
 
-  let add: TaskTemplate = {
+  // slug may not exist if adding a new template
+  const slug = previousState.slug;
+  if (!slug || slug.trim().length < 16 || slug.trim().length > 64) {
+    console.log("Template slug is missing or not well formed");
+    throw new Error(
+      "Template slug is missing or not well formed.  This value is required and cannot be tampered with."
+    );
+  }
+
+  const updated: TaskTemplate = {
     // id omitted
     name: formData.get("name") as string,
     description: formData.get("description") as string,
@@ -39,12 +47,12 @@ export async function handleTemplateAdd(
   };
 
   // check task template fields
-  const errors = validateTaskTemplate(add);
+  const errors = validateTaskTemplate(updated);
   if (errors && Object.keys(errors).length > 0) {
     return {
       csrf: csrf,
-      // slug omitted because doesn't exist yet
-      template: add,
+      slug: slug,
+      template: updated,
       errors: errors,
     } as TemplateActionCmd;
   }
@@ -55,8 +63,8 @@ export async function handleTemplateAdd(
   if (assigneesErrors && Object.keys(assigneesErrors).length > 0) {
     return {
       csrf: csrf,
-      // slug omitted because doesn't exist yet
-      template: add,
+      slug: slug,
+      template: updated,
       errors: assigneesErrors,
     } as TemplateActionCmd;
   }
@@ -64,18 +72,18 @@ export async function handleTemplateAdd(
   // build cmd for createing task in gateway
   const cmd: TaskTemplateCmd = {
     csrf: csrf,
-    name: add.name,
-    description: add.description,
-    cadence: add.cadence,
-    category: add.category,
-    is_archived: add.is_archived,
+    name: updated.name,
+    description: updated.description,
+    cadence: updated.cadence,
+    category: updated.category,
+    is_archived: updated.is_archived,
     assignees: usernames,
   };
 
   try {
     // call gateway to create a new task template
     const apiResponse = await fetch(
-      `${process.env.GATEWAY_SERVICE_URL}/templates`,
+      `${process.env.GATEWAY_SERVICE_URL}/templates/${slug}`,
       {
         method: "POST",
         headers: {
@@ -86,8 +94,14 @@ export async function handleTemplateAdd(
       }
     );
     if (apiResponse.ok) {
-      add = await apiResponse.json();
-      console.log("success", add);
+      const success = await apiResponse.json();
+      console.log("success", success);
+      return {
+        csrf: csrf,
+        slug: success.slug,
+        template: success,
+        errors: {},
+      } as TemplateActionCmd;
     } else {
       const fail = await apiResponse.json();
       if (isGatewayError(fail)) {
@@ -95,14 +109,17 @@ export async function handleTemplateAdd(
         return {
           csrf: csrf,
 
-          template: add,
+          template: updated,
           errors: errors,
         } as TemplateActionCmd;
+      } else {
+        throw new Error(
+          "unhandled error resulted from call to gateway failed to edit task template",
+          fail
+        );
       }
     }
   } catch (error) {
-    throw new Error("Failed to call gateway to create a new task template");
+    throw new Error("Failed to call gateway to edit task template");
   }
-
-  redirect(`/templates`);
 }

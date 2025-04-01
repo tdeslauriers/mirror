@@ -6,7 +6,7 @@ import GetCsrf from "@/components/csrf-token";
 import ResetForm from "../../components/forms/reset-form";
 import { Suspense } from "react";
 import Loading from "@/components/loading";
-import checkForIdentityCookie from "@/components/check-for-id-cookie";
+import { checkForIdentityCookie } from "@/components/checkCookies";
 import callGatewayData from "@/components/call-gateway-data";
 
 export const metadata = {

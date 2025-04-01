@@ -5,9 +5,7 @@ import { Suspense } from "react";
 import AddAllowanceForm from "./add-allowance-form";
 import { handleAddAllowance } from "./actions";
 import { AllowanceUser } from "@/components/forms";
-import checkForIdentityCookie, {
-  UiCookies,
-} from "@/components/check-for-id-cookie";
+import { checkForIdentityCookie, UiCookies } from "@/components/checkCookies";
 import callGatewayData from "@/components/call-gateway-data";
 
 export const metadata = {

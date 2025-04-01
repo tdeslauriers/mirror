@@ -35,11 +35,11 @@ export default function TemplateForm({
   });
 
   const [selectedCategory, setSelectedCategory] = useState<string | undefined>(
-    templateState.template?.category || ""
+    templateState?.template?.category || ""
   );
 
   const [selectedCadence, setSelectedCadence] = useState<string | undefined>(
-    templateState.template?.cadence || ""
+    templateState?.template?.cadence || ""
   );
 
   const [fieldErrors, setFieldErrors] = useState<Err>({});
@@ -60,7 +60,7 @@ export default function TemplateForm({
 
   // assignees
   const [currentUsers, setCurrentUsers] = useState<AllowanceUser[] | null>(
-    templateState.template?.assignees || []
+    templateState?.template?.assignees || []
   );
 
   const [selectedUser, setSelectedUser] = useState("");

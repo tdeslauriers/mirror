@@ -1,11 +1,10 @@
-
 import ScopeForm from "@/components/forms/scope-form";
 import GetCsrf from "@/components/csrf-token";
 import { handleScopeEdit } from "./actions";
 import { Suspense } from "react";
 import Loading from "@/components/loading";
 import Link from "next/link";
-import checkForIdentityCookie from "@/components/check-for-id-cookie";
+import { checkForIdentityCookie } from "@/components/checkCookies";
 import callGatewayData from "@/components/call-gateway-data";
 
 export const metadata = {

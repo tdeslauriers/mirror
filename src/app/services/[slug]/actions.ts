@@ -14,27 +14,17 @@ import {
   validateScopeSlugs,
   validateServiceClient,
 } from "..";
-import { cookies } from "next/headers";
+
 import { isGatewayError } from "@/app/api";
+import { checkForSessionCookie } from "@/components/checkCookies";
 
 export async function handleClientEdit(
   previousState: ServiceClientActionCmd,
   formData: FormData
 ) {
   // get session token
-  const cookieStore = await cookies();
-  const hasSession = cookieStore.has("session_id")
-    ? cookieStore.get("session_id")
-    : null;
-  if (
-    !hasSession ||
-    hasSession.value.trim().length < 16 ||
-    hasSession.value.trim().length > 64
-  ) {
-    throw new Error(
-      "Session cookie is missing or not well formed.  This value is required and cannot be tampered with."
-    );
-  }
+  // get session token
+  const sessionCookie = await checkForSessionCookie();
 
   // light-weight validation of csrf token
   // true validation happpens in the gateway
@@ -83,7 +73,7 @@ export async function handleClientEdit(
       {
         method: "PUT",
         headers: {
-          Authorization: `${hasSession?.value}`,
+          Authorization: `${sessionCookie?.value}`,
           "Content-Type": "application/json",
         },
         body: JSON.stringify(updated),
@@ -167,19 +157,8 @@ export async function handleReset(
   }
 
   // get session token
-  const cookieStore = await cookies();
-  const hasSession = cookieStore.has("session_id")
-    ? cookieStore.get("session_id")
-    : null;
-  if (
-    !hasSession ||
-    hasSession.value.trim().length < 16 ||
-    hasSession.value.trim().length > 64
-  ) {
-    throw new Error(
-      "Session cookie is missing or not well formed.  This value is required and cannot be tampered with."
-    );
-  }
+  // get session token
+  const sessionCookie = await checkForSessionCookie();
 
   try {
     const apiResponse = await fetch(
@@ -187,7 +166,7 @@ export async function handleReset(
       {
         method: "POST",
         headers: {
-          Authorization: `${hasSession?.value}`,
+          Authorization: `${sessionCookie?.value}`,
           "Content-Type": "application/json",
         },
         body: JSON.stringify(reset),
@@ -230,19 +209,7 @@ export async function handleScopesUpdate(
   formData: FormData
 ) {
   // get session token
-  const cookieStore = await cookies();
-  const hasSession = cookieStore.has("session_id")
-    ? cookieStore.get("session_id")
-    : null;
-  if (
-    !hasSession ||
-    hasSession.value.trim().length < 16 ||
-    hasSession.value.trim().length > 64
-  ) {
-    throw new Error(
-      "Session cookie is missing or not well formed.  This value is required and cannot be tampered with."
-    );
-  }
+  const sessionCookie = await checkForSessionCookie();
 
   // lightweight validation of csrf token
   // true validation happens in the gateway
@@ -292,7 +259,7 @@ export async function handleScopesUpdate(
       {
         method: "PUT",
         headers: {
-          Authorization: `${hasSession?.value}`,
+          Authorization: `${sessionCookie?.value}`,
           "Content-Type": "application/json",
         },
         body: JSON.stringify(cmd),

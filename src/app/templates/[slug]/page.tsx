@@ -1,7 +1,12 @@
 import callGatewayData from "@/components/call-gateway-data";
-import checkForIdentityCookie from "@/components/check-for-id-cookie";
+import { checkForIdentityCookie } from "@/components/checkCookies";
 import GetCsrf from "@/components/csrf-token";
 import { AllowanceUser } from "@/components/forms";
+import TemplateForm from "@/components/forms/task-template-form";
+import Loading from "@/components/loading";
+import { Suspense } from "react";
+import { handleTemplateEdit } from "./actions";
+import Link from "next/link";
 
 export const metadata = {
   robots: "noindex, nofollow",
@@ -63,6 +68,9 @@ export default async function TemplatesPage({
                 {template.name ? template.name : null}
               </span>
             </h1>
+            <Link href="/templates">
+              <button>Assignments Table</button>
+            </Link>
           </div>
         </div>
         <hr className={`page-title`} />
@@ -78,18 +86,24 @@ export default async function TemplatesPage({
         </div>
         <div className="card-title">
           <h2>
-            Task Template uuid:{" "}
+            Template uuid:{" "}
             {template.id ? (
-              <div className="highlight">{template.id}</div>
-            ) : null}
-          </h2>
-          <h2>
-            Task Template slug:{" "}
-            {template.slug ? (
-              <div className="highlight">{template.slug}</div>
+              <span className="highlight">{template.id}</span>
             ) : null}
           </h2>
         </div>
+
+        <Suspense fallback={<Loading />}>
+          <div className="card">
+            <TemplateForm
+              csrf={csrf}
+              slug={slug}
+              assignees={assignees}
+              template={template}
+              templateFormUpdate={handleTemplateEdit}
+            />
+          </div>
+        </Suspense>
       </main>
     </>
   );

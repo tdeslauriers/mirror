@@ -1,15 +1,18 @@
 "use server";
 
 import { validateScope } from "..";
-import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { GatewayError, isGatewayError } from "@/app/api";
 import { Scope, ScopeActionCmd } from "@/components/forms";
+import { checkForSessionCookie } from "@/components/checkCookies";
 
 export async function handleScopeAdd(
   previousState: ScopeActionCmd,
   formData: FormData
 ) {
+  // get session token
+  const sessionCookie = await checkForSessionCookie();
+
   // light-weight validation of csrf token
   // true validation happpens in the gateway
   const csrf = previousState.csrf;
@@ -39,21 +42,6 @@ export async function handleScopeAdd(
     } as ScopeActionCmd;
   }
 
-  // get session token
-  const cookieStore = await cookies();
-  const hasSession = cookieStore.has("session_id")
-    ? cookieStore.get("session_id")
-    : null;
-  if (
-    !hasSession ||
-    hasSession.value.trim().length < 16 ||
-    hasSession.value.trim().length > 64
-  ) {
-    throw new Error(
-      "Session cookie is missing or not well formed.  This value is required and cannot be tampered with."
-    );
-  }
-
   // send form data to gateway
   try {
     const response = await fetch(
@@ -62,7 +50,7 @@ export async function handleScopeAdd(
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `${hasSession.value}`,
+          Authorization: `${sessionCookie.value}`,
         },
         body: JSON.stringify(add),
       }

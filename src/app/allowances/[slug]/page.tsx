@@ -4,9 +4,7 @@ import Loading from "@/components/loading";
 import Link from "next/link";
 import { Suspense } from "react";
 import { handleAllowanceEdit } from "./actions";
-import checkForIdentityCookie, {
-  UiCookies,
-} from "@/components/check-for-id-cookie";
+import {checkForIdentityCookie, UiCookies } from "@/components/checkCookies";
 import callGatewayData from "@/components/call-gateway-data";
 import { Allowance } from "@/components/forms";
 

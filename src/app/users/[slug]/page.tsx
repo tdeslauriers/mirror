@@ -5,7 +5,7 @@ import UserForm from "@/components/forms/user-form";
 import Loading from "@/components/loading";
 import { handleScopesUpdate, handleUserEdit } from "./actions";
 import ScopesManageForm from "@/components/forms/scopes-manage-form";
-import checkForIdentityCookie from "@/components/check-for-id-cookie";
+import { checkForIdentityCookie } from "@/components/checkCookies";
 import callGatewayData from "@/components/call-gateway-data";
 
 export const metadata = {
@@ -78,8 +78,7 @@ export default async function Page({
           </div>
         )}
         <div className="card-title">
-          <h2>Uuid: {<span className="highlight">{user?.id}</span>}</h2>
-          <h2>Slug: {<span className="highlight">{user?.slug}</span>}</h2>
+          <h2>User Uuid: {<span className="highlight">{user?.id}</span>}</h2>
         </div>
         <Suspense fallback={<Loading />}>
           <div className={`card`}>

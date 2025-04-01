@@ -8,7 +8,7 @@ import { Suspense } from "react";
 import ClientRegistrationForm from "@/components/forms/client-registration-form";
 import handleClientRegister from "./actions";
 import Link from "next/link";
-import checkForIdentityCookie from "@/components/check-for-id-cookie";
+import { checkForIdentityCookie } from "@/components/checkCookies";
 
 export const metadata = {
   robots: "noindex, nofollow",
