@@ -85,7 +85,7 @@ export async function handleTemplateEdit(
     const apiResponse = await fetch(
       `${process.env.GATEWAY_SERVICE_URL}/templates/${slug}`,
       {
-        method: "POST",
+        method: "PUT",
         headers: {
           "Content-Type": "application/json",
           Authorization: `${sessionCookie.value}`,

@@ -44,12 +44,12 @@ spec:
             - name: MIRROR_SERVER_CERT
               valueFrom:
                 secretKeyRef:
-                  name: secret-ux-server-cert
+                  name: secret-mirror-server-cert
                   key: server-cert
             - name: MIRROR_SERVER_KEY
               valueFrom:
                 secretKeyRef:
-                  name: secret-ux-server-cert
+                  name: secret-mirror-server-cert
                   key: server-key
             - name: GATEWAY_SERVICE_URL
               valueFrom:
