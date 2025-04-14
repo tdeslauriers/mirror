@@ -3,22 +3,16 @@
 import { useEffect, useState } from "react";
 import style from "./nav-drawer.module.css";
 import Link from "next/link";
-
-type Render = {
-  user_read?: boolean;
-  gallery_read?: boolean;
-  blog_read?: boolean;
-  task_read?: boolean;
-  allowances_read?: boolean;
-};
-
-interface ShowMenu {
-  [key: string]: boolean;
-}
+import { UxRender } from "@/app/api";
+import MenuUser from "./menu-user";
+import { ShowMenu } from ".";
+import MenuGallery from "./menu-gallery";
+import MenuBlog from "./menu-blog";
+import MenuTasks from "./menu-tasks";
 
 export default function NavDrawer() {
   const [hasIdentity, setHasIdentity] = useState<boolean>(false);
-  const [render, setRender] = useState<Render>({});
+  const [render, setRender] = useState<UxRender>({});
   const [showMenus, setShowMenus] = useState<ShowMenu>({});
 
   useEffect(() => {
@@ -83,132 +77,36 @@ export default function NavDrawer() {
       {hasIdentity ? (
         <>
           <div className={`${style.drawer} `}>
-            {render && render.user_read && (
-              <div className={`${style.section}`}>
-                <button
-                  className={`${style.menubutton}`}
-                  onClick={() => toggleMenu("users")}
-                >
-                  <strong>
-                    <span
-                      className={`${showMenus["users"] ? "highlight" : "base"}`}
-                    >
-                      Identity
-                    </span>
-                  </strong>
-                </button>
-                {showMenus["users"] && (
-                  <div className={`${style.submenu}`}>
-                    <ul>
-                      <li>
-                        <Link className={`locallink`} href={"/users"}>
-                          Users
-                        </Link>
-                      </li>
-                      <li>
-                        <Link className={`locallink`} href={"/scopes"}>
-                          Scopes
-                        </Link>
-                      </li>
-                      <li>
-                        <Link className={`locallink`} href={"/services"}>
-                          Services
-                        </Link>
-                      </li>
-                    </ul>
-                  </div>
-                )}
-              </div>
+            {render && render.users && (
+              <MenuUser
+                visible={showMenus}
+                render={render}
+                toggle={toggleMenu}
+              />
             )}
-            {render && render.gallery_read && (
-              <div className={`${style.section}`}>
-                <button
-                  className={`${style.menubutton}`}
-                  onClick={() => toggleMenu("gallery")}
-                >
-                  <strong>
-                    <span
-                      className={`${
-                        showMenus["gallery"] ? "highlight" : "base"
-                      }`}
-                    >
-                      Gallery
-                    </span>
-                  </strong>
-                  {showMenus["gallery"] && (
-                    <div className={`${style.submenu}`}>
-                      <ul>
-                        <li>
-                          <span className={`highlight`}>Coming Soon!</span>
-                        </li>
-                      </ul>
-                    </div>
-                  )}
-                </button>
-              </div>
+
+            {render && render.gallery && (
+              <MenuGallery
+                visible={showMenus}
+                render={render}
+                toggle={toggleMenu}
+              />
             )}
-            {render && render.blog_read && (
-              <div className={`${style.section}`}>
-                <button
-                  className={`${style.menubutton}`}
-                  onClick={() => toggleMenu("blog")}
-                >
-                  <strong>
-                    <span
-                      className={`${showMenus["blog"] ? "highlight" : "base"}`}
-                    >
-                      Blog
-                    </span>
-                  </strong>
-                </button>
-                {showMenus["blog"] && (
-                  <div className={`${style.submenu}`}>
-                    <ul>
-                      <li>
-                        <span className={`highlight`}>Coming Soon!</span>
-                      </li>
-                    </ul>
-                  </div>
-                )}
-              </div>
+
+            {render && render.blog && (
+              <MenuBlog
+                visible={showMenus}
+                render={render}
+                toggle={toggleMenu}
+              />
             )}
-            {render && (render.task_read || render.allowances_read) && (
-              <div className={`${style.section}`}>
-                <button
-                  className={`${style.menubutton}`}
-                  onClick={() => toggleMenu("allowance")}
-                >
-                  <strong>
-                    <span
-                      className={`${
-                        showMenus["allowance"] ? "highlight" : "base"
-                      }`}
-                    >
-                      Tasks
-                    </span>
-                  </strong>
-                </button>
-                {showMenus["allowance"] && (
-                  <div className={`${style.submenu}`}>
-                    <ul>
-                      {render && render.allowances_read && (
-                        <li>
-                          <Link className={`locallink`} href={"/allowances"}>
-                            Allowances
-                          </Link>
-                        </li>
-                      )}
-                      {render && render.task_read && (
-                        <li>
-                          <Link className={`locallink`} href={"/templates"}>
-                            Assignments
-                          </Link>
-                        </li>
-                      )}
-                    </ul>
-                  </div>
-                )}
-              </div>
+
+            {render && render.tasks && (
+              <MenuTasks
+                visible={showMenus}
+                render={render}
+                toggle={toggleMenu}
+              />
             )}
           </div>
         </>

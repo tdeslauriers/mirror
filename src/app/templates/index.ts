@@ -51,6 +51,25 @@ export const category: string[] = [
   "OTHER",
 ];
 
+export function cadenceTitle(cadence: string): string {
+  switch (cadence) {
+    case "ADHOC":
+      return "Ad Hoc task records will be created immediately one time.  Not recurring or scheduled.";
+    case "DAILY":
+      return "Daily task records will be created every day.";
+    case "WEEKLY":
+      return "Weekly task records will be created every week on Sunday morning.";
+    case "MONTHLY":
+      return "Monthly task records will be created every month on the first day of the month.";
+    case "QUARTERLY":
+      return "Quarterly task records will be created every three months on the first day of the month.";
+    case "ANNUALLY":
+      return "Annually task records will be created every year on the first day of January.";
+    default:
+      return "Unknown";
+  }
+}
+
 export function validateTaskTemplate(template: TaskTemplate): {
   [key: string]: string[];
 } {

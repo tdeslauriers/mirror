@@ -68,31 +68,46 @@ export type IdentityCookie = {
   ux_render?: UxRender;
 };
 
+// UxRender is an object that reflects the visual elements that are available to the user
+// on the client side.  This struct is used to determine what the user can see and interact with.
+// NOTE: these flags are ux/ui convenience for feature display ONLY:
+// they in no way give the user access to the data that is being called by the respective apis.
 export type UxRender = {
-  // users
   profile_read?: boolean;
+
+  // site modules and their associated access
+  users?: UserAccessFlags;
+  gallery?: GalleryAccessFlags;
+  blog?: BlogAccessFlags;
+  tasks?: TaskAccessFlags;
+};
+
+export type UserAccessFlags = {
   user_read?: boolean;
   user_write?: boolean;
   scope_read?: boolean;
   scope_write?: boolean;
+  client_read?: boolean;
+  client_write?: boolean;
+};
 
-  blog_read?: boolean;
-  blog_write?: boolean;
-
-  // allowance
-  task_read?: boolean;
-  task_write?: boolean;
-  payroll_read?: boolean;
-  payroll_write?: boolean;
-
+export type GalleryAccessFlags = {
   gallery_read?: boolean;
   gallery_write?: boolean;
+};
 
-  judo_read?: boolean;
-  judo_write?: boolean;
+export type BlogAccessFlags = {
+  blog_read?: boolean;
+  blog_write?: boolean;
+};
 
-  familytree_read?: boolean;
-  familytree_write?: boolean;
+export type TaskAccessFlags = {
+  allowances_read?: boolean;
+  allowances_write?: boolean;
+  tasks_read?: boolean;
+  tasks_write?: boolean;
+  templates_read?: boolean;
+  templates_write?: boolean;
 };
 
 // type checked before usage

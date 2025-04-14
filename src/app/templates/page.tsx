@@ -28,7 +28,7 @@ export default async function TemplatesPage() {
               paddingRight: "1rem",
             }}
           >
-            <h1>Task Assignments</h1>
+            <h1>Task Tempates and Assignments</h1>
             <Link href="/templates/add">
               <button>Add Task</button>
             </Link>
@@ -38,14 +38,16 @@ export default async function TemplatesPage() {
         <div className="banner">
           <ul style={{ listStyleType: "none" }}>
             <li style={{ margin: ".5rem" }}>
-              Tasks may be assigned to more than one person.
+              This table will only show one unique instance of each task type,
+              ie, they are templates for recurring task creation.
             </li>
             <li style={{ margin: ".5rem" }}>
-              Each person assigned to a task will receive thier own task record
-              to interact with.
+              Each person assigned to a task template will receive thier own
+              task record to interact with on the cadence recurrance.
             </li>
             <li style={{ margin: ".5rem" }}>
-              This table will only show one unique instance of each task.
+              Ad Hoc task templates will be archived upon closure of the task
+              record, and will no longer show in this table.
             </li>
           </ul>
         </div>

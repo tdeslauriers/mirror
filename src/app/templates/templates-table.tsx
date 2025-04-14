@@ -1,7 +1,7 @@
 "use client";
 
 import { Suspense, useState } from "react";
-import { TaskTemplate } from ".";
+import { cadence, cadenceTitle, TaskTemplate } from ".";
 import { access } from "fs";
 import Table, { TableColumn } from "@/components/table";
 import Link from "next/link";
@@ -39,21 +39,16 @@ export default function TemplatesTable({ data }: TemplatesTableProps) {
       header: "Cadence",
       accessor: "cadence" as keyof TaskTemplate,
       sortable: true,
-    },
-    {
-      header: "Archived?",
-      accessor: "is_archived" as keyof TaskTemplate,
-      sortable: false,
       render: (value: TaskTemplate[keyof TaskTemplate]) => (
-        <>
-          {value ? (
-            <span className="highlight-error no-hover">Archived</span>
-          ) : (
-            <span>Active</span>
-          )}
-        </>
+        <div title={cadenceTitle(value as string)}>
+          <span>{value as string}</span>{" "}
+          <sup style={{ fontSize: "0.7rem" }}>
+            <span className="highlight">*info</span>
+          </sup>
+        </div>
       ),
     },
+
     {
       header: "Assignees",
       accessor: "assignees" as keyof TaskTemplate,
