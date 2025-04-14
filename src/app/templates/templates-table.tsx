@@ -57,11 +57,19 @@ export default function TemplatesTable({ data }: TemplatesTableProps) {
         <>
           {value ? (
             <ul style={{ listStyleType: "none" }}>
-              {(value as AllowanceUser[]).map((assignee) => (
-                <li key={assignee.username}>
+              {(value as AllowanceUser[]).map((assignee, index) => (
+                <li
+                  key={assignee.username}
+                  style={
+                    index < (value as AllowanceUser[]).length - 1
+                      ? { marginBottom: "0.5rem" }
+                      : { marginBottom: "0" }
+                  }
+                >
                   <Link
                     className="locallink no-hover"
                     href={`/users/${assignee.slug}`}
+                    style={{ whiteSpace: "nowrap" }}
                   >
                     {assignee.firstname} {assignee.lastname}
                   </Link>

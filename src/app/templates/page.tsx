@@ -28,7 +28,7 @@ export default async function TemplatesPage() {
               paddingRight: "1rem",
             }}
           >
-            <h1>Task Tempates and Assignments</h1>
+            <h1>Task Templates and Assignments</h1>
             <Link href="/templates/add">
               <button>Add Task</button>
             </Link>
@@ -36,7 +36,7 @@ export default async function TemplatesPage() {
         </div>
         <hr className="page-title" />
         <div className="banner">
-          <ul style={{ listStyleType: "none" }}>
+          <ul>
             <li style={{ margin: ".5rem" }}>
               This table will only show one unique instance of each task type,
               ie, they are templates for recurring task creation.
