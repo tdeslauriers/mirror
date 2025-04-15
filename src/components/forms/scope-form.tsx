@@ -18,11 +18,13 @@ import {
 
 export default function ScopeForm({
   csrf,
+  editAllowed,
   slug,
   scope,
   scopeFormUpdate,
 }: {
-  csrf: string;
+  csrf: string | null;
+  editAllowed?: boolean;
   slug: string | null;
   scope: Scope | null;
   scopeFormUpdate: (
@@ -30,7 +32,6 @@ export default function ScopeForm({
     formData: FormData
   ) => ScopeActionCmd | Promise<ScopeActionCmd>;
 }) {
-
   const [scopeState, formAction] = useActionState(scopeFormUpdate, {
     csrf: csrf,
     slug: slug,
@@ -67,6 +68,7 @@ export default function ScopeForm({
               defaultValue={scopeState.scope?.service_name}
               placeholder="Service Name"
               required
+              disabled={!editAllowed}
             />
           </div>
         </div>
@@ -97,6 +99,7 @@ export default function ScopeForm({
               defaultValue={scopeState.scope?.scope}
               placeholder="Scope"
               required
+              disabled={!editAllowed}
             />
           </div>
         </div>
@@ -119,6 +122,7 @@ export default function ScopeForm({
               defaultValue={scopeState.scope?.name}
               placeholder="Name"
               required
+              disabled={!editAllowed}
             />
           </div>
         </div>
@@ -136,6 +140,7 @@ export default function ScopeForm({
               name="description"
               defaultValue={scopeState.scope?.description}
               placeholder="Description"
+              disabled={!editAllowed}
             />
           </div>
         </div>
@@ -153,22 +158,25 @@ export default function ScopeForm({
               name="active"
               type="checkbox"
               defaultChecked={scopeState.scope?.active}
+              disabled={!editAllowed}
             />
           </div>
         </div>
 
-        <div className={`row`}>
-          <FormSubmit
-            buttonLabel={
-              scopeState.scope?.slug ? "Update scope data" : "Add scope"
-            }
-            pendingLabel={
-              scopeState.scope?.slug
-                ? "Updating scope record..."
-                : "Adding scope..."
-            }
-          />
-        </div>
+        {editAllowed && (
+          <div className={`row`}>
+            <FormSubmit
+              buttonLabel={
+                scopeState.scope?.slug ? "Update scope data" : "Add scope"
+              }
+              pendingLabel={
+                scopeState.scope?.slug
+                  ? "Updating scope record..."
+                  : "Adding scope..."
+              }
+            />
+          </div>
+        )}
       </form>
     </>
   );

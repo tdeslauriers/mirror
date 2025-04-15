@@ -20,7 +20,7 @@ export type Scope = {
 };
 
 export type ScopeActionCmd = {
-  csrf?: string;
+  csrf?: string | null;
   slug?: string | null;
   scope?: Scope | null;
   errors: { [key: string]: string[] };
@@ -41,7 +41,7 @@ export type ServiceClient = {
 };
 
 export type ServiceClientActionCmd = {
-  csrf?: string;
+  csrf?: string | null;
   slug?: string | null;
   serviceClient?: ServiceClient | null;
   errors: { [key: string]: string[] };
@@ -58,7 +58,7 @@ export type ResetData = {
 };
 
 export type ResetPwActionCmd = {
-  csrf?: string;
+  csrf?: string | null;
   resource_id?: string; // used for service pw resets, users will be undefined.
   reset: ResetData | null;
   errors: { [key: string]: string[] };
@@ -211,7 +211,7 @@ export type Allowance = {
 };
 
 export type AllowanceActionCmd = {
-  csrf?: string;
+  csrf?: string | null;
   slug?: string | null;
 
   credit?: number;
@@ -224,7 +224,7 @@ export type AllowanceActionCmd = {
 };
 
 export type UpdateAllowanceCmd = {
-  csrf?: string;
+  csrf?: string | null;
 
   credit?: number;
   debit?: number;
@@ -235,7 +235,7 @@ export type UpdateAllowanceCmd = {
 };
 
 export type TemplateActionCmd = {
-  csrf?: string;
+  csrf?: string | null;
   slug?: string | null;
   template?: TaskTemplate | null;
   errors: { [key: string]: string[] };

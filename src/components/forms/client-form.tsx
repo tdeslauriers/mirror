@@ -12,11 +12,13 @@ import FormSubmit from "./form-submit";
 
 export default function ClientForm({
   csrf,
+  editAllowed,
   slug,
   client,
   clientFormUpdate,
 }: {
-  csrf: string;
+  csrf: string | null;
+  editAllowed?: boolean; // just cookie check => ui rendering logic only
   slug: string | null;
   client: ServiceClient | null;
   clientFormUpdate: (
@@ -56,6 +58,7 @@ export default function ClientForm({
               defaultValue={clientState.serviceClient?.name}
               placeholder="Service Name"
               required
+              disabled={!editAllowed}
             />
           </div>
         </div>
@@ -78,6 +81,7 @@ export default function ClientForm({
               defaultValue={clientState.serviceClient?.owner}
               placeholder="Owner"
               required
+              disabled={!editAllowed}
             />
           </div>
         </div>
@@ -95,6 +99,7 @@ export default function ClientForm({
               name="enabled"
               type="checkbox"
               defaultChecked={clientState.serviceClient?.enabled}
+              disabled={!editAllowed}
             />
           </div>
 
@@ -110,6 +115,7 @@ export default function ClientForm({
               name="account_expired"
               type="checkbox"
               defaultChecked={clientState.serviceClient?.account_expired}
+              disabled={!editAllowed}
             />
           </div>
 
@@ -125,16 +131,19 @@ export default function ClientForm({
               name="account_locked"
               type="checkbox"
               defaultChecked={clientState.serviceClient?.account_locked}
+              disabled={!editAllowed}
             />
           </div>
         </div>
 
-        <div className="row" style={{ marginTop: "1.5rem" }}>
-          <FormSubmit
-            buttonLabel="update service data"
-            pendingLabel="updating service record..."
-          />
-        </div>
+        {editAllowed && (
+          <div className="row" style={{ marginTop: "1.5rem" }}>
+            <FormSubmit
+              buttonLabel="update service data"
+              pendingLabel="updating service record..."
+            />
+          </div>
+        )}
       </form>
     </>
   );

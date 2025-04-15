@@ -12,6 +12,17 @@ export default async function UsersPage() {
   // quick for redirect if auth'd cookies not present
   const cookies = await getAuthCookies("/users");
 
+  // check if identity cookie has user_read permission
+  // ie, gaurd pattern or access hint gating
+  if (!cookies.identity || !cookies.identity.ux_render?.users?.user_read) {
+    console.log(
+      "Failed to load users page. User does not have user_read permission."
+    );
+    throw new Error(
+      "Failed to load users page. You do not have permission to view this page."
+    );
+  }
+
   // get user data from gateway
   const users = await callGatewayData("/users", cookies.session);
 

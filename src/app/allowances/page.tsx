@@ -9,15 +9,26 @@ export const metadata = {
   robots: "noindex, nofollow",
 };
 
+const pageError = "Failed to load allowances page: ";
+
 export default async function AllowancesPage() {
   // quick for redirect if auth'd cookies not present
   const cookies = await getAuthCookies("/allowances");
 
+  // check if identity cookie has allowances_read permission
+  // ie, gaurd pattern or access hint gating
+  if (
+    !cookies.identity ||
+    !cookies.identity.ux_render?.tasks?.allowances_read
+  ) {
+    console.log(pageError + "User does not have allowances_read permission.");
+    throw new Error(
+      pageError + "You do not have permission to view allowances."
+    );
+  }
+
   // get allowances data from gateway
-  const allowances = await callGatewayData(
-    "/allowances",
-    cookies.session
-  );
+  const allowances = await callGatewayData("/allowances", cookies.session);
 
   return (
     <>
@@ -33,9 +44,12 @@ export default async function AllowancesPage() {
             }}
           >
             <h1>Allowances</h1>
-            <Link href="/allowances/add">
-              <button>Add Allowance Remitee</button>
-            </Link>
+            {cookies.identity &&
+              cookies.identity.ux_render?.tasks?.allowances_write && (
+                <Link href="/allowances/add">
+                  <button>Add Allowance Remitee</button>
+                </Link>
+              )}
           </div>
         </div>
         <hr className="page-title" />

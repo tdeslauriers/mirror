@@ -19,6 +19,13 @@ export default async function ScopesAddPage() {
   // quick for redirect if auth'd cookies not present
   const cookies = await getAuthCookies("/scopes/add");
 
+  // check if identity cookie has scopes_write permission
+  // ie, gaurd pattern or access hint gating
+  if (!cookies.identity || !cookies.identity.ux_render?.users?.scope_write) {
+    console.log(pageError + "User does not have scopes_write permission.");
+    throw new Error(pageError + "You do not have permission to add scopes.");
+  }
+
   // get csrf token from gateway for profile form
   const csrf = await GetCsrf(cookies.session ? cookies.session : "");
 

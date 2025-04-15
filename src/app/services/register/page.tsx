@@ -20,6 +20,13 @@ export default async function Page() {
   // quick for redirect if auth'd cookies not present
   const cookies = await getAuthCookies("/services/register");
 
+  // check if identity cookie has scopes_write permission
+  // ie, gaurd pattern or access hint gating
+  if (!cookies.identity || !cookies.identity.ux_render?.users?.client_write) {
+    console.log(pageError + "User does not have client_write permission.");
+    throw new Error(pageError + "You do not have permission to add services.");
+  }
+
   // get csrf token from gateway for profile form
   const csrf = await GetCsrf(cookies.session ? cookies.session : "");
 

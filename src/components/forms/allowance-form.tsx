@@ -9,13 +9,15 @@ import { Allowance, AllowanceActionCmd } from ".";
 
 export default function AllowanceForm({
   csrf,
+  editAllowed,
   slug,
   credit,
   debit,
   allowance,
   allowanceFormUpdate,
 }: {
-  csrf: string;
+  csrf: string | null;
+  editAllowed?: boolean;
   slug: string | null;
   credit?: number;
   debit?: number;
@@ -102,7 +104,7 @@ export default function AllowanceForm({
             min={0}
             max={10000}
             defaultValue={allowanceState?.credit || 0}
-            disabled={isDisabled(allowanceState.allowance)}
+            disabled={isDisabled(allowanceState.allowance) || !editAllowed}
           />
         </div>
 
@@ -147,7 +149,7 @@ export default function AllowanceForm({
                 : 0
             }
             defaultValue={allowanceState?.debit || 0}
-            disabled={isDisabled(allowanceState.allowance)}
+            disabled={isDisabled(allowanceState.allowance) || !editAllowed}
           />
         </div>
       </div>
@@ -168,6 +170,7 @@ export default function AllowanceForm({
             name="is_archived"
             type="checkbox"
             defaultChecked={allowanceState.allowance?.is_archived}
+            disabled={!editAllowed}
           />
         </div>
 
@@ -185,6 +188,7 @@ export default function AllowanceForm({
             name="is_active"
             type="checkbox"
             defaultChecked={allowanceState.allowance?.is_active}
+            disabled={!editAllowed}
           />
         </div>
 
@@ -202,15 +206,19 @@ export default function AllowanceForm({
             name="is_calculated"
             type="checkbox"
             defaultChecked={allowanceState.allowance?.is_calculated}
+            disabled={!editAllowed}
           />
         </div>
       </div>
-      <div className="row">
-        <FormSubmit
-          buttonLabel="Update Allowance"
-          pendingLabel="Updating Alowance"
-        />
-      </div>
+
+      {editAllowed && (
+        <div className="row">
+          <FormSubmit
+            buttonLabel="Update Allowance"
+            pendingLabel="Updating Alowance"
+          />
+        </div>
+      )}
     </form>
   );
 }

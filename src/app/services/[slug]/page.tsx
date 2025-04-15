@@ -26,16 +26,29 @@ export default async function Page({
   // quick check for redirect if auth'd cookies not present
   const cookies = await getAuthCookies(`/services/${slug}`);
 
-  // get csrf token from gateway for service form
-  const csrf = await GetCsrf(cookies.session ? cookies.session : "");
-
-  if (!csrf) {
-    console.log(
-      `${pageError} CSRF token could not be retrieved for service client ${slug}.`
-    );
+  // check if identity cookie has client_read permission
+  // ie, gaurd pattern or access hint gating
+  if (!cookies.identity || !cookies.identity.ux_render?.users?.client_read) {
+    console.log(pageError + "User does not have client_read permission.");
     throw new Error(
-      `${pageError} CSRF token could not be retrieved for service client ${slug}.`
+      pageError + "You do not have permission to view this page."
     );
+  }
+
+  // check if identity cookie has client_write permission
+  let csrf: string | null = null;
+  if (cookies.identity && cookies.identity.ux_render?.users?.client_write) {
+    // get csrf token from gateway for service form
+    csrf = await GetCsrf(cookies.session ? cookies.session : "");
+
+    if (!csrf) {
+      console.log(
+        `${pageError} CSRF token could not be retrieved for service client ${slug}.`
+      );
+      throw new Error(
+        `${pageError} CSRF token could not be retrieved for service client ${slug}.`
+      );
+    }
   }
 
   // get client record data from gateway
@@ -93,6 +106,7 @@ export default async function Page({
           <Suspense fallback={<Loading />}>
             <ClientForm
               csrf={csrf}
+              editAllowed={cookies.identity.ux_render?.users?.client_write}
               slug={slug}
               client={client}
               clientFormUpdate={handleClientEdit}
@@ -100,40 +114,51 @@ export default async function Page({
           </Suspense>
         </div>
 
-        <div className="card-title">
-          <h2>
-            Reset Service Password:{" "}
-            <sup>
-              <span className="highlight-info" style={{ fontSize: ".65em" }}>
-                *requires update of 1password, k8s secrets, and service restart
-              </span>
-            </sup>
-          </h2>
-        </div>
-        <div className="card">
-          <Suspense fallback={<Loading />}>
-            <ResetForm
-              csrf={csrf}
-              resource_id={client && client.id ? client.id : undefined}
-              handleReset={handleReset}
-            />
-          </Suspense>
-        </div>
+        {cookies.identity.ux_render?.users?.client_write && (
+          <>
+            <div className="card-title">
+              <h2>
+                Reset Service Password:{" "}
+                <sup>
+                  <span
+                    className="highlight-info"
+                    style={{ fontSize: ".65em" }}
+                  >
+                    *requires update of 1password, k8s secrets, and service
+                    restart
+                  </span>
+                </sup>
+              </h2>
+            </div>
+            <div className="card">
+              <Suspense fallback={<Loading />}>
+                <ResetForm
+                  csrf={csrf}
+                  resource_id={client && client.id ? client.id : undefined}
+                  handleReset={handleReset}
+                />
+              </Suspense>
+            </div>
+          </>
+        )}
 
         <div className="card-title">
           <h2>
             Scopes:{" "}
-            <sup>
-              <span className="highlight-info" style={{ fontSize: ".65em" }}>
-                * must click &lsquo;Update Scopes&lsquo; to save changes
-              </span>
-            </sup>
+            {cookies.identity.ux_render?.users?.client_write && (
+              <sup>
+                <span className="highlight-info" style={{ fontSize: ".65em" }}>
+                  * must click &lsquo;Update Scopes&lsquo; to save changes
+                </span>
+              </sup>
+            )}
           </h2>
         </div>
         <Suspense fallback={<Loading />}>
           <div className="card">
             <ScopesManageForm
               csrf={csrf}
+              editAllowed={cookies.identity.ux_render?.users?.client_write}
               slug={slug}
               entityScopes={client.scopes}
               menuScopes={allScopes}

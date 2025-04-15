@@ -18,6 +18,18 @@ export default async function Page() {
   // quick for redirect if auth'd cookies not present
   const cookies: UiCookies = await getAuthCookies("/allowances/add");
 
+  // check if identity cookie has allowances_write permission
+  // ie, gaurd pattern or access hint gating
+  if (
+    !cookies.identity ||
+    !cookies.identity.ux_render?.tasks?.allowances_write
+  ) {
+    console.log(pageError + "User does not have allowances_write permission.");
+    throw new Error(
+      pageError + "You do not have permission to add allowances."
+    );
+  }
+
   // get csrf token from gateway for profile form
   const csrf = await GetCsrf(cookies.session ? cookies.session : "");
 

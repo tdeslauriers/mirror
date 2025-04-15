@@ -24,16 +24,28 @@ export default async function TemplatesPage({
   // quick check for redirect if auth'd cookies not present
   const cookies = await getAuthCookies(`/templates/${slug}`);
 
-  // get csrf token from gateway for service form
-  const csrf = await GetCsrf(cookies.session ? cookies.session : "");
-
-  if (!csrf) {
-    console.log(
-      `${pageError} CSRF token could not be retrieved for service client ${slug}.`
-    );
+  // check if identity cookie has template_read permission
+  // ie, gaurd pattern or access hint gating
+  if (!cookies.identity || !cookies.identity.ux_render?.tasks?.templates_read) {
+    console.log(pageError + "User does not have templates_read permission.");
     throw new Error(
-      `${pageError} CSRF token could not be retrieved for service client ${slug}.`
+      pageError + "You do not have permission to view this page."
     );
+  }
+
+  // check if identity cookie has template_write permission
+  let csrf: string | null = null;
+  if (cookies.identity && cookies.identity.ux_render?.tasks?.templates_write) {
+    // get csrf token from gateway for template form
+    csrf = await GetCsrf(cookies.session ? cookies.session : "");
+    if (!csrf) {
+      console.log(
+        `${pageError} CSRF token could not be retrieved for template ${slug}.`
+      );
+      throw new Error(
+        `${pageError} CSRF token could not be retrieved for template ${slug}.`
+      );
+    }
   }
 
   // get list of assignees for form dropdown
@@ -92,6 +104,7 @@ export default async function TemplatesPage({
           <div className="card">
             <TemplateForm
               csrf={csrf}
+              editAllowed={cookies.identity?.ux_render?.tasks?.templates_write}
               slug={slug}
               assignees={assignees}
               template={template}

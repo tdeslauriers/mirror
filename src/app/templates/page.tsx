@@ -8,9 +8,20 @@ export const metadata = {
   robots: "noindex, nofollow",
 };
 
+const pageError = "Failed to load templates page: ";
+
 export default async function TemplatesPage() {
   // quick for redirect if auth'd cookies not present
   const cookies: UiCookies = await getAuthCookies("/templates");
+
+  // check if identity cookie has template_read permission
+  // ie, gaurd pattern or access hint gating
+  if (!cookies.identity || !cookies.identity.ux_render?.tasks?.templates_read) {
+    console.log(pageError + "User does not have templates_read permission.");
+    throw new Error(
+      pageError + "You do not have permission to view this page."
+    );
+  }
 
   // get template data from gateway
   const templates = await callGatewayData("/templates", cookies.session);
@@ -29,9 +40,12 @@ export default async function TemplatesPage() {
             }}
           >
             <h1>Task Templates and Assignments</h1>
-            <Link href="/templates/add">
-              <button>Add Task/Template</button>
-            </Link>
+            {cookies.identity &&
+              cookies.identity.ux_render?.tasks?.templates_write && (
+                <Link href="/templates/add">
+                  <button>Add Task/Template</button>
+                </Link>
+              )}
           </div>
         </div>
         <hr className="page-title" />

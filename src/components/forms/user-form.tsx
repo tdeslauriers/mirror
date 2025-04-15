@@ -6,15 +6,16 @@ import ErrorField from "@/components/errors/error-field";
 import FormSubmit from "@/components/forms/form-submit";
 import { NAME_MAX_LENGTH, NAME_MIN_LENGTH } from "@/validation/user_fields";
 import { User } from "../../app/users";
-import { useParams } from "next/navigation";
 
 export default function UserForm({
   csrf,
+  editAllowed,
   slug,
   profile,
   userEdit,
 }: {
-  csrf: string;
+  csrf: string | null;
+  editAllowed?: boolean; // just cookie check => ui rendering logic only
   slug?: string;
   profile: Profile | User;
   userEdit: (
@@ -60,6 +61,7 @@ export default function UserForm({
               defaultValue={profileState.profile?.firstname}
               placeholder="Firstname"
               required
+              disabled={!editAllowed}
             />
           </div>
         </div>
@@ -83,6 +85,7 @@ export default function UserForm({
               defaultValue={profileState.profile?.lastname}
               placeholder="Lastname"
               required
+              disabled={!editAllowed}
             />
           </div>
         </div>
@@ -126,6 +129,7 @@ export default function UserForm({
                 max={12}
                 defaultValue={profileState.profile?.birth_month}
                 placeholder="Month"
+                disabled={!editAllowed}
               />
 
               <input
@@ -137,6 +141,7 @@ export default function UserForm({
                 max={31}
                 defaultValue={profileState.profile?.birth_day}
                 placeholder="Day"
+                disabled={!editAllowed}
               />
 
               <input
@@ -150,6 +155,7 @@ export default function UserForm({
                 max={new Date().getFullYear()}
                 defaultValue={profileState.profile?.birth_year}
                 placeholder="Year"
+                disabled={!editAllowed}
               />
             </div>
           </div>
@@ -157,61 +163,64 @@ export default function UserForm({
 
         {profileState.slug && (
           <div className="checkbox-row">
-            
-              <div className="field">
-                <label className="label" htmlFor="enabled">
-                  Enabled
-                </label>
-                {profileState.errors.enabled && (
-                  <ErrorField errorMsgs={profileState.errors.enabled} />
-                )}
-                <input
-                  className="form"
-                  name="enabled"
-                  type="checkbox"
-                  defaultChecked={profileState.profile?.enabled}
-                />
-              </div>
+            <div className="field">
+              <label className="label" htmlFor="enabled">
+                Enabled
+              </label>
+              {profileState.errors.enabled && (
+                <ErrorField errorMsgs={profileState.errors.enabled} />
+              )}
+              <input
+                className="form"
+                name="enabled"
+                type="checkbox"
+                defaultChecked={profileState.profile?.enabled}
+                disabled={!editAllowed}
+              />
+            </div>
 
-              <div className="field">
-                <label className="label" htmlFor="account_expired">
-                  Account Expired
-                </label>
-                {profileState.errors.account_expired && (
-                  <ErrorField errorMsgs={profileState.errors.account_expired} />
-                )}
-                <input
-                  className="form"
-                  name="account_expired"
-                  type="checkbox"
-                  defaultChecked={profileState.profile?.account_expired}
-                />
-              </div>
+            <div className="field">
+              <label className="label" htmlFor="account_expired">
+                Account Expired
+              </label>
+              {profileState.errors.account_expired && (
+                <ErrorField errorMsgs={profileState.errors.account_expired} />
+              )}
+              <input
+                className="form"
+                name="account_expired"
+                type="checkbox"
+                defaultChecked={profileState.profile?.account_expired}
+                disabled={!editAllowed}
+              />
+            </div>
 
-              <div className="field">
-                <label className="label" htmlFor="account_locked">
-                  Account Locked
-                </label>
-                {profileState.errors.account_locked && (
-                  <ErrorField errorMsgs={profileState.errors.account_locked} />
-                )}
-                <input
-                  className="form"
-                  name="account_locked"
-                  type="checkbox"
-                  defaultChecked={profileState.profile?.account_locked}
-                />
-              </div>
-            
+            <div className="field">
+              <label className="label" htmlFor="account_locked">
+                Account Locked
+              </label>
+              {profileState.errors.account_locked && (
+                <ErrorField errorMsgs={profileState.errors.account_locked} />
+              )}
+              <input
+                className="form"
+                name="account_locked"
+                type="checkbox"
+                defaultChecked={profileState.profile?.account_locked}
+                disabled={!editAllowed}
+              />
+            </div>
           </div>
         )}
 
-        <div className={`row`} style={{ marginTop: "1.5rem" }}>
-          <FormSubmit
-            buttonLabel="update profile data"
-            pendingLabel="updating profile record..."
-          />
-        </div>
+        {editAllowed && (
+          <div className={`row`} style={{ marginTop: "1.5rem" }}>
+            <FormSubmit
+              buttonLabel="update profile data"
+              pendingLabel="updating profile record..."
+            />
+          </div>
+        )}
       </form>
     </>
   );

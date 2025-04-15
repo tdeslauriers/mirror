@@ -13,12 +13,14 @@ type Err = { [key: string]: string[] };
 
 export default function TemplateForm({
   csrf,
+  editAllowed,
   slug,
   assignees,
   template,
   templateFormUpdate,
 }: {
-  csrf: string;
+  csrf: string | null;
+  editAllowed?: boolean; // just cookie check => ui rendering logic only
   slug: string | null;
   assignees: AllowanceUser[] | null;
   template: TaskTemplate | null;
@@ -123,6 +125,7 @@ export default function TemplateForm({
               defaultValue={templateState.template?.name || ""}
               placeholder="Task Name"
               required
+              disabled={!editAllowed}
             />
           </div>
         </div>
@@ -142,6 +145,7 @@ export default function TemplateForm({
               defaultValue={templateState.template?.description || ""}
               placeholder="Task Description"
               required
+              disabled={!editAllowed}
             />
           </div>
         </div>
@@ -160,6 +164,7 @@ export default function TemplateForm({
               className="select-category"
               defaultValue={selectedCategory}
               onChange={handleSelectCategory}
+              disabled={!editAllowed}
             >
               <option key="no-category-selected" value="">
                 Select Category...
@@ -185,6 +190,7 @@ export default function TemplateForm({
               className="select"
               defaultValue={selectedCadence}
               onChange={handleSelectCadence}
+              disabled={!editAllowed}
             >
               <option key="no-cadence-selected" value="">
                 Select Cadence...
@@ -211,6 +217,7 @@ export default function TemplateForm({
               name="is_archived"
               type="checkbox"
               defaultChecked={templateState.template?.is_archived}
+              disabled={!editAllowed}
             />
           </div>
         </div>
@@ -248,6 +255,7 @@ export default function TemplateForm({
                 name="add-assignee"
                 type="button"
                 onClick={() => addAssignee(selectedUser)}
+                disabled={!editAllowed}
               >
                 Add Assignee
               </button>
@@ -293,6 +301,7 @@ export default function TemplateForm({
                       name="remove-assignee"
                       type="button"
                       onClick={() => removeUser(user.slug)}
+                      disabled={!editAllowed}
                     >
                       Remove
                     </button>
@@ -308,18 +317,20 @@ export default function TemplateForm({
             </div>
           ))}
 
-        <div className={`row`}>
-          <FormSubmit
-            buttonLabel={
-              templateState.template?.slug ? "Update Task" : "Create Task"
-            }
-            pendingLabel={
-              templateState.template?.slug
-                ? "Updating Task..."
-                : "Creating Task..."
-            }
-          />
-        </div>
+        {editAllowed && (
+          <div className={`row`}>
+            <FormSubmit
+              buttonLabel={
+                templateState.template?.slug ? "Update Task" : "Create Task"
+              }
+              pendingLabel={
+                templateState.template?.slug
+                  ? "Updating Task..."
+                  : "Creating Task..."
+              }
+            />
+          </div>
+        )}
       </form>
     </>
   );

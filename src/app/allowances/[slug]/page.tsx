@@ -25,17 +25,15 @@ export default async function Page({
   // quick for redirect if auth'd cookies not present
   const cookies: UiCookies = await getAuthCookies(`/allowances/${slug}`);
 
-  // get csrf token from gateway for allowance form updates
-  const csrf = await GetCsrf(
-    cookies.session? cookies.session : ""
-  );
-
-  if (!csrf) {
-    console.log(
-      pageError + "CSRF token could not be retrieved for scope form."
-    );
+  // check if identity cookie has allowances_read permission
+  // ie, gaurd pattern or access hint gating
+  if (
+    !cookies.identity ||
+    !cookies.identity.ux_render?.tasks?.allowances_read
+  ) {
+    console.log(pageError + "User does not have allowances_read permission.");
     throw new Error(
-      pageError + "CSRF token could not be retrieved for scope form."
+      pageError + "You do not have permission to view allowance records."
     );
   }
 
@@ -44,6 +42,21 @@ export default async function Page({
     `/allowances/${slug}`,
     cookies.session
   );
+
+  let csrf: string | null = null;
+  if (cookies.identity && cookies.identity.ux_render?.tasks?.allowances_write) {
+    // get csrf token from gateway for allowance form updates
+    csrf = await GetCsrf(cookies.session ? cookies.session : "");
+
+    if (!csrf) {
+      console.log(
+        pageError + "CSRF token could not be retrieved for scope form."
+      );
+      throw new Error(
+        pageError + "CSRF token could not be retrieved for scope form."
+      );
+    }
+  }
 
   return (
     <>
@@ -85,18 +98,13 @@ export default async function Page({
               <span className="highlight">{allowance.id}</span>
             )}
           </h2>
-          <h2>
-            Slug:{" "}
-            {allowance && allowance.id && (
-              <span className="highlight">{allowance.slug}</span>
-            )}
-          </h2>
         </div>
 
         <Suspense fallback={<Loading />}>
           <div className="card">
             <AllowanceForm
               csrf={csrf}
+              editAllowed={cookies.identity?.ux_render?.tasks?.allowances_write}
               slug={slug}
               allowance={allowance}
               allowanceFormUpdate={handleAllowanceEdit}

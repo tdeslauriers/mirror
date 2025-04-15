@@ -18,6 +18,18 @@ export default async function AddPage() {
   // quick for redirect if auth'd cookies not present
   const cookies = await getAuthCookies("/templates/add");
 
+  // check if identity cookie has template_write permission
+  // ie, gaurd pattern or access hint gating
+  if (
+    !cookies.identity ||
+    !cookies.identity.ux_render?.tasks?.templates_write
+  ) {
+    console.log(pageError + "User does not have templates_write permission.");
+    throw new Error(
+      pageError + "You do not have permission to view this page."
+    );
+  }
+
   // get csrf token from gateway for template form submission
   const csrf = await GetCsrf(cookies.session ? cookies.session : "");
 

@@ -6,7 +6,6 @@ import Loading from "@/components/loading";
 import Link from "next/link";
 import { getAuthCookies } from "@/components/checkCookies";
 import callGatewayData from "@/components/call-gateway-data";
-import { IdentityCookie } from "@/app/api";
 
 export const metadata = {
   robots: "noindex, nofollow",
@@ -25,16 +24,27 @@ export default async function Page({
   // quick for redirect if auth'd cookies not present
   const cookies = await getAuthCookies(`/scopes/${slug}`);
 
-  // get csrf token from gateway for scope form
-  const csrf = await GetCsrf(cookies.session ? cookies.session : "");
+  // check if identity cookie has scopes_read permission
+  // ie, gaurd pattern or access hint gating
+  if (!cookies.identity || !cookies.identity.ux_render?.users?.scope_read) {
+    console.log(pageError + "User does not have scopes_read permission.");
+    throw new Error(pageError + "You do not have permission to view scopes.");
+  }
 
-  if (!csrf) {
-    console.log(
-      pageError + "CSRF token could not be retrieved for scope form."
-    );
-    throw new Error(
-      pageError + "CSRF token could not be retrieved for scope form."
-    );
+  // check if identity cookie has scopes_write permission and get csrf is so for scope form
+  let csrf: string | null = null;
+  if (cookies.identity && cookies.identity.ux_render?.users?.scope_write) {
+    // get csrf token from gateway for scope form
+    csrf = await GetCsrf(cookies.session ? cookies.session : "");
+
+    if (!csrf) {
+      console.log(
+        pageError + "CSRF token could not be retrieved for scope form."
+      );
+      throw new Error(
+        pageError + "CSRF token could not be retrieved for scope form."
+      );
+    }
   }
 
   // get scope record data from gateway
@@ -89,6 +99,7 @@ export default async function Page({
           <div className="card">
             <ScopeForm
               csrf={csrf}
+              editAllowed={!!cookies.identity?.ux_render?.users?.scope_write}
               slug={slug}
               scope={scope}
               scopeFormUpdate={handleScopeEdit}

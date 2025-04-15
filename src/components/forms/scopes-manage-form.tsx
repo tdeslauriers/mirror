@@ -9,12 +9,14 @@ import ErrorField from "../errors/error-field";
 
 export default function ScopesManageForm({
   csrf,
+  editAllowed,
   slug,
   entityScopes: entityScopes,
   menuScopes: menuScopes,
   updateScopes,
 }: {
-  csrf?: string;
+  csrf?: string | null;
+  editAllowed?: boolean; // just cookie check => ui rendering logic only
   slug?: string | null;
   entityScopes: Scope[] | null;
   menuScopes: Scope[];
@@ -66,42 +68,47 @@ export default function ScopesManageForm({
         {entityScopesState.errors.server && (
           <ErrorField errorMsgs={entityScopesState.errors.server} />
         )}
-        <label>add scope</label>
-        <div className={styles.row}>
-          <div className={styles.box}>
-            <select
-              name="scope-select"
-              className={styles.select}
-              value={selectedScopeName}
-              onChange={handleSelect}
-            >
-              <option value="">Select scope...</option>
-              {menuScopes.map((m) => (
-                <option key={m.slug} value={m.slug}>
-                  {m.name}
-                </option>
-              ))}
-            </select>
-          </div>
-          <div className={`${styles.box} ${styles.right}`}>
-            <div
-              style={{ width: "auto", alignItems: "right" }}
-              className={`actions  ${styles.right}`}
-            >
-              <button
-                name="add-scope"
-                type="button"
-                onClick={() => addScope(selectedScopeName)}
-              >
-                Add scope
-              </button>
+
+        {editAllowed && (
+          <>
+            <label>add scope</label>
+            <div className={styles.row}>
+              <div className={styles.box}>
+                <select
+                  name="scope-select"
+                  className={styles.select}
+                  value={selectedScopeName}
+                  onChange={handleSelect}
+                >
+                  <option value="">Select scope...</option>
+                  {menuScopes.map((m) => (
+                    <option key={m.slug} value={m.slug}>
+                      {m.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div className={`${styles.box} ${styles.right}`}>
+                <div
+                  style={{ width: "auto", alignItems: "right" }}
+                  className={`actions  ${styles.right}`}
+                >
+                  <button
+                    name="add-scope"
+                    type="button"
+                    onClick={() => addScope(selectedScopeName)}
+                  >
+                    Add scope
+                  </button>
+                </div>
+              </div>
             </div>
-          </div>
-        </div>
-        <sub style={{ fontSize: ".75rem" }}>
-          * A scope may only be added once below.
-        </sub>
-        <hr style={{ marginTop: "2rem" }} />
+            <sub style={{ fontSize: ".75rem" }}>
+              * A scope may only be added once below.
+            </sub>
+            <hr style={{ marginTop: "2rem" }} />
+          </>
+        )}
 
         {(!currentScopes || currentScopes.length < 1) && (
           <>
@@ -148,6 +155,7 @@ export default function ScopesManageForm({
                     <button
                       type="button"
                       onClick={() => removeScope(scope.slug)}
+                      disabled={!editAllowed}
                     >
                       Remove
                     </button>
@@ -157,12 +165,15 @@ export default function ScopesManageForm({
               <input type="hidden" name="scopes[]" value={scope.slug} />
             </div>
           ))}
-        <div className={`row`}>
-          <FormSubmit
-            buttonLabel="Update Scopes"
-            pendingLabel="updating assigned scopes..."
-          />
-        </div>
+
+        {editAllowed && (
+          <div className={`row`}>
+            <FormSubmit
+              buttonLabel="Update Scopes"
+              pendingLabel="updating assigned scopes..."
+            />
+          </div>
+        )}
       </form>
     </>
   );

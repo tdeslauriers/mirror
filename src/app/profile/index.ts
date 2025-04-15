@@ -27,7 +27,7 @@ export type Profile = {
 };
 
 export type ProfileActionCmd = {
-  csrf?: string;
+  csrf?: string | null;
   slug?: string;
   profile: Profile | null;
   errors: { [key: string]: string[] };

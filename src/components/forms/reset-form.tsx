@@ -18,7 +18,7 @@ export default function ResetForm({
   resource_id,
   handleReset,
 }: {
-  csrf: string;
+  csrf: string | null;
   resource_id?: string;
   handleReset: (
     prevState: ResetPwActionCmd,

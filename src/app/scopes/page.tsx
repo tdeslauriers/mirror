@@ -9,9 +9,18 @@ export const metadata = {
   robots: "noindex, nofollow",
 };
 
+const pageError = "Failed to load scopes page: ";
+
 export default async function ScopesPage() {
   // quick for redirect if auth'd cookies not present
   const cookies = await getAuthCookies("/scopes");
+
+  // check if identity cookie has scopes_read permission
+  // ie, gaurd pattern or access hint gating
+  if (!cookies.identity || !cookies.identity.ux_render?.users?.scope_read) {
+    console.log(pageError + "User does not have scopes_read permission.");
+    throw new Error(pageError + "You do not have permission to view scopes.");
+  }
 
   // get scoeps data from gateway
   const scopes = await callGatewayData("/scopes", cookies.session);
@@ -30,9 +39,11 @@ export default async function ScopesPage() {
             }}
           >
             <h1>Scopes</h1>
-            <Link href="/scopes/add">
-              <button>Add Scope</button>
-            </Link>
+            {cookies.identity?.ux_render?.users?.scope_write && (
+              <Link href="/scopes/add">
+                <button>Add Scope</button>
+              </Link>
+            )}
           </div>
         </div>
         <hr className={`page-title`} />

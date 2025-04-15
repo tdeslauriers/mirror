@@ -13,6 +13,13 @@ export default async function ServicesPage() {
   // quick for redirect if auth'd cookies not present
   const cookies = await getAuthCookies("/services");
 
+  // check if identity cookie has services_read permission
+  // ie, gaurd pattern or access hint gating
+  if (!cookies.identity || !cookies.identity.ux_render?.users?.client_read) {
+    console.log("User does not have client_read permission.");
+    throw new Error("You do not have permission to view services.");
+  }
+
   // get services data from gateway
   const clients = await callGatewayData("/clients", cookies.session);
 
@@ -30,9 +37,12 @@ export default async function ServicesPage() {
             }}
           >
             <h1>Services</h1>
-            <Link href="/services/register">
-              <button>Register Service</button>
-            </Link>
+            {cookies.identity &&
+              cookies.identity.ux_render?.users?.client_write && (
+                <Link href="/services/register">
+                  <button>Register Service</button>
+                </Link>
+              )}
           </div>
         </div>
         <hr className="page-title" />

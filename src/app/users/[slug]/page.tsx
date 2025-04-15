@@ -25,16 +25,29 @@ export default async function Page({
   // quick for redirect if auth'd cookies not present
   const cookies = await getAuthCookies(`/users/${slug}`);
 
-  // get csrf token from gateway for user form
-  const csrf = await GetCsrf(cookies.session ? cookies.session : "");
-
-  if (!csrf) {
-    console.log(
-      `${pageError} CSRF token could not be retrieved for user ${slug}.`
-    );
+  // check if identity cookie has user_read permission
+  // ie, gaurd pattern or access hint gating
+  if (!cookies.identity || !cookies.identity.ux_render?.users?.user_read) {
+    console.log(pageError + "User does not have user_read permission.");
     throw new Error(
-      `${pageError} CSRF token could not be retrieved for user ${slug}.`
+      pageError + "You do not have permission to view this page."
     );
+  }
+
+  // check if identity cookie has user_write permission
+  let csrf: string | null = null;
+  if (cookies.identity && cookies.identity.ux_render?.users?.user_write) {
+    // get csrf token from gateway for user form
+    csrf = await GetCsrf(cookies.session ? cookies.session : "");
+
+    if (!csrf) {
+      console.log(
+        `${pageError} CSRF token could not be retrieved for user ${slug}.`
+      );
+      throw new Error(
+        `${pageError} CSRF token could not be retrieved for user ${slug}.`
+      );
+    }
   }
 
   // get user record data from gateway
@@ -78,10 +91,12 @@ export default async function Page({
         <div className="card-title">
           <h2>User Uuid: {<span className="highlight">{user?.id}</span>}</h2>
         </div>
+
         <Suspense fallback={<Loading />}>
           <div className={`card`}>
             <UserForm
               csrf={csrf}
+              editAllowed={cookies.identity?.ux_render?.users?.user_write}
               slug={slug}
               profile={user}
               userEdit={handleUserEdit}
@@ -92,17 +107,20 @@ export default async function Page({
         <div className="card-title">
           <h2>
             Scopes:{" "}
-            <sup>
-              <span className="highlight-info" style={{ fontSize: ".65em" }}>
-                * must click &lsquo;Update Scopes&lsquo; to save changes
-              </span>
-            </sup>
+            {cookies.identity.ux_render?.users?.user_write && (
+              <sup>
+                <span className="highlight-info" style={{ fontSize: ".65em" }}>
+                  * must click &lsquo;Update Scopes&lsquo; to save changes
+                </span>
+              </sup>
+            )}
           </h2>
         </div>
         <Suspense fallback={<Loading />}>
           <div className="card">
             <ScopesManageForm
               csrf={csrf}
+              editAllowed={cookies.identity?.ux_render?.users?.user_write}
               slug={slug}
               entityScopes={user?.scopes}
               menuScopes={allScopes}
