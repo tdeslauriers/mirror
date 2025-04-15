@@ -204,36 +204,7 @@ export async function getAuthCookies(page: string) {
     }
   }
 
-  // check that session is a string
-  let session: string | null = null;
-  if (hasSession) {
-    const sessionParsed = hasSession.value;
-    if (isValidValue(sessionParsed, "string")) {
-      session = sessionParsed;
-    } else {
-      console.log("Session cookie is invalid.");
-      throw new Error(
-        "Session cookie is invalid.  This value is required and cannot be tampered with."
-      );
-    }
-  }
-
-  // check that session is a well formed UUID
-  if (!session) {
-    console.log("Session cookie is missing.");
-    throw new Error(
-      "Session cookie is missing.  This value is required and cannot be tampered with."
-    );
-  } else {
-    const check = checkUuid(session);
-    if (!check.isValid) {
-      const err = "Session cookie is invalid: " + check.messages.join("; ");
-      console.log(err);
-      throw new Error(err);
-    }
-  }
-
-  return { identity: identity, session: session } as UiCookies;
+  return { identity: identity, session: hasSession?.value } as UiCookies;
 }
 
 export async function checkForSessionCookie() {
