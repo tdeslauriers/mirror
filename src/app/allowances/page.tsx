@@ -2,7 +2,7 @@ import Link from "next/link";
 import { Suspense } from "react";
 import Loading from "@/components/loading";
 import AllowancesTable from "./allowances-table";
-import {checkForIdentityCookie} from "@/components/checkCookies";
+import { getAuthCookies } from "@/components/checkCookies";
 import callGatewayData from "@/components/call-gateway-data";
 
 export const metadata = {
@@ -11,12 +11,12 @@ export const metadata = {
 
 export default async function AllowancesPage() {
   // quick for redirect if auth'd cookies not present
-  const cookies = await checkForIdentityCookie("/allowances");
+  const cookies = await getAuthCookies("/allowances");
 
   // get allowances data from gateway
   const allowances = await callGatewayData(
     "/allowances",
-    cookies.session?.value
+    cookies.session
   );
 
   return (

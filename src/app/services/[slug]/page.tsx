@@ -6,7 +6,7 @@ import { handleClientEdit, handleReset, handleScopesUpdate } from "./actions";
 import ResetForm from "@/components/forms/reset-form";
 import ScopesManageForm from "@/components/forms/scopes-manage-form";
 import Link from "next/link";
-import { checkForIdentityCookie } from "@/components/checkCookies";
+import { getAuthCookies } from "@/components/checkCookies";
 import callGatewayData from "@/components/call-gateway-data";
 
 export const metadata = {
@@ -24,12 +24,10 @@ export default async function Page({
   const slug = (await params).slug;
 
   // quick check for redirect if auth'd cookies not present
-  const cookies = await checkForIdentityCookie(`/services/${slug}`);
+  const cookies = await getAuthCookies(`/services/${slug}`);
 
   // get csrf token from gateway for service form
-  const csrf = await GetCsrf(
-    cookies.session?.value ? cookies.session.value : ""
-  );
+  const csrf = await GetCsrf(cookies.session ? cookies.session : "");
 
   if (!csrf) {
     console.log(
@@ -41,13 +39,10 @@ export default async function Page({
   }
 
   // get client record data from gateway
-  const client = await callGatewayData(
-    `/clients/${slug}`,
-    cookies.session?.value
-  );
+  const client = await callGatewayData(`/clients/${slug}`, cookies.session);
 
   // get scopess data from gateway for scopes dropdown
-  const allScopes = await callGatewayData("/scopes", cookies.session?.value);
+  const allScopes = await callGatewayData("/scopes", cookies.session);
 
   return (
     <>

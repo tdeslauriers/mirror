@@ -1,7 +1,7 @@
 import Loading from "@/components/loading";
 import { Suspense } from "react";
 import UserTable from "./user-table";
-import { checkForIdentityCookie } from "@/components/checkCookies";
+import { getAuthCookies } from "@/components/checkCookies";
 import callGatewayData from "@/components/call-gateway-data";
 
 export const metadata = {
@@ -10,10 +10,10 @@ export const metadata = {
 
 export default async function UsersPage() {
   // quick for redirect if auth'd cookies not present
-  const cookies = await checkForIdentityCookie("/users");
+  const cookies = await getAuthCookies("/users");
 
   // get user data from gateway
-  const users = await callGatewayData("/users", cookies.session?.value);
+  const users = await callGatewayData("/users", cookies.session);
 
   return (
     <>

@@ -2,7 +2,7 @@ import Loading from "@/components/loading";
 import { Suspense } from "react";
 import ServicesTable from "./services_table";
 import Link from "next/link";
-import { checkForIdentityCookie } from "@/components/checkCookies";
+import { getAuthCookies } from "@/components/checkCookies";
 import callGatewayData from "@/components/call-gateway-data";
 
 export const metadata = {
@@ -11,10 +11,10 @@ export const metadata = {
 
 export default async function ServicesPage() {
   // quick for redirect if auth'd cookies not present
-  const cookies = await checkForIdentityCookie("/services");
+  const cookies = await getAuthCookies("/services");
 
   // get services data from gateway
-  const clients = await callGatewayData("/clients", cookies.session?.value);
+  const clients = await callGatewayData("/clients", cookies.session);
 
   return (
     <>

@@ -19,7 +19,7 @@ export default function FormSubmit({
   return (
     <>
       <div className={`actions`}>
-        <button type="submit" disabled={status.pending}>
+        <button type="submit" disabled={status.pending }>
           <strong>
             {status.pending ? pending.toUpperCase() : buttonLabel.toUpperCase()}
           </strong>

@@ -6,7 +6,7 @@ import GetCsrf from "@/components/csrf-token";
 import ResetForm from "../../components/forms/reset-form";
 import { Suspense } from "react";
 import Loading from "@/components/loading";
-import { checkForIdentityCookie } from "@/components/checkCookies";
+import { getAuthCookies } from "@/components/checkCookies";
 import callGatewayData from "@/components/call-gateway-data";
 
 export const metadata = {
@@ -17,12 +17,10 @@ const pageError: string = "Failed to load profile page: ";
 
 export default async function ProfilePage() {
   // quick for redirect if auth'd cookies not present
-  const cookies = await checkForIdentityCookie("/profile");
+  const cookies = await getAuthCookies("/profile");
 
   // get csrf token from gateway for profile form
-  const csrf = await GetCsrf(
-    cookies.session?.value ? cookies.session.value : ""
-  );
+  const csrf = await GetCsrf(cookies.session ? cookies.session : "");
 
   if (!csrf) {
     console.log(pageError + "CSRF token could not be retrieved.");
@@ -30,10 +28,7 @@ export default async function ProfilePage() {
   }
 
   // get profile data from gateway
-  const profile: Profile = await callGatewayData(
-    "/profile",
-    cookies.session?.value
-  );
+  const profile: Profile = await callGatewayData("/profile", cookies.session);
 
   return (
     <>

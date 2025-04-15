@@ -104,6 +104,7 @@ tr.no-hover:hover {
 .table-wrapper {
   display: inline-block;
   width: auto;
+  ;
 }
 
 .table-wrapper input {

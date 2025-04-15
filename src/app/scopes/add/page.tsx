@@ -7,7 +7,7 @@ import { handleScopeAdd } from "./actions";
 import Link from "next/link";
 import { Suspense } from "react";
 import Loading from "@/components/loading";
-import { checkForIdentityCookie } from "@/components/checkCookies";
+import { getAuthCookies } from "@/components/checkCookies";
 
 export const metadata = {
   robots: "noindex, nofollow",
@@ -17,12 +17,10 @@ const pageError = "Failed to load scope add page: ";
 
 export default async function ScopesAddPage() {
   // quick for redirect if auth'd cookies not present
-  const cookies = await checkForIdentityCookie("/scopes/add");
+  const cookies = await getAuthCookies("/scopes/add");
 
   // get csrf token from gateway for profile form
-  const csrf = await GetCsrf(
-    cookies.session?.value ? cookies.session.value : ""
-  );
+  const csrf = await GetCsrf(cookies.session ? cookies.session : "");
 
   if (!csrf) {
     console.log(

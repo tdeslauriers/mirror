@@ -5,7 +5,7 @@ import UserForm from "@/components/forms/user-form";
 import Loading from "@/components/loading";
 import { handleScopesUpdate, handleUserEdit } from "./actions";
 import ScopesManageForm from "@/components/forms/scopes-manage-form";
-import { checkForIdentityCookie } from "@/components/checkCookies";
+import { getAuthCookies } from "@/components/checkCookies";
 import callGatewayData from "@/components/call-gateway-data";
 
 export const metadata = {
@@ -23,12 +23,10 @@ export default async function Page({
   const slug = (await params).slug;
 
   // quick for redirect if auth'd cookies not present
-  const cookies = await checkForIdentityCookie(`/users/${slug}`);
+  const cookies = await getAuthCookies(`/users/${slug}`);
 
   // get csrf token from gateway for user form
-  const csrf = await GetCsrf(
-    cookies.session?.value ? cookies.session.value : ""
-  );
+  const csrf = await GetCsrf(cookies.session ? cookies.session : "");
 
   if (!csrf) {
     console.log(
@@ -40,10 +38,10 @@ export default async function Page({
   }
 
   // get user record data from gateway
-  const user = await callGatewayData(`/users/${slug}`, cookies.session?.value);
+  const user = await callGatewayData(`/users/${slug}`, cookies.session);
 
   // get scopess data from gateway for scopes dropdown
-  const allScopes = await callGatewayData("/scopes", cookies.session?.value);
+  const allScopes = await callGatewayData("/scopes", cookies.session);
 
   return (
     <>

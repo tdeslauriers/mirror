@@ -27,7 +27,7 @@ const PASSWORD_KEYBOARD_SEQUENCES: string[] = [
 ];
 
 export const NAME_MIN_LENGTH = 1;
-export const NAME_MAX_LENGTH = 32;
+export const NAME_MAX_LENGTH = 64;  // needed because of 'fullname' field in cookies
 const NAME_REGEX: RegExp = /^[a-zA-Z_'-\s]+$/;
 
 const UUID_REGEX =

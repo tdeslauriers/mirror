@@ -4,7 +4,7 @@ import Loading from "@/components/loading";
 import Link from "next/link";
 import { Suspense } from "react";
 import { handleAllowanceEdit } from "./actions";
-import {checkForIdentityCookie, UiCookies } from "@/components/checkCookies";
+import { getAuthCookies, UiCookies } from "@/components/checkCookies";
 import callGatewayData from "@/components/call-gateway-data";
 import { Allowance } from "@/components/forms";
 
@@ -23,13 +23,11 @@ export default async function Page({
   const slug = (await params).slug;
 
   // quick for redirect if auth'd cookies not present
-  const cookies: UiCookies = await checkForIdentityCookie(
-    `/allowances/${slug}`
-  );
+  const cookies: UiCookies = await getAuthCookies(`/allowances/${slug}`);
 
   // get csrf token from gateway for allowance form updates
   const csrf = await GetCsrf(
-    cookies.session?.value ? cookies.session.value : ""
+    cookies.session? cookies.session : ""
   );
 
   if (!csrf) {
@@ -44,7 +42,7 @@ export default async function Page({
   // get allowance account data from gateway
   const allowance: Allowance = await callGatewayData(
     `/allowances/${slug}`,
-    cookies.session?.value
+    cookies.session
   );
 
   return (

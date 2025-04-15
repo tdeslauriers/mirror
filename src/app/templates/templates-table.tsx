@@ -41,9 +41,9 @@ export default function TemplatesTable({ data }: TemplatesTableProps) {
       sortable: true,
       render: (value: TaskTemplate[keyof TaskTemplate]) => (
         <div title={cadenceTitle(value as string)}>
-          <span>{value as string}</span>{" "}
-          <sup style={{ fontSize: "0.7rem" }}>
-            <span className="highlight">*info</span>
+          <span>{value as string}</span>
+          <sup>
+            <span className="highlight">*</span>
           </sup>
         </div>
       ),
@@ -60,6 +60,7 @@ export default function TemplatesTable({ data }: TemplatesTableProps) {
               {(value as AllowanceUser[]).map((assignee, index) => (
                 <li
                   key={assignee.username}
+                  title={`see all of ${assignee.firstname}'s tasks`}
                   style={
                     index < (value as AllowanceUser[]).length - 1
                       ? { marginBottom: "0.5rem" }
@@ -73,6 +74,9 @@ export default function TemplatesTable({ data }: TemplatesTableProps) {
                   >
                     {assignee.firstname} {assignee.lastname}
                   </Link>
+                  <sup>
+                    <span className="highlight">*</span>
+                  </sup>
                 </li>
               ))}
             </ul>

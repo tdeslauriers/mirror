@@ -16,7 +16,7 @@ export default function AllowancesTable({ data }: AllowanceTableProps) {
 
   const columns: TableColumn<Allowance>[] = [
     {
-      header: "Username",
+      header: "Account/Remittee",
       accessor: "username" as keyof Allowance,
       sortable: true,
       render: (value: Allowance[keyof Allowance], row: Allowance) => (
@@ -121,5 +121,3 @@ export default function AllowancesTable({ data }: AllowanceTableProps) {
     </div>
   );
 }
-
-

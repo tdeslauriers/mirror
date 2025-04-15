@@ -2,7 +2,7 @@ import callGatewayData from "@/components/call-gateway-data";
 
 import Link from "next/link";
 import TemplatesTable from "./templates-table";
-import { checkForIdentityCookie, UiCookies } from "@/components/checkCookies";
+import { getAuthCookies, UiCookies } from "@/components/checkCookies";
 
 export const metadata = {
   robots: "noindex, nofollow",
@@ -10,10 +10,10 @@ export const metadata = {
 
 export default async function TemplatesPage() {
   // quick for redirect if auth'd cookies not present
-  const cookies: UiCookies = await checkForIdentityCookie("/templates");
+  const cookies: UiCookies = await getAuthCookies("/templates");
 
   // get template data from gateway
-  const templates = await callGatewayData("/templates", cookies.session?.value);
+  const templates = await callGatewayData("/templates", cookies.session);
 
   return (
     <>
@@ -30,7 +30,7 @@ export default async function TemplatesPage() {
           >
             <h1>Task Templates and Assignments</h1>
             <Link href="/templates/add">
-              <button>Add Task</button>
+              <button>Add Task/Template</button>
             </Link>
           </div>
         </div>
@@ -46,7 +46,7 @@ export default async function TemplatesPage() {
               task record to interact with on the cadence recurrance.
             </li>
             <li style={{ margin: ".5rem" }}>
-              Ad Hoc task templates will be archived upon closure of the task
+              Ad hoc task templates will be archived upon closure of the task
               record, and will no longer show in this table.
             </li>
           </ul>

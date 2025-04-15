@@ -4,8 +4,9 @@ import { handleScopeEdit } from "./actions";
 import { Suspense } from "react";
 import Loading from "@/components/loading";
 import Link from "next/link";
-import { checkForIdentityCookie } from "@/components/checkCookies";
+import { getAuthCookies } from "@/components/checkCookies";
 import callGatewayData from "@/components/call-gateway-data";
+import { IdentityCookie } from "@/app/api";
 
 export const metadata = {
   robots: "noindex, nofollow",
@@ -22,12 +23,10 @@ export default async function Page({
   const slug = (await params).slug;
 
   // quick for redirect if auth'd cookies not present
-  const cookies = await checkForIdentityCookie(`/scopes/${slug}`);
+  const cookies = await getAuthCookies(`/scopes/${slug}`);
 
   // get csrf token from gateway for scope form
-  const csrf = await GetCsrf(
-    cookies.session?.value ? cookies.session.value : ""
-  );
+  const csrf = await GetCsrf(cookies.session ? cookies.session : "");
 
   if (!csrf) {
     console.log(
@@ -39,10 +38,7 @@ export default async function Page({
   }
 
   // get scope record data from gateway
-  const scope = await callGatewayData(
-    `/scopes/${slug}`,
-    cookies.session?.value
-  );
+  const scope = await callGatewayData(`/scopes/${slug}`, cookies.session);
 
   return (
     <>

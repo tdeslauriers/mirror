@@ -30,6 +30,7 @@ export default function ScopeForm({
     formData: FormData
   ) => ScopeActionCmd | Promise<ScopeActionCmd>;
 }) {
+
   const [scopeState, formAction] = useActionState(scopeFormUpdate, {
     csrf: csrf,
     slug: slug,

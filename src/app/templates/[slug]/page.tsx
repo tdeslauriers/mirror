@@ -1,5 +1,5 @@
 import callGatewayData from "@/components/call-gateway-data";
-import { checkForIdentityCookie } from "@/components/checkCookies";
+import { getAuthCookies } from "@/components/checkCookies";
 import GetCsrf from "@/components/csrf-token";
 import { AllowanceUser } from "@/components/forms";
 import TemplateForm from "@/components/forms/task-template-form";
@@ -22,12 +22,10 @@ export default async function TemplatesPage({
   const slug = (await params).slug;
 
   // quick check for redirect if auth'd cookies not present
-  const cookies = await checkForIdentityCookie(`/templates/${slug}`);
+  const cookies = await getAuthCookies(`/templates/${slug}`);
 
   // get csrf token from gateway for service form
-  const csrf = await GetCsrf(
-    cookies.session?.value ? cookies.session.value : ""
-  );
+  const csrf = await GetCsrf(cookies.session ? cookies.session : "");
 
   if (!csrf) {
     console.log(
@@ -41,13 +39,10 @@ export default async function TemplatesPage({
   // get list of assignees for form dropdown
   const assignees: AllowanceUser[] = await callGatewayData(
     "/templates/assignees",
-    cookies.session?.value
+    cookies.session
   );
 
-  const template = await callGatewayData(
-    `/templates/${slug}`,
-    cookies.session?.value
-  );
+  const template = await callGatewayData(`/templates/${slug}`, cookies.session);
 
   return (
     <>

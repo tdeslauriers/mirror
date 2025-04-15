@@ -4,7 +4,7 @@ import TemplateForm from "@/components/forms/task-template-form";
 import Loading from "@/components/loading";
 import Link from "next/link";
 import { Suspense } from "react";
-import { checkForIdentityCookie } from "@/components/checkCookies";
+import { getAuthCookies } from "@/components/checkCookies";
 import callGatewayData from "@/components/call-gateway-data";
 import { handleTemplateAdd } from "./actions";
 
@@ -16,12 +16,10 @@ const pageError = "Failed to load task template add page: ";
 
 export default async function AddPage() {
   // quick for redirect if auth'd cookies not present
-  const cookies = await checkForIdentityCookie("/templates/add");
+  const cookies = await getAuthCookies("/templates/add");
 
   // get csrf token from gateway for template form submission
-  const csrf = await GetCsrf(
-    cookies.session?.value ? cookies.session.value : ""
-  );
+  const csrf = await GetCsrf(cookies.session ? cookies.session : "");
 
   if (!csrf) {
     console.log(
@@ -35,7 +33,7 @@ export default async function AddPage() {
   // get list of assignees for form dropdown
   const assignees: AllowanceUser[] = await callGatewayData(
     "/templates/assignees",
-    cookies.session?.value
+    cookies.session
   );
 
   return (

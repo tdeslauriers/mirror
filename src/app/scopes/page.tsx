@@ -2,7 +2,7 @@ import Loading from "@/components/loading";
 import { Suspense } from "react";
 import ScopesTable from "./scopes_table";
 import Link from "next/link";
-import { checkForIdentityCookie } from "@/components/checkCookies";
+import { getAuthCookies } from "@/components/checkCookies";
 import callGatewayData from "@/components/call-gateway-data";
 
 export const metadata = {
@@ -11,10 +11,10 @@ export const metadata = {
 
 export default async function ScopesPage() {
   // quick for redirect if auth'd cookies not present
-  const cookies = await checkForIdentityCookie("/scopes");
+  const cookies = await getAuthCookies("/scopes");
 
   // get scoeps data from gateway
-  const scopes = await callGatewayData("/scopes", cookies.session?.value);
+  const scopes = await callGatewayData("/scopes", cookies.session);
 
   return (
     <>

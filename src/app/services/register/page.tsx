@@ -8,7 +8,7 @@ import { Suspense } from "react";
 import ClientRegistrationForm from "@/components/forms/client-registration-form";
 import handleClientRegister from "./actions";
 import Link from "next/link";
-import { checkForIdentityCookie } from "@/components/checkCookies";
+import { getAuthCookies } from "@/components/checkCookies";
 
 export const metadata = {
   robots: "noindex, nofollow",
@@ -18,12 +18,10 @@ const pageError = "Failed to load /services/register page: ";
 
 export default async function Page() {
   // quick for redirect if auth'd cookies not present
-  const cookies = await checkForIdentityCookie("/services/register");
+  const cookies = await getAuthCookies("/services/register");
 
   // get csrf token from gateway for profile form
-  const csrf = await GetCsrf(
-    cookies.session?.value ? cookies.session.value : ""
-  );
+  const csrf = await GetCsrf(cookies.session ? cookies.session : "");
 
   if (!csrf) {
     console.log(

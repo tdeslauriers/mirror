@@ -5,7 +5,7 @@ import { Suspense } from "react";
 import AddAllowanceForm from "./add-allowance-form";
 import { handleAddAllowance } from "./actions";
 import { AllowanceUser } from "@/components/forms";
-import { checkForIdentityCookie, UiCookies } from "@/components/checkCookies";
+import { getAuthCookies, UiCookies } from "@/components/checkCookies";
 import callGatewayData from "@/components/call-gateway-data";
 
 export const metadata = {
@@ -16,12 +16,10 @@ const pageError = "Failed to load allowance add page: ";
 
 export default async function Page() {
   // quick for redirect if auth'd cookies not present
-  const cookies: UiCookies = await checkForIdentityCookie("/allowances/add");
+  const cookies: UiCookies = await getAuthCookies("/allowances/add");
 
   // get csrf token from gateway for profile form
-  const csrf = await GetCsrf(
-    cookies.session?.value ? cookies.session.value : ""
-  );
+  const csrf = await GetCsrf(cookies.session ? cookies.session : "");
 
   if (!csrf) {
     console.log(
@@ -36,7 +34,7 @@ export default async function Page() {
   const users: AllowanceUser[] = await callGatewayData(
     "/users",
 
-    cookies.session?.value
+    cookies.session
   );
 
   return (
