@@ -28,7 +28,10 @@ export default async function ProfilePage() {
   }
 
   // get profile data from gateway
-  const profile: Profile = await callGatewayData("/profile", cookies.session);
+  const profile: Profile = await callGatewayData({
+    endpoint: "/profile",
+    session: cookies.session,
+  });
 
   return (
     <>

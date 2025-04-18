@@ -48,7 +48,10 @@ export default async function Page({
   }
 
   // get scope record data from gateway
-  const scope = await callGatewayData(`/scopes/${slug}`, cookies.session);
+  const scope = await callGatewayData({
+    endpoint: `/scopes/${slug}`,
+    session: cookies.session,
+  });
 
   return (
     <>

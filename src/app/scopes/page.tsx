@@ -23,7 +23,10 @@ export default async function ScopesPage() {
   }
 
   // get scoeps data from gateway
-  const scopes = await callGatewayData("/scopes", cookies.session);
+  const scopes = await callGatewayData({
+    endpoint: "/scopes",
+    session: cookies.session,
+  });
 
   return (
     <>

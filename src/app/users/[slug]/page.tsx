@@ -51,10 +51,16 @@ export default async function Page({
   }
 
   // get user record data from gateway
-  const user = await callGatewayData(`/users/${slug}`, cookies.session);
+  const user = await callGatewayData({
+    endpoint: `/users/${slug}`,
+    session: cookies.session,
+  });
 
   // get scopess data from gateway for scopes dropdown
-  const allScopes = await callGatewayData("/scopes", cookies.session);
+  const allScopes = await callGatewayData({
+    endpoint: "/scopes",
+    session: cookies.session,
+  });
 
   return (
     <>

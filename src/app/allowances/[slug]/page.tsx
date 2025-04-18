@@ -38,10 +38,10 @@ export default async function Page({
   }
 
   // get allowance account data from gateway
-  const allowance: Allowance = await callGatewayData(
-    `/allowances/${slug}`,
-    cookies.session
-  );
+  const allowance: Allowance = await callGatewayData({
+    endpoint: `/allowances/${slug}`,
+    session: cookies.session,
+  });
 
   let csrf: string | null = null;
   if (cookies.identity && cookies.identity.ux_render?.tasks?.allowances_write) {

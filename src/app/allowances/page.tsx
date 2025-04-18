@@ -28,7 +28,10 @@ export default async function AllowancesPage() {
   }
 
   // get allowances data from gateway
-  const allowances = await callGatewayData("/allowances", cookies.session);
+  const allowances = await callGatewayData({
+    endpoint: "/allowances",
+    session: cookies.session,
+  });
 
   return (
     <>

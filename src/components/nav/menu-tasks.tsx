@@ -54,6 +54,18 @@ export default function MenuTasks({
                   </Link>
                 </li>
               )}
+
+              {render && render.tasks?.tasks_read && (
+                <li>
+                  <Link
+                    className={`locallink`}
+                    href={"/tasks?view=today"}
+                    onClick={linkClick}
+                  >
+                    Today: All Tasks
+                  </Link>
+                </li>
+              )}
             </ul>
           </div>
         )}

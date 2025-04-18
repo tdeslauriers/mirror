@@ -24,7 +24,10 @@ export default async function UsersPage() {
   }
 
   // get user data from gateway
-  const users = await callGatewayData("/users", cookies.session);
+  const users = await callGatewayData({
+    endpoint: "/users",
+    session: cookies.session,
+  });
 
   return (
     <>

@@ -24,7 +24,7 @@ export default async function TemplatesPage() {
   }
 
   // get template data from gateway
-  const templates = await callGatewayData("/templates", cookies.session);
+  const templates = await callGatewayData({endpoint: "/templates", session: cookies.session});
 
   return (
     <>

@@ -27,7 +27,7 @@ export type TaskTemplateCmd = {
   assignees?: string[]; // only the usernames sent to the gateway
 };
 
-export const cadence: string[] = [
+export const TaskCadence: string[] = [
   "ADHOC",
   "DAILY",
   "WEEKLY",
@@ -36,7 +36,7 @@ export const cadence: string[] = [
   "ANNUALLY",
 ];
 
-export const category: string[] = [
+export const TaskCategory: string[] = [
   "BILLS",
   "CAR",
   "DEV",
@@ -98,7 +98,7 @@ export function validateTaskTemplate(template: TaskTemplate): {
   }
 
   // check if category is from the list
-  if (template.category && !category.includes(template.category)) {
+  if (template.category && !TaskCategory.includes(template.category)) {
     errors.category = ["Category is not valid selection"];
   }
 
@@ -107,7 +107,7 @@ export function validateTaskTemplate(template: TaskTemplate): {
   }
 
   // check if cadence is from the list
-  if (template.cadence && !cadence.includes(template.cadence)) {
+  if (template.cadence && !TaskCadence.includes(template.cadence)) {
     errors.cadence = ["Cadence is not valid selection"];
   }
 

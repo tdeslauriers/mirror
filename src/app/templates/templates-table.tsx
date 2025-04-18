@@ -1,7 +1,7 @@
 "use client";
 
 import { Suspense, useState } from "react";
-import { cadence, cadenceTitle, TaskTemplate } from ".";
+import { TaskCadence, cadenceTitle, TaskTemplate } from ".";
 import { access } from "fs";
 import Table, { TableColumn } from "@/components/table";
 import Link from "next/link";

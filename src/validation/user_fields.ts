@@ -1,7 +1,8 @@
 // regex's that for input validation of profile  type data
 export const EMAIL_MIN_LENGTH = 6;
 export const EMAIL_MAX_LENGTH = 254; // RFC 5321
-const EMAIL_REGEX: RegExp = /^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z]+$/;
+export const EMAIL_REGEX: RegExp =
+  /^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z]+$/;
 
 export const PASSWORD_MIN_LENGTH = 16;
 export const PASSWORD_MAX_LENGTH = 64;
@@ -27,10 +28,10 @@ const PASSWORD_KEYBOARD_SEQUENCES: string[] = [
 ];
 
 export const NAME_MIN_LENGTH = 1;
-export const NAME_MAX_LENGTH = 64;  // needed because of 'fullname' field in cookies
+export const NAME_MAX_LENGTH = 64; // needed because of 'fullname' field in cookies
 const NAME_REGEX: RegExp = /^[a-zA-Z_'-\s]+$/;
 
-const UUID_REGEX =
+export const UUID_REGEX =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
 export type FieldValidation = {

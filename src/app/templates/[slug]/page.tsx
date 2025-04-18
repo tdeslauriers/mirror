@@ -49,12 +49,15 @@ export default async function TemplatesPage({
   }
 
   // get list of assignees for form dropdown
-  const assignees: AllowanceUser[] = await callGatewayData(
-    "/templates/assignees",
-    cookies.session
-  );
+  const assignees: AllowanceUser[] = await callGatewayData({
+    endpoint: "/templates/assignees",
+    session: cookies.session,
+  });
 
-  const template = await callGatewayData(`/templates/${slug}`, cookies.session);
+  const template = await callGatewayData({
+    endpoint: `/templates/${slug}`,
+    session: cookies.session,
+  });
 
   return (
     <>

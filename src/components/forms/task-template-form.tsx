@@ -1,6 +1,6 @@
 "use client";
 
-import { cadence, category, TaskTemplate } from "@/app/templates";
+import { TaskCadence, TaskCategory, TaskTemplate } from "@/app/templates";
 import { AllowanceUser, TemplateActionCmd } from ".";
 import { useActionState, useEffect, useState } from "react";
 import ErrorField from "../errors/error-field";
@@ -169,7 +169,7 @@ export default function TemplateForm({
               <option key="no-category-selected" value="">
                 Select Category...
               </option>
-              {category.map((c) => (
+              {TaskCategory.map((c) => (
                 <option key={c} value={c}>
                   {c}
                 </option>
@@ -195,7 +195,7 @@ export default function TemplateForm({
               <option key="no-cadence-selected" value="">
                 Select Cadence...
               </option>
-              {cadence.map((c) => (
+              {TaskCadence.map((c) => (
                 <option key={c} value={c}>
                   {c}
                 </option>

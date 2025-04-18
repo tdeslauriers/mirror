@@ -43,11 +43,10 @@ export default async function Page() {
   }
 
   // get user data from gateway
-  const users: AllowanceUser[] = await callGatewayData(
-    "/users",
-
-    cookies.session
-  );
+  const users: AllowanceUser[] = await callGatewayData({
+    endpoint: "/users",
+    session: cookies.session,
+  });
 
   return (
     <>

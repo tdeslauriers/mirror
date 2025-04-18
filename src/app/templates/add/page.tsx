@@ -43,10 +43,10 @@ export default async function AddPage() {
   }
 
   // get list of assignees for form dropdown
-  const assignees: AllowanceUser[] = await callGatewayData(
-    "/templates/assignees",
-    cookies.session
-  );
+  const assignees: AllowanceUser[] = await callGatewayData({
+    endpoint: "/templates/assignees",
+    session: cookies.session,
+  });
 
   return (
     <>

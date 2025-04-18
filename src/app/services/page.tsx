@@ -21,7 +21,10 @@ export default async function ServicesPage() {
   }
 
   // get services data from gateway
-  const clients = await callGatewayData("/clients", cookies.session);
+  const clients = await callGatewayData({
+    endpoint: "/clients",
+    session: cookies.session,
+  });
 
   return (
     <>
