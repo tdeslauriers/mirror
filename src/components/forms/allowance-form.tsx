@@ -6,6 +6,7 @@ import FormSubmit from "./form-submit";
 import ErrorField from "../errors/error-field";
 import { convertCentsToDollars } from "@/app/allowances";
 import { Allowance, AllowanceActionCmd } from ".";
+import { all } from "axios";
 
 export default function AllowanceForm({
   csrf,
@@ -79,7 +80,7 @@ export default function AllowanceForm({
               <span
                 className={
                   isDisabled(allowanceState.allowance)
-                    ? "highlight-error"
+                    ? "highlight-disabled"
                     : "highlight"
                 }
                 style={{ fontSize: ".65rem" }}
@@ -114,8 +115,9 @@ export default function AllowanceForm({
             <sup>
               <span
                 className={
-                  isDisabled(allowanceState.allowance)
-                    ? "highlight-error"
+                  isDisabled(allowanceState.allowance) ||
+                  allowanceState.allowance?.balance === 0
+                    ? "highlight-disabled"
                     : "highlight"
                 }
                 style={{ fontSize: ".65rem" }}
@@ -131,7 +133,8 @@ export default function AllowanceForm({
           )}
           <input
             className={`${
-              isDisabled(allowanceState.allowance)
+              isDisabled(allowanceState.allowance) ||
+              allowanceState.allowance?.balance === 0
                 ? style.disabled
                 : style.account
             }`}
@@ -149,7 +152,11 @@ export default function AllowanceForm({
                 : 0
             }
             defaultValue={allowanceState?.debit || 0}
-            disabled={isDisabled(allowanceState.allowance) || !editAllowed}
+            disabled={
+              isDisabled(allowanceState.allowance) ||
+              !editAllowed ||
+              allowanceState.allowance?.balance === 0
+            }
           />
         </div>
       </div>

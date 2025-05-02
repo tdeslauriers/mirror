@@ -33,6 +33,7 @@ export async function handleTemplateAdd(
     description: formData.get("description") as string,
     cadence: formData.get("cadence") as string,
     category: formData.get("category") as string,
+    is_calculated: formData.get("is_calculated") === "on" ? true : false,
     // slug omitted
     // created_at omitted
     is_archived: formData.get("is_archived") === "on" ? true : false,
@@ -68,6 +69,7 @@ export async function handleTemplateAdd(
     description: add.description,
     cadence: add.cadence,
     category: add.category,
+    is_calculated: add.is_calculated,
     is_archived: add.is_archived,
     assignees: usernames,
   };

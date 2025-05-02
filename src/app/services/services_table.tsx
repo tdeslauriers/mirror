@@ -42,43 +42,64 @@ export default function ServicesTable({ data }: ServicesTableProps) {
       ) => <>{(value as string).split("T")[0]}</>,
     },
     {
-      header: "Enabled",
+      header: "Enabled?",
       accessor: "enabled" as keyof ServiceClient,
       sortable: false,
       render: (value: ServiceClient[keyof ServiceClient]) => (
         <>
           {value ? (
-            <span>Enabled</span>
+            <span className="highlight" aria-label="enabled">
+              ✔️
+            </span>
           ) : (
-            <span className="highlight-error no-hover">Disabled</span>
+            <span
+              className="highlight-error no-hover-error"
+              aria-label="disabled"
+            >
+              ❌
+            </span>
           )}
         </>
       ),
     },
     {
-      header: "Account expired",
+      header: "Expired?",
       accessor: "account_expired" as keyof ServiceClient,
       sortable: false,
       render: (value: ServiceClient[keyof ServiceClient]) => (
         <>
           {value ? (
-            <span className="highlight-error no-hover">Expired</span>
+            <span
+              className="highlight-error no-hover-disabled"
+              aria-label="expired"
+            >
+              Expired
+            </span>
           ) : (
-            <span>Active</span>
+            <span className="highlight" aria-label="active">
+              Active
+            </span>
           )}
         </>
       ),
     },
     {
-      header: "Account Locked",
+      header: "Locked?",
       accessor: "account_locked" as keyof ServiceClient,
       sortable: false,
       render: (value: ServiceClient[keyof ServiceClient]) => (
         <>
           {value ? (
-            <span className="highlight-error no-hover">Locked</span>
+            <span
+              className="highlight-error no-hover-error"
+              aria-label="locked"
+            >
+              🔒
+            </span>
           ) : (
-            <span>Unlocked</span>
+            <span className="highlight" aria-label="Unlocked">
+              🔓
+            </span>
           )}
         </>
       ),

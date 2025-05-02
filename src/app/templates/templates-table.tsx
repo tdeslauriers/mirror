@@ -48,6 +48,40 @@ export default function TemplatesTable({ data }: TemplatesTableProps) {
         </div>
       ),
     },
+    {
+      header: "Calculated?",
+      accessor: "is_calculated" as keyof TaskTemplate,
+      sortable: false,
+      render: (value: TaskTemplate[keyof TaskTemplate]) => (
+        <span
+          className={
+            value === true
+              ? "highlight"
+              : "highlight-disabled no-hover-disabled"
+          }
+          aria-label={value ? "Calculated" : "Not Calculated"}
+        >
+          {value ? "💲" : "❌"}
+        </span>
+      ),
+    },
+    {
+      header: "Archived?",
+      accessor: "is_archived" as keyof TaskTemplate,
+      sortable: false,
+      render: (value: TaskTemplate[keyof TaskTemplate]) => (
+        <span
+          className={
+            value === true
+              ? "highlight-disabled no-hover-disabled"
+              : "highlight"
+          }
+          aria-label={value ? "Archived" : "Active"}
+        >
+          {value ? "📦" : "Active"}
+        </span>
+      ),
+    },
 
     {
       header: "Assignees",
@@ -81,7 +115,7 @@ export default function TemplatesTable({ data }: TemplatesTableProps) {
               ))}
             </ul>
           ) : (
-            <span className="highlight-error no-hover">Unassigned</span>
+            <span className="highlight-error no-hover-error">Unassigned</span>
           )}
         </>
       ),
@@ -102,13 +136,7 @@ export default function TemplatesTable({ data }: TemplatesTableProps) {
           data={data}
           columns={columns}
           search={search}
-          filterKeys={[
-            "name",
-            "description",
-            "category",
-            "cadence",
-            "is_archived",
-          ]}
+          filterKeys={["name", "description", "category", "cadence"]}
           pageSize={10}
         />
       </Suspense>

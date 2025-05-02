@@ -29,6 +29,9 @@
   --error-site-color: rgb(255, 45, 3);
   --error-site-fade: rgb(168, 31, 4);
 
+  --disabled-site-color: rgb(104, 106, 104);
+  --disabled-site-fade: rgb(159, 164, 159);
+
   --primary-glow: radial-gradient(rgba(21, 255, 0, 0.4), rgba(1, 65, 255, 0));
   --secondary-glow: linear-gradient(
     to top right,
@@ -70,6 +73,9 @@
 
   --error-site-color: rgb(255, 45, 3);
   --error-site-fade: rgb(254, 126, 100);
+
+  --disabled-site-color: rgb(104, 106, 104);
+  --disabled-site-fade: rgb(159, 164, 159);
 
   --primary-menutext-color: rgb(159, 164, 159);
 
@@ -128,6 +134,16 @@
   --highlight-error-glow: 0 0 10px var(--error-site-color),
     0 0 20px var(--error-site-color), 0 0 30px var(--error-site-color),
     0 0 40px var(--error-site-color);
+
+  --highlight-disabled: linear-gradient(
+    to left,
+    var(--disabled-site-color),
+    var(--disabled-site-fade)
+  );
+
+  --highlight-disabled-glow: 0 0 10px var(--disabled-site-color),
+    0 0 20px var(--disabled-site-color), 0 0 30px var(--disabled-site-color),
+    0 0 40px var(--disabled-site-color);
 }
 
 * {
@@ -180,6 +196,15 @@ span.highlight-error {
 
 span.highlight-info {
   background: var(--highlight-info);
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+  font-weight: bold;
+}
+
+span.highlight-disabled {
+  background: var(--highlight-disabled);
   background-clip: text;
   -webkit-background-clip: text;
   color: transparent;

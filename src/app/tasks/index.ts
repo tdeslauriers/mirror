@@ -1,4 +1,3 @@
-import { error } from "console";
 import { AllowanceUser } from "@/components/forms";
 import { EMAIL_REGEX, UUID_REGEX } from "@/validation/user_fields";
 import { TaskCadence, TaskCategory } from "../templates";
@@ -12,11 +11,13 @@ export type Task = {
   category?: string; // from template
   created_at?: string; // from task
   is_complete?: boolean; // from task
+  completed_at?: string; // from task
   is_satisfactory?: boolean; // from task
   is_proactive?: boolean; // from task
-  slug?: string; // from task
+  task_slug?: string; // from task
   is_archived?: boolean; // from task
-  assignees?: AllowanceUser;
+  allowance_slug?: string; // allowance
+  assignee?: AllowanceUser;
 };
 
 // Allowed query params for the tasks page
@@ -184,9 +185,9 @@ function validateAssignee(assignee: string) {
   }
 
   if (
-    !UUID_REGEX.test(assignee.trim()) ||
-    !EMAIL_REGEX.test(assignee.trim()) ||
-    !AssigneeCodes.includes(assignee.trim())
+    !UUID_REGEX.test(assignee.trim().toLowerCase()) &&
+    !EMAIL_REGEX.test(assignee.trim().toLowerCase()) &&
+    !AssigneeCodes.includes(assignee.trim().toLowerCase())
   ) {
     console.log(
       "Assignee param must be a valid UUID, email address, or known shorthand code like 'me' or 'all'"
@@ -229,4 +230,23 @@ function validateBoolParam(param: string | string[]) {
   }
 
   return errors;
+}
+
+// TaskStatusCmd is the command object for updating task status
+export type TaskStatusCmd = {
+  csrf: string; // csrf token
+  task_slug: string; // task slug
+  status: string; // task status
+};
+
+// allowed statuses
+export function validateStatus(status: string) {
+  if (
+    status !== "is_complete" &&
+    status !== "is_satisfactory" &&
+    status !== "is_proactive"
+  ) {
+    console.log("Invalid status: ", status);
+    throw new Error("Invalid status: " + status);
+  }
 }

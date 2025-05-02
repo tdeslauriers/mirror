@@ -1,0 +1,89 @@
+.taskcard {
+  display: block;
+  width: 40vw;
+  height: 100%;
+  padding: 0.5rem 1rem 0.75rem;
+  border: 1px solid var(--primary-border-color);
+  border-radius: 4px;
+  box-shadow: 1px 0 55px rgba(7, 8, 7, 0.5);
+  margin: 2rem;
+}
+
+.row {
+  display: flex;
+  margin: 1rem 0 1rem;
+  font-size: 1.25rem;
+  justify-content: space-between;
+}
+
+.title {
+  font-size: 1.5rem;
+}
+
+.metadata {
+  font-size: 0.9rem;
+}
+
+.box {
+  display: flex;
+
+  align-items: center;
+  justify-content: left;
+  width: 100%;
+
+  font-family: "Montserrat", sans-serif;
+}
+
+.right {
+  justify-content: right;
+
+  align-items: right;
+  display: column;
+}
+
+.status {
+  width: auto;
+}
+
+.status button {
+  width: auto;
+  padding: 0.5rem 1rem;
+  font-size: 1rem;
+}
+
+.status button:disabled {
+  color: rgb(var(--foreground-rgb));
+  background: linear-gradient(
+    90deg,
+    var(--primary-site-fade),
+    var(--primary-site-color)
+  );
+  cursor: not-allowed;
+}
+.status button:hover:disabled,
+.status button:focus:disabled {
+  background: #ccc;
+  color: #979797;
+  cursor: not-allowed;
+}
+
+@media (max-width: 700px) {
+  .row {
+    flex-direction: column;
+  }
+
+  .box {
+    justify-content: left;
+    align-items: left;
+    /* margin-bottom: 1rem; */
+  }
+
+  .status {
+    width: 100%;
+  }
+  .status button {
+    width: 100%;
+    padding: 0.5rem 1rem;
+    font-size: 1rem;
+  }
+}

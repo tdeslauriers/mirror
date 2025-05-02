@@ -49,15 +49,15 @@ export default function ScopesTable({ data }: ScopesTableProps) {
       ),
     },
     {
-      header: "Active",
+      header: "Active?",
       accessor: "active" as keyof Scope,
       sortable: false,
       render: (value: Scope[keyof Scope]) => (
         <>
           {value ? (
-            <span>Active</span>
+            <span className="highlight no-hover">✔️</span>
           ) : (
-            <span className="highlight-error no-hover">Inactive</span>
+            <span className="highlight-disabled no-hover-disabled">❌</span>
           )}
         </>
       ),

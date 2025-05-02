@@ -77,8 +77,6 @@ input[type="checkbox"]:focus {
   justify-content: space-between;
 }
 
-
-
 .date {
   width: 100%;
 }
@@ -139,10 +137,10 @@ span.highlightError {
 }
 
 .actionsError button {
-  margin-top: 1rem;
+  /* margin-top: 1rem; */
   border: 0;
   border: none;
-  border-radius: 2px;
+  border-radius: 4px;
   padding: 0.75rem 2rem;
   background: linear-gradient(
     90deg,
@@ -153,7 +151,9 @@ span.highlightError {
   cursor: pointer;
   font: inherit;
   font-size: 1.25rem;
+  font-weight: bold;
   text-transform: uppercase;
+  color: rgb(var(--foreground-rgb));
 }
 
 .actionsError button:hover,
@@ -228,6 +228,16 @@ span.highlightError {
 
   .checkbox-row input[type="checkbox"] {
     margin-bottom: 1.5rem;
+  }
+
+  .actionsError {
+    flex-direction: column;
+  }
+
+  .actionsError button {
+    width: 100%;
+    margin-top: 0.5rem;
+    margin-bottom: 0.5rem;
   }
 }
 

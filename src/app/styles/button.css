@@ -58,22 +58,26 @@
 
 @keyframes glow-input-fix {
   0% {
-    box-shadow: 0 0 5px var(--info-site-color), 0 0 10px var(--info-site-color),
-      0 0 15px var(--info-site-color), 0 0 20px var(--info-site-color);
+    box-shadow: 0 0 5px var(--disabled-site-color),
+      0 0 10px var(--disabled-site-color), 0 0 15px var(--disabled-site-color),
+      0 0 20px var(--disabled-site-color);
   }
   100% {
-    box-shadow: 0 0 10px var(--info-site-color), 0 0 20px var(--info-site-color),
-      0 0 30px var(--info-site-color), 0 0 40px var(--info-site-color);
+    box-shadow: 0 0 10px var(--disabled-site-color),
+      0 0 20px var(--disabled-site-color), 0 0 30px var(--disabled-site-color),
+      0 0 40px var(--disabled-site-color);
   }
 }
 
 @media (max-width: 700px) {
   .actions {
     flex-direction: column;
+    
   }
 
   .actions button {
-    margin-top: 1rem;
-    margin-bottom: 1rem;
+    width: 100%;
+    margin-top: .5rem;
+    margin-bottom: .5rem;
   }
 }

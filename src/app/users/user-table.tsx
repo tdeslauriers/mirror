@@ -54,43 +54,61 @@ export default function UserTable({ data }: UserTableProps) {
       ),
     },
     {
-      header: "Enabled",
+      header: "Enabled?",
       accessor: "enabled" as keyof User,
       sortable: false,
       render: (value: User[keyof User]) => (
         <>
           {value ? (
-            <span>Enabled</span>
+            <span className="highlight" aria-label="enabled">
+              ✔️
+            </span>
           ) : (
-            <span className="highlight-error no-hover">Disabled</span>
+            <span className="highlight-error no-hover" aria-label="disabled">
+              ❌
+            </span>
           )}
         </>
       ),
     },
     {
-      header: "Account Expired",
+      header: "Expired?",
       accessor: "account_expired" as keyof User,
       sortable: false,
       render: (value: User[keyof User]) => (
         <>
           {value ? (
-            <span className="highlight-error no-hover">Expired</span>
+            <span
+              className="highlight-disabled no-hover-disabled"
+              aria-label="expired"
+            >
+              Expired
+            </span>
           ) : (
-            <span>Active</span>
+            <span className="highlight" aria-label="active">
+              Active
+            </span>
           )}
         </>
       ),
     },
     {
-      header: "Account Locked",
+      header: "Locked",
       accessor: "account_locked" as keyof User,
       sortable: false,
       render: (value: User[keyof User]) => (
         <>
           {value ? (
-            <span className="highlight-error no-hover">Locked</span>
+            <span
+              className="highlight-error no-hover-error"
+              aria-label="locked"
+            >
+              🔒
+            </span>
           ) : (
-            <span>Unlocked</span>
+            <span className="highlight" aria-label="unlocked">
+              🔓
+            </span>
           )}
         </>
       ),

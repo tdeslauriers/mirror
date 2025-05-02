@@ -52,43 +52,54 @@ export default function AllowancesTable({ data }: AllowanceTableProps) {
       ),
     },
     {
-      header: "Archived",
+      header: "Archived?",
       accessor: "is_archived" as keyof Allowance,
       sortable: false,
       render: (value: Allowance[keyof Allowance]) => (
         <>
           {value ? (
-            <span className="highlight-error no-hover">Archived</span>
+            <span className="no-hover-disabled" aria-label="Archived">
+              📦
+            </span>
           ) : (
-            <span>Unarchived</span>
+            <span className="highlight" aria-label="Active">
+              Active
+            </span>
           )}
         </>
       ),
     },
     {
-      header: "Active",
+      header: "Active?",
       accessor: "is_active" as keyof Allowance,
       sortable: false,
       render: (value: Allowance[keyof Allowance]) => (
         <>
-          {value ? (
-            <span>Active</span>
-          ) : (
-            <span className="highlight-error no-hover">Inactive</span>
+          {value && (
+            <span className="highlight" aria-label="Active">
+              ✔️
+            </span>
           )}
         </>
       ),
     },
     {
-      header: "Calculated",
+      header: "Calculated?",
       accessor: "is_calculated" as keyof Allowance,
       sortable: false,
       render: (value: Allowance[keyof Allowance]) => (
         <>
           {value ? (
-            <span>Calculated</span>
+            <span className="highlight" aria-label="calculated">
+              💲
+            </span>
           ) : (
-            <span className="highlight-error no-hover">Not Calculated</span>
+            <span
+              className="highlight-disabled no-hover-disabled"
+              aria-label="Not calculated"
+            >
+              ❌
+            </span>
           )}
         </>
       ),

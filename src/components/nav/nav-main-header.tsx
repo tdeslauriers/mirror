@@ -26,7 +26,7 @@ export default async function NavMainHeader() {
             <ul>
               <li>
                 <Link className={style.locallink} href="/">
-                  des Lauriers world
+                  des Lauriers World
                 </Link>
               </li>
               <li>

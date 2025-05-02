@@ -23,7 +23,6 @@ export async function handleClientEdit(
   formData: FormData
 ) {
   // get session token
-  // get session token
   const sessionCookie = await checkForSessionCookie();
 
   // light-weight validation of csrf token
@@ -101,13 +100,13 @@ export async function handleClientEdit(
         } as ServiceClientActionCmd;
       } else {
         throw new Error(
-          "Service client details form could not be updated.  Please try again."
+          "Service client details form could not be updated due to unhandled gateway error.  Please try again."
         );
       }
     }
   } catch (error) {
     throw new Error(
-      "Service client details form could not be updated.  Please try again."
+      "Unable to call client service gateway.  Please try again."
     );
   }
 }

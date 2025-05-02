@@ -73,11 +73,25 @@ span.highlight-error:hover {
   outline: none;
 }
 
-tr:hover span.no-hover,
-tr:active span.no-hover,
-tr:focus span.no-hover {
+tr:hover span.no-hover-error,
+tr:active span.no-hover-error,
+tr:focus span.no-hover-error {
   color: inherit; /* Reset color */
   text-shadow: var(--highlight-error-glow);
+}
+
+tr:hover span.no-hover-info,
+tr:active span.no-hover-info,
+tr:focus span.no-hover-info {
+  color: inherit; /* Reset color */
+  text-shadow: var(--highlight-info-glow);
+}
+
+tr:hover span.no-hover-disabled,
+tr:active span.no-hover-disabled,
+tr:focus span.no-hover-disabled {
+  color: inherit; /* Reset color */
+  text-shadow: var(--highlight-disabled-glow);
 }
 
 a:focus,
@@ -104,7 +118,6 @@ tr.no-hover:hover {
 .table-wrapper {
   display: inline-block;
   width: auto;
-  ;
 }
 
 .table-wrapper input {
@@ -228,6 +241,7 @@ tr.no-hover:hover {
 
   tbody tr {
     display: block;
+
     margin-bottom: 15px;
     border: 1px solid var(--primary-border-color);
     border-radius: 4px;
@@ -239,6 +253,7 @@ tr.no-hover:hover {
     display: block;
     text-align: right;
     padding: 5px;
+    height: auto;
   }
 
   td::before {

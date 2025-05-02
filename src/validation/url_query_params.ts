@@ -5,7 +5,7 @@ export const DEFAULT_QUERY_PARAM_REGEX: RegExp = /^[a-zA-Z0-9_]+$/;
 
 export const DEFAULT_MIN_QUERY_PARAM_VALUE_LENGTH: number = 1;
 export const DEFAULT_MAX_QUERY_PARAM_VALUE_LENGTH: number = 511; // 512 - 1 is the max length for a URL query param value
-export const DEFAULT_QUERY_PARAM_VALUE_REGEX: RegExp = /^[a-zA-Z0-9@._+\- ]+$/;
+export const DEFAULT_QUERY_PARAM_VALUE_REGEX: RegExp = /^[a-zA-Z0-9@,_\- ]+$/;
 
 // this will be used to validate query params passed to server components or the API gateway
 export interface SafeSearchParamsOptions {

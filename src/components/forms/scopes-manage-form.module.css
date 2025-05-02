@@ -28,7 +28,7 @@
   justify-content: right;
 }
 
-@media(max-width: 700px) {
+@media (max-width: 700px) {
   .row {
     flex-direction: column;
   }
@@ -38,5 +38,4 @@
     align-items: left;
     margin-bottom: 1rem;
   }
-  
 }

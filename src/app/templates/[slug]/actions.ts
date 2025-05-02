@@ -41,6 +41,7 @@ export async function handleTemplateEdit(
     description: formData.get("description") as string,
     cadence: formData.get("cadence") as string,
     category: formData.get("category") as string,
+    is_calculated: formData.get("is_calculated") === "on" ? true : false,
     // slug omitted
     // created_at omitted
     is_archived: formData.get("is_archived") === "on" ? true : false,
@@ -76,9 +77,12 @@ export async function handleTemplateEdit(
     description: updated.description,
     cadence: updated.cadence,
     category: updated.category,
+    is_calculated: updated.is_calculated,
     is_archived: updated.is_archived,
     assignees: usernames,
   };
+
+  console.log("cmd", cmd);
 
   try {
     // call gateway to create a new task template

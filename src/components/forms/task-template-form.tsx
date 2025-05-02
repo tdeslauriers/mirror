@@ -204,7 +204,26 @@ export default function TemplateForm({
           </div>
         </div>
 
-        <div className="row" style={{ marginTop: "1.5rem" }}>
+        <div
+          className="checkbox-row"
+          style={{ marginTop: "1.5rem", marginBottom: "1.5rem" }}
+        >
+          <div className="field">
+            <label className="label" htmlFor="calculated">
+              Calculated
+            </label>
+            {templateState.errors.active && (
+              <ErrorField errorMsgs={templateState.errors.is_calculated} />
+            )}
+            <input
+              className="form"
+              name="is_calculated"
+              type="checkbox"
+              defaultChecked={templateState.template?.is_calculated}
+              disabled={!editAllowed}
+            />
+          </div>
+
           <div className="field">
             <label className="label" htmlFor="archived">
               Archived

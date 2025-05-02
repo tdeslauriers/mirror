@@ -8,6 +8,7 @@ export type TaskTemplate = {
   description?: string;
   cadence?: string;
   category?: string;
+  is_calculated?: boolean;
   slug?: string;
   created_at?: string;
   is_archived?: boolean;
@@ -21,6 +22,7 @@ export type TaskTemplateCmd = {
   description?: string;
   cadence?: string;
   category?: string;
+  is_calculated?: boolean;
   slug?: string;
   created_at?: string;
   is_archived?: boolean;
