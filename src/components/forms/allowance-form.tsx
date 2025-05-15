@@ -6,7 +6,6 @@ import FormSubmit from "./form-submit";
 import ErrorField from "../errors/error-field";
 import { convertCentsToDollars } from "@/app/allowances";
 import { Allowance, AllowanceActionCmd } from ".";
-import { all } from "axios";
 
 export default function AllowanceForm({
   csrf,
@@ -43,11 +42,16 @@ export default function AllowanceForm({
         <div className={style.left}>
           <h2>
             Balance:{" "}
-            <span className="highlight">
-              {allowanceState.allowance?.balance
-                ? convertCentsToDollars(allowanceState.allowance?.balance)
-                : 0}
-            </span>
+            {allowanceState.allowance &&
+            allowanceState.allowance?.is_calculated ? (
+              <span className="highlight">
+                {allowanceState.allowance?.balance
+                  ? convertCentsToDollars(allowanceState.allowance?.balance)
+                  : 0}
+              </span>
+            ) : (
+              <span className="highlight-disabled">Not Applicable</span>
+            )}
           </h2>
         </div>
         <div className={style.right}>
@@ -94,7 +98,7 @@ export default function AllowanceForm({
           )}
           <input
             className={`${
-              isDisabled(allowanceState.allowance)
+              isDisabled(allowanceState.allowance) || !editAllowed
                 ? style.disabled
                 : style.account
             }`}
@@ -134,6 +138,7 @@ export default function AllowanceForm({
           <input
             className={`${
               isDisabled(allowanceState.allowance) ||
+              !editAllowed ||
               allowanceState.allowance?.balance === 0
                 ? style.disabled
                 : style.account
@@ -234,9 +239,6 @@ function isDisabled(allowance: Allowance | undefined | null) {
   if (!allowance) {
     return true;
   }
-  if (!allowance.balance) {
-    return false;
-  }
   if (allowance.is_archived) {
     return true;
   }
@@ -245,6 +247,9 @@ function isDisabled(allowance: Allowance | undefined | null) {
   }
   if (!allowance.is_calculated) {
     return true;
+  }
+  if (!allowance.balance) {
+    return false;
   }
   return false;
 }

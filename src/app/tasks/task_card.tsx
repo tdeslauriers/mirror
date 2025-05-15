@@ -10,9 +10,11 @@ import ErrorField from "@/components/errors/error-field";
 export default function TaskCard({
   task,
   csrf,
+  reviewAllowed, // just cookie check => ui rendering logic only
 }: {
   task: Task;
   csrf?: string | null;
+  reviewAllowed?: boolean; // just cookie check => ui rendering logic only
 }) {
   const [isPendingComplete, startTransitionComplete] = useTransition();
   const [isPendingSatisfactory, startTransitionSatisfactory] = useTransition();
@@ -122,14 +124,17 @@ export default function TaskCard({
             <span className="highlight">{task.name}</span>
           </h3>
         </div>
-        <div className={`${style.box} ${style.right}`}>
-          <Link
-            className="locallink"
-            href={`/allowances/${task.allowance_slug}`}
-          >
-            {task.assignee?.firstname} {task.assignee?.lastname}
-          </Link>
-        </div>
+
+        {reviewAllowed && (
+          <div className={`${style.box} ${style.right}`}>
+            <Link
+              className="locallink"
+              href={`/allowances/${task.allowance_slug}`}
+            >
+              {task.assignee?.firstname} {task.assignee?.lastname}
+            </Link>
+          </div>
+        )}
       </div>
 
       <div className={style.row}>
@@ -159,14 +164,11 @@ export default function TaskCard({
       <hr />
 
       <div className={`${style.row}`}>
-        <div
-          className={`${isComplete ? "actions" : "actionsError"} ${
-            style.status
-          }`}
-        >
+        <div className={`${isComplete ? style.status : style.statusError}`}>
           <button
             name="is_complete"
             type="button"
+            title="Click to flip status"
             value={isComplete ? "true" : "false"}
             onClick={() => handleStatusUpdate("is_complete")}
             disabled={isPendingComplete}
@@ -174,32 +176,34 @@ export default function TaskCard({
             {isComplete ? "Complete" : "Incomplete"}
           </button>
         </div>
-        <div
-          className={`${isSatisfactory ? "actions" : "actionsError"}  ${
-            style.status
-          }`}
-        >
+        <div className={`${isSatisfactory ? style.status : style.statusError}`}>
           <button
             name="is_satisfactory"
             type="button"
+            title={
+              reviewAllowed
+                ? "Click to flip status"
+                : "Not allowed to change status"
+            }
             value={isSatisfactory ? "true" : "false"}
             onClick={() => handleStatusUpdate("is_satisfactory")}
-            disabled={isPendingSatisfactory}
+            disabled={isPendingSatisfactory || !reviewAllowed}
           >
             {isSatisfactory ? "Satisfactory" : "Deficient"}
           </button>
         </div>
-        <div
-          className={`${isProactive ? "actions" : "actionsError"}  ${
-            style.status
-          }`}
-        >
+        <div className={`${isProactive ? style.status : style.statusError}`}>
           <button
             name="is_proactive"
+            title={
+              reviewAllowed
+                ? "Click to flip status"
+                : "Not allowed to change status"
+            }
             type="button"
             value={isProactive ? "true" : "false"}
             onClick={() => handleStatusUpdate("is_proactive")}
-            disabled={isPendingProactive}
+            disabled={isPendingProactive || !reviewAllowed}
           >
             {isProactive ? "Proactive" : "Reminded"}
           </button>

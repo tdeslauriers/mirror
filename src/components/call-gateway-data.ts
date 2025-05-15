@@ -1,9 +1,5 @@
 "use server";
 
-import { redirect } from "next/navigation";
-import GetOauthExchange from "./oauth-exchange";
-import { headers } from "next/headers";
-
 // makes a call to the gateway service endpoint to retrieve data used in page rendering.
 // Note: this is only for GET requests and does not handle POST, PUT, DELETE, etc.
 export default async function callGatewayData({

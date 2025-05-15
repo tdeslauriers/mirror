@@ -24,7 +24,10 @@ export default async function TemplatesPage() {
   }
 
   // get template data from gateway
-  const templates = await callGatewayData({endpoint: "/templates", session: cookies.session});
+  const templates = await callGatewayData({
+    endpoint: "/templates",
+    session: cookies.session,
+  });
 
   return (
     <>
@@ -57,7 +60,7 @@ export default async function TemplatesPage() {
             </li>
             <li style={{ margin: ".5rem" }}>
               Each person assigned to a task template will receive thier own
-              task record to interact with on the cadence recurrance.
+              task record to interact with on the recurrance cadence.
             </li>
             <li style={{ margin: ".5rem" }}>
               Ad hoc task templates will be archived upon closure of the task

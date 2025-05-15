@@ -53,6 +53,8 @@
   border: 1px solid rgb(168, 173, 169);
 
   width: 100%;
+
+  cursor: not-allowed;
 }
 
 @media (max-width: 700px) {

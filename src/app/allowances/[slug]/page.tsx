@@ -75,9 +75,13 @@ export default async function Page({
               Allowance Account:{" "}
               <span className="highlight">{allowance?.username}</span>
             </h1>
-            <Link href={`/allowances`}>
-              <button>Allowances Table</button>
-            </Link>
+
+            {cookies.identity &&
+              cookies.identity.ux_render?.tasks?.allowances_write && (
+                <Link href={`/allowances`}>
+                  <button>Allowances Table</button>
+                </Link>
+              )}
           </div>
         </div>
         <hr className="page-title" />

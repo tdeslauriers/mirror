@@ -54,17 +54,14 @@ export async function updateTaskStatusAction(
 
   // call gateway to update task status
   try {
-    const response = await fetch(
-      `${process.env.GATEWAY_SERVICE_URL}/tasks/${taskSlug}/status`,
-      {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: session?.value,
-        },
-        body: JSON.stringify(cmd),
-      }
-    );
+    const response = await fetch(`${process.env.GATEWAY_SERVICE_URL}/tasks`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: session?.value,
+      },
+      body: JSON.stringify(cmd),
+    });
 
     if (response.ok) {
       const success = await response.json();
@@ -86,6 +83,10 @@ export async function updateTaskStatusAction(
       }
     }
   } catch (error) {
+    if ((error as Error).message) {
+      console.log("Error: ", (error as Error).message);
+      throw new Error((error as Error).message);
+    }
     throw new Error(
       "Failed to call task service gateway. If this error persists, please contact me."
     );

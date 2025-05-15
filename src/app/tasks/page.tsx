@@ -92,9 +92,24 @@ export default async function TasksPage({
         </div>
         <hr className="page-title" />
         <div className="task-list">
+          {tasks && tasks.length <= 0 && (
+            <>
+              <div className="banner">
+                You do not have any pending daily tasks.
+              </div>
+            </>
+          )}
+
           {tasks.map((task: Task) => (
             <>
-              <TaskCard key={task.task_slug} task={task} csrf={csrf} />
+              <TaskCard
+                key={task.task_slug}
+                task={task}
+                csrf={csrf}
+                reviewAllowed={
+                  cookies.identity?.ux_render?.tasks?.allowances_write
+                }
+              />
             </>
           ))}
         </div>

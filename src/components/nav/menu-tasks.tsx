@@ -36,6 +36,18 @@ export default function MenuTasks({
                 <li>
                   <Link
                     className={`locallink`}
+                    href={"/allowances/account"}
+                    onClick={linkClick}
+                  >
+                    Allowance
+                  </Link>
+                </li>
+              )}
+
+              {render && render.tasks?.allowances_write && (
+                <li>
+                  <Link
+                    className={`locallink`}
                     href={"/allowances"}
                     onClick={linkClick}
                   >
@@ -55,7 +67,7 @@ export default function MenuTasks({
                 </li>
               )}
 
-              {render && render.tasks?.tasks_read && (
+              {render && render.tasks?.allowances_write && (
                 <li>
                   <Link
                     className={`locallink`}
@@ -63,6 +75,18 @@ export default function MenuTasks({
                     onClick={linkClick}
                   >
                     Today: All Tasks
+                  </Link>
+                </li>
+              )}
+
+              {render && render.tasks?.tasks_read && (
+                <li>
+                  <Link
+                    className={`locallink`}
+                    href={"/tasks?view=today&assignee=me"}
+                    onClick={linkClick}
+                  >
+                    Today: My Tasks
                   </Link>
                 </li>
               )}
