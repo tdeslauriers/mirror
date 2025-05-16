@@ -50,6 +50,8 @@
   border: none;
   border-radius: 4px;
   padding: 0.75rem 2rem;
+  margin-right: 0.25rem;
+  margin-left: 0.25rem;
   background: linear-gradient(
     90deg,
     var(--primary-site-fade),
@@ -89,6 +91,8 @@
   border: none;
   border-radius: 4px;
   padding: 0.75rem 2rem;
+  margin-right: 0.25rem;
+  margin-left: 0.25rem;
   background: linear-gradient(
     90deg,
     var(--error-site-fade),
@@ -142,8 +146,36 @@
   }
   .status button {
     width: 100%;
-    padding: 0.5rem 1rem;
-    font-size: 1rem;
+    margin-top: 0.25rem;
+  }
+
+  .statusError button {
+    width: 100%;
+    margin-top: 0.25rem;
+  }
+}
+
+@media (min-width: 700px) and (max-width: 1500px) {
+  .taskcard {
+    width: 85vw;
+  }
+
+  .row {
+    flex-direction: column;
+  }
+
+  .box {
+    justify-content: left;
+    align-items: left;
+    /* margin-bottom: 1rem; */
+  }
+
+  .status button {
+    margin-top: 0.5rem;
+  }
+
+  .statusError button {
+    margin-top: 0.5rem;
   }
 }
 

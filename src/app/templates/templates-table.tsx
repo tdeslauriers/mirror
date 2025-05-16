@@ -94,7 +94,7 @@ export default function TemplatesTable({ data }: TemplatesTableProps) {
               {(value as AllowanceUser[]).map((assignee, index) => (
                 <li
                   key={assignee.username}
-                  title={`see all of ${assignee.firstname}'s tasks`}
+                  title={`see ${assignee.firstname}'s allowance`}
                   style={
                     index < (value as AllowanceUser[]).length - 1
                       ? { marginBottom: "0.5rem" }
@@ -108,9 +108,6 @@ export default function TemplatesTable({ data }: TemplatesTableProps) {
                   >
                     {assignee.firstname} {assignee.lastname}
                   </Link>
-                  <sup>
-                    <span className="highlight">*</span>
-                  </sup>
                 </li>
               ))}
             </ul>

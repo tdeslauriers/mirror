@@ -7,21 +7,25 @@ import {
 } from "@/validation/url_query_params";
 import TaskCard from "./task_card";
 import GetCsrf from "@/components/csrf-token";
+
 export const metadata = {
   robots: "noindex, nofollow",
 };
 
 const pageError = "Failed to load /tasks page: ";
 
+interface TasksPageProps {
+  searchParams?: Record<string, string | string[] | undefined>;
+}
+
 export default async function TasksPage({
   searchParams,
-}: Record<string, string | string[] | undefined>) {
+}: {
+  searchParams: TasksPageProps | any;
+}) {
   // check for query params
   // need to collect these before cookie check
-  const rawParams = ((await searchParams) || {}) as Record<
-    string,
-    string | string[] | undefined
-  >;
+  const rawParams = await Promise.resolve(searchParams);
 
   const sanitizedParams = safeSearchParams(rawParams, {
     allowedKeys: TaskQueryParams,
