@@ -4,7 +4,6 @@ import Link from "next/link";
 import { Suspense } from "react";
 import AddAllowanceForm from "./add-allowance-form";
 import { handleAddAllowance } from "./actions";
-import { AllowanceUser } from "@/components/forms";
 import { getAuthCookies, UiCookies } from "@/components/checkCookies";
 import callGatewayData from "@/components/call-gateway-data";
 
@@ -43,7 +42,7 @@ export default async function Page() {
   }
 
   // get user data from gateway
-  const users: AllowanceUser[] = await callGatewayData({
+  const users = await callGatewayData({
     endpoint: "/users",
     session: cookies.session,
   });

@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useActionState, useState } from "react";
 import ErrorField from "@/components/errors/error-field";
 import { AddAllowanceActionCmd, AllowanceUser } from "@/components/forms";
+import { UserProfile } from "..";
 
 type Err = { [key: string]: string[] };
 
@@ -14,7 +15,7 @@ export default function AddAllowanceForm({
   addAllowance,
 }: {
   csrf: string;
-  users: AllowanceUser[];
+  users: UserProfile[];
   addAllowance: (
     prevState: AddAllowanceActionCmd,
     formData: FormData

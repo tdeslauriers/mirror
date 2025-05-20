@@ -7,6 +7,18 @@ import {
 import { GatewayError } from "../api";
 import { AddAllowanceCmd, UpdateAllowanceCmd } from "@/components/forms";
 
+export type UserProfile = {
+  id?: string;
+  username?: string;
+  firstname?: string;
+  lastname?: string;
+  slug?: string;
+  birth_date?: string;
+  created_at?: string;
+  is_active?: boolean;
+  is_archived?: boolean;
+};
+
 // converting user input in dollars to cents
 export function convertDollarsToCents(dollars: string) {
   const amount = parseFloat(dollars);
@@ -167,8 +179,6 @@ export function validateUpdateAllowanceCmd(cmd: UpdateAllowanceCmd) {
   if (!cmd.is_active && cmd.is_calculated) {
     errors.is_active = ["Cannot set account to both inactive and calculated."];
   }
-
-  
 
   return errors;
 }
