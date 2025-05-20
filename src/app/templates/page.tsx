@@ -3,6 +3,8 @@ import callGatewayData from "@/components/call-gateway-data";
 import Link from "next/link";
 import TemplatesTable from "./templates-table";
 import { getAuthCookies, UiCookies } from "@/components/checkCookies";
+import { AllowanceUser } from "@/components/forms";
+import { TaskTemplate } from ".";
 
 export const metadata = {
   robots: "noindex, nofollow",
@@ -24,7 +26,7 @@ export default async function TemplatesPage() {
   }
 
   // get template data from gateway
-  const templates = await callGatewayData({
+  const templates: TaskTemplate[] = await callGatewayData({
     endpoint: "/templates",
     session: cookies.session,
   });
@@ -69,7 +71,11 @@ export default async function TemplatesPage() {
           </ul>
         </div>
 
-        <TemplatesTable data={templates} />
+        <TemplatesTable
+          data={templates}
+          username={cookies.identity.username}
+          accountVisibility={cookies.identity.ux_render.tasks.allowances_write}
+        />
       </main>
     </>
   );

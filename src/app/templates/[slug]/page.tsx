@@ -107,7 +107,11 @@ export default async function TemplatesPage({
           <div className="card">
             <TemplateForm
               csrf={csrf}
+              username={cookies.identity?.username}
               editAllowed={cookies.identity?.ux_render?.tasks?.templates_write}
+              accountVisibility={
+                cookies.identity?.ux_render?.tasks?.allowances_write
+              }
               slug={slug}
               assignees={assignees}
               template={template}
@@ -119,4 +123,3 @@ export default async function TemplatesPage({
     </>
   );
 }
-

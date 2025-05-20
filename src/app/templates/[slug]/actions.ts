@@ -82,8 +82,6 @@ export async function handleTemplateEdit(
     assignees: usernames,
   };
 
-  console.log("cmd", cmd);
-
   try {
     // call gateway to create a new task template
     const apiResponse = await fetch(
@@ -99,7 +97,6 @@ export async function handleTemplateEdit(
     );
     if (apiResponse.ok) {
       const success = await apiResponse.json();
-      console.log("success", success);
       return {
         csrf: csrf,
         slug: success.slug,

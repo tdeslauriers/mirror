@@ -1,17 +1,22 @@
 "use client";
 
 import { Suspense, useState } from "react";
-import { TaskCadence, cadenceTitle, TaskTemplate } from ".";
-import { access } from "fs";
+import { cadenceTitle, TaskTemplate } from ".";
 import Table, { TableColumn } from "@/components/table";
 import Link from "next/link";
 import { AllowanceUser } from "@/components/forms";
 
 interface TemplatesTableProps {
   data: TaskTemplate[];
+  username?: string | null;
+  accountVisibility?: boolean;
 }
 
-export default function TemplatesTable({ data }: TemplatesTableProps) {
+export default function TemplatesTable({
+  data,
+  username,
+  accountVisibility,
+}: TemplatesTableProps) {
   const [search, setSearch] = useState("");
 
   const columns: TableColumn<TaskTemplate>[] = [
@@ -94,20 +99,30 @@ export default function TemplatesTable({ data }: TemplatesTableProps) {
               {(value as AllowanceUser[]).map((assignee, index) => (
                 <li
                   key={assignee.username}
-                  title={`see ${assignee.firstname}'s allowance`}
+                  title={
+                    accountVisibility || assignee.username === username
+                      ? `see ${assignee.firstname}'s allowance`
+                      : `not authorized to see ${assignee.firstname}'s allowance`
+                  }
                   style={
                     index < (value as AllowanceUser[]).length - 1
                       ? { marginBottom: "0.5rem" }
                       : { marginBottom: "0" }
                   }
                 >
-                  <Link
-                    className="locallink no-hover"
-                    href={`/users/${assignee.slug}`}
-                    style={{ whiteSpace: "nowrap" }}
-                  >
-                    {assignee.firstname} {assignee.lastname}
-                  </Link>
+                  {accountVisibility || assignee.username === username ? (
+                    <Link
+                      className="locallink no-hover"
+                      href={`/allowances/${assignee.allowance_slug}`}
+                      style={{ whiteSpace: "nowrap" }}
+                    >
+                      {assignee.firstname} {assignee.lastname}
+                    </Link>
+                  ) : (
+                    <span className="highlight-disabled no-hover-disabled">
+                      {assignee.firstname} {assignee.lastname}
+                    </span>
+                  )}
                 </li>
               ))}
             </ul>

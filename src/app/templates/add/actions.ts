@@ -89,7 +89,6 @@ export async function handleTemplateAdd(
     );
     if (apiResponse.ok) {
       add = await apiResponse.json();
-      console.log("success", add);
     } else {
       const fail = await apiResponse.json();
       if (isGatewayError(fail)) {

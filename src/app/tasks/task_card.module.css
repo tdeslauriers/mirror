@@ -146,12 +146,12 @@
   }
   .status button {
     width: 100%;
-    margin-top: 0.25rem;
+    margin-top: 0.5rem;
   }
 
   .statusError button {
     width: 100%;
-    margin-top: 0.25rem;
+    margin-top: 0.5rem;
   }
 }
 

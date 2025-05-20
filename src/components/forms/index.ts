@@ -186,16 +186,10 @@ export type AddAllowanceCmd = {
 };
 
 export type AllowanceUser = {
-  id?: string;
   username?: string;
   firstname?: string;
   lastname?: string;
-  slug?: string;
-  created_at?: string;
-  birth_date?: string;
-  enabled?: boolean;
-  account_expired?: boolean;
-  account_locked?: boolean;
+  allowance_slug?: string;
 };
 
 export type Allowance = {

@@ -71,8 +71,8 @@
   --info-site-color: rgb(253, 169, 2);
   --info-site-fade: rgb(248, 198, 97);
 
-  --error-site-color: rgb(255, 45, 3);
-  --error-site-fade: rgb(254, 126, 100);
+  --error-site-color: rgb(255, 3, 3);
+  --error-site-fade: rgb(254, 100, 100);
 
   --disabled-site-color: rgb(104, 106, 104);
   --disabled-site-fade: rgb(159, 164, 159);

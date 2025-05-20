@@ -14,7 +14,7 @@ export default async function NavMainHeader() {
       <header className={style.header}>
         <div className={style.left}>
           <Link className={style.logo} href="/">
-            <Image src={logo256} alt="Laurels Logo" />
+            <Image src={logo256} priority alt="Laurels Logo" />
           </Link>
 
           {/* mobile nav menu */}

@@ -14,13 +14,17 @@ type Err = { [key: string]: string[] };
 export default function TemplateForm({
   csrf,
   editAllowed,
+  accountVisibility,
+  username,
   slug,
   assignees,
   template,
   templateFormUpdate,
 }: {
   csrf: string | null;
+  username?: string | null; // pulled from cookie for visiblitiy only
   editAllowed?: boolean; // just cookie check => ui rendering logic only
+  accountVisibility?: boolean; // just cookie check => ui rendering logic only
   slug: string | null;
   assignees: AllowanceUser[] | null;
   template: TaskTemplate | null;
@@ -75,9 +79,9 @@ export default function TemplateForm({
   };
 
   const addAssignee = (slug: string | undefined) => {
-    const user = assignees?.find((a) => a.slug === slug);
+    const user = assignees?.find((a) => a.allowance_slug === slug);
     if (currentUsers && currentUsers.length > 0) {
-      const exists = currentUsers.find((a) => a.slug === slug);
+      const exists = currentUsers.find((a) => a.allowance_slug === slug);
       if (user && !exists) {
         setCurrentUsers([...currentUsers, user]);
       }
@@ -92,7 +96,7 @@ export default function TemplateForm({
   const removeUser = (slug: string | undefined) => {
     if (!slug) return;
     if (!currentUsers) return;
-    setCurrentUsers(currentUsers.filter((a) => a.slug !== slug));
+    setCurrentUsers(currentUsers.filter((a) => a.allowance_slug !== slug));
   };
 
   return (
@@ -258,7 +262,7 @@ export default function TemplateForm({
               </option>
               {assignees &&
                 assignees.map((a) => (
-                  <option key={a.slug} value={a.slug}>
+                  <option key={a.allowance_slug} value={a.allowance_slug}>
                     {`${a.lastname}, ${a.firstname}`}
                   </option>
                 ))}
@@ -300,16 +304,22 @@ export default function TemplateForm({
 
         {currentUsers &&
           currentUsers.map((user) => (
-            <div key={user.slug} className={style.assigneecard}>
+            <div key={user.allowance_slug} className={style.assigneecard}>
               <div className={style.row} style={{ fontSize: "2rem" }}>
                 <div className={style.box}>
-                  <Link
-                    href={`/users/${user.slug}`}
-                    className="locallink"
-                    style={{ textDecoration: "none" }}
-                  >
-                    {`${user.lastname}, ${user.firstname}`}
-                  </Link>
+                  {accountVisibility || user.username === username ? (
+                    <Link
+                      href={`/allowances/${user.allowance_slug}`}
+                      className="locallink"
+                      style={{ textDecoration: "none" }}
+                    >
+                      {`${user.lastname}, ${user.firstname}`}
+                    </Link>
+                  ) : (
+                    <span className="highlight-disabled no-hover-disabled">
+                      {`${user.lastname}, ${user.firstname}`}
+                    </span>
+                  )}
                 </div>
                 <div className={`${style.box} ${style.right}`}>
                   <div
@@ -319,7 +329,7 @@ export default function TemplateForm({
                     <button
                       name="remove-assignee"
                       type="button"
-                      onClick={() => removeUser(user.slug)}
+                      onClick={() => removeUser(user.allowance_slug)}
                       disabled={!editAllowed}
                     >
                       Remove

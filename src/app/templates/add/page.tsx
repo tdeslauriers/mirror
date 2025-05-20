@@ -81,7 +81,11 @@ export default async function AddPage() {
           <div className="card">
             <TemplateForm
               csrf={csrf}
+              username={cookies.identity.username}
               editAllowed={cookies.identity?.ux_render?.tasks?.templates_write}
+              accountVisibility={
+                cookies.identity?.ux_render?.tasks?.allowances_write
+              }
               slug={null}
               assignees={assignees}
               template={null}
