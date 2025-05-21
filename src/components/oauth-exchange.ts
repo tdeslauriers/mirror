@@ -57,7 +57,6 @@ export default async function GetOauthExchange(
       } else {
         const fail = await apiResponse.json();
         if (isGatewayError(fail)) {
-          const errors = handleOauthErrors(fail);
           handleOauthErrors(fail);
         } else {
           throw new Error(

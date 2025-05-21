@@ -1,9 +1,10 @@
 "use client";
 
 import { useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { use, useEffect, useRef, useState } from "react";
 import { State } from "../api";
 import Loading from "@/components/loading";
+import ErrorLoadPage from "@/components/errors/error-load-page";
 
 export default function Callback() {
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -22,8 +23,17 @@ export default function Callback() {
     redirect_url ?? ""
   )}`;
 
+  // useRef to ensure idempotence (runs only once)
+  const hasCalledCallback = useRef(false);
+
   useEffect(() => {
     const fetchCallback = async () => {
+      // prevent multiple invocations of the callback
+      if (hasCalledCallback.current) {
+        return;
+      }
+      hasCalledCallback.current = true;
+
       try {
         const response = await fetch(callback, {
           method: "POST",
@@ -36,35 +46,50 @@ export default function Callback() {
           // no need to turn off loading because will navigate away
           setCallbackSucceeded(true);
         } else {
-          const fail = await response.json();
-          console.log("failed to call oauth 2 redirect", fail);
+          const fail = await response.json().catch(() => null);
+          console.error("call to redirect/callback failed", fail);
           setIsLoading(false);
-          throw new Error("failed to call oauth 2 redirect");
         }
       } catch (error) {
         console.log("failed to call oauth 2 redirect/callback", error);
         setIsLoading(false);
-        throw new Error("failed to call oauth 2 redirect/callback");
       }
     };
 
     fetchCallback();
-  });
+  }, []);
 
-  if (callbackSucceeded) {
-    if (state && state.length >= 36 && state.length <= 256) {
-      const oauthState: State = JSON.parse(atob(state));
-      if (
-        oauthState.nav_endpoint &&
-        oauthState.nav_endpoint.length > 0 &&
-        oauthState.nav_endpoint.length <= 256
-      ) {
-        window.location.href = oauthState.nav_endpoint;
-      }
-    } else {
-      window.location.href = "/";
+  useEffect(() => {
+    if (!callbackSucceeded) {
+      return;
     }
-  }
 
-  return <>{isLoading && <Loading />}</>;
+    try {
+      if (state && state.length >= 36 && state.length <= 256) {
+        const oauthState: State = JSON.parse(atob(state));
+        if (
+          oauthState.nav_endpoint &&
+          oauthState.nav_endpoint.length > 0 &&
+          oauthState.nav_endpoint.length <= 256
+        ) {
+          window.location.href = oauthState.nav_endpoint;
+          return;
+        }
+      }
+    } catch (error) {
+      console.log("failed to parse state", error);
+    }
+
+    // fallback to home page if state/nav is not valid
+    window.location.href = "/";
+  }, [callbackSucceeded]);
+
+  return (
+    <>
+      {isLoading && <Loading />}
+      {!isLoading && !callbackSucceeded && (
+        <ErrorLoadPage errMsg={"Login failed."} redirectUrl={"/login"} />
+      )}
+    </>
+  );
 }

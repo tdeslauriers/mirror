@@ -52,7 +52,6 @@ export default async function LoginPage({
   }
 
   const csrf = await GetCsrf(hasSession.value);
-
   if (!csrf) {
     console.log("CSRF token could not be retrieved.");
     throw new Error(

@@ -93,7 +93,6 @@ export async function POST(req: NextRequest) {
 
     // return field level errors to error page
     // TODO: build error page to receive and display errors in redirect flow
-
     const cmd: CallbackCmd = {
       session: hasSession.value,
 
@@ -164,6 +163,7 @@ export async function POST(req: NextRequest) {
         );
       } else {
         const fail = await apiResponse.json();
+
         if (isGatewayError(fail)) {
           const errors = handleCallbackErrors(fail);
           // TODO: handle network error
@@ -181,6 +181,7 @@ export async function POST(req: NextRequest) {
     } catch (error: any) {
       // TODO: handle network error
       // redirect to error page: for now just send error back to callback page
+      console.log("callback api CATCH error: ", error);
       return NextResponse.json(
         { server: [error.message] },
         {
@@ -193,7 +194,15 @@ export async function POST(req: NextRequest) {
     }
   } else {
     console.log("session_id cookie is missing or not well formed.");
-    errors.server = [ErrMsgGeneric];
+    return NextResponse.json(
+      { server: ["session_id cookie is missing or not well formed."] },
+      {
+        status: 500,
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
   }
 }
 
