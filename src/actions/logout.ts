@@ -2,7 +2,7 @@
 
 import { LogoutCmd } from "./index";
 import { RequestCookie } from "next/dist/compiled/@edge-runtime/cookies";
-import {  redirect } from "next/navigation";
+import { redirect } from "next/navigation";
 import { cookies } from "next/headers";
 import { GatewayError, isGatewayError } from "@/app/api";
 
@@ -68,8 +68,8 @@ export async function logout() {
       return { server: [error.message] };
     }
 
-    // redirect to login page
-    redirect("/login");
+    // redirect to home page
+    redirect("/");
   } else {
     redirect("/login");
   }

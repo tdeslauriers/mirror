@@ -32,7 +32,7 @@ export default function MenuTasks({
         {visible["tasks"] && (
           <div className={`${style.submenu}`}>
             <ul>
-              {render && render.tasks?.allowances_read && (
+              {render && render.tasks?.account_read && (
                 <li>
                   <Link
                     className={`locallink`}
@@ -44,7 +44,7 @@ export default function MenuTasks({
                 </li>
               )}
 
-              {render && render.tasks?.allowances_write && (
+              {render && render.tasks?.allowances_read && (
                 <li>
                   <Link
                     className={`locallink`}
@@ -67,7 +67,7 @@ export default function MenuTasks({
                 </li>
               )}
 
-              {render && render.tasks?.allowances_write && (
+              {render && render.tasks?.allowances_read && (
                 <li>
                   <Link
                     className={`locallink`}

@@ -37,6 +37,8 @@ const blogAccessFlagsSchema = {
 };
 
 const taskAccessFlagsSchema = {
+  account_read: "boolean",
+  account_write: "boolean",
   allowances_read: "boolean",
   allowances_write: "boolean",
   tasks_read: "boolean",

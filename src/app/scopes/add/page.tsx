@@ -69,6 +69,7 @@ export default async function ScopesAddPage() {
           <div className="card">
             <ScopeForm
               csrf={csrf}
+              editAllowed={cookies.identity?.ux_render?.users?.scope_write}
               slug={null}
               scope={null}
               scopeFormUpdate={handleScopeAdd}
