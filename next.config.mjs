@@ -1,4 +1,5 @@
 import createMDX from "@next/mdx";
+import remarkSlug from "remark-slug";
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
@@ -9,6 +10,10 @@ const nextConfig = {
 
 const withMDX = createMDX({
   // Add markdown plugins here, as desired
+  extension: /\.mdx?$/,
+  options: {
+    remarkPlugins: [remarkSlug],
+  },
 });
 
 // Merge MDX config with Next.js config

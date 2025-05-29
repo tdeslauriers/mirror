@@ -1,45 +1,35 @@
-import GetCsrf from "@/components/csrf-token";
+import callGatewayData from "@/components/call-gateway-data";
+import { getAuthCookies, UiCookies } from "@/components/checkCookies";
+import { Allowance } from "@/components/forms";
 import AllowanceForm from "@/components/forms/allowance-form";
 import Loading from "@/components/loading";
-import Link from "next/link";
 import { Suspense } from "react";
-import { handleAllowanceEdit } from "./actions";
-import { getAuthCookies, UiCookies } from "@/components/checkCookies";
-import callGatewayData from "@/components/call-gateway-data";
-import { Allowance } from "@/components/forms";
+import GetCsrf from "@/components/csrf-token";
+import { handleAccountEdit } from "./actions";
+import Link from "next/link";
 
 export const metadata = {
   robots: "noindex, nofollow",
 };
 
-const pageError = "Failed to load allowance record page: ";
+const pageError = "Failed to load allowance account page: ";
 
-export default async function Page({
-  params,
-}: {
-  params: Promise<{ slug: string }>;
-}) {
-  // get slug param from url
-  const slug = (await params).slug;
-
+export default async function Page() {
   // quick for redirect if auth'd cookies not present
-  const cookies: UiCookies = await getAuthCookies(`/allowances/${slug}`);
+  const cookies: UiCookies = await getAuthCookies(`/account`);
 
   // check if identity cookie has allowances_read permission
   // ie, gaurd pattern or access hint gating
-  if (
-    !cookies.identity ||
-    !cookies.identity.ux_render?.tasks?.allowances_read
-  ) {
-    console.log(pageError + "User does not have allowances_read permission.");
+  if (!cookies.identity || !cookies.identity.ux_render?.tasks?.account_read) {
+    console.log(pageError + "User does not have account_read permission.");
     throw new Error(
-      pageError + "You do not have permission to view allowance records."
+      pageError + "You do not have permission to view your allowance account."
     );
   }
 
   // get allowance account data from gateway
   const allowance: Allowance = await callGatewayData({
-    endpoint: `/allowances/${slug}`,
+    endpoint: `/account`,
     session: cookies.session,
   });
 
@@ -75,13 +65,6 @@ export default async function Page({
               Allowance Account:{" "}
               <span className="highlight">{allowance?.username}</span>
             </h1>
-
-            {cookies.identity &&
-              cookies.identity.ux_render?.tasks?.allowances_write && (
-                <Link href={`/allowances`}>
-                  <button>Allowances Table</button>
-                </Link>
-              )}
           </div>
         </div>
         <hr className="page-title" />
@@ -122,10 +105,13 @@ export default async function Page({
           <div className="card">
             <AllowanceForm
               csrf={csrf}
-              editAllowed={cookies.identity?.ux_render?.tasks?.allowances_write}
-              slug={slug}
+              editAllowed={
+                cookies.identity?.ux_render?.tasks?.allowances_write ||
+                cookies.identity?.ux_render?.tasks?.account_write
+              }
+              slug={null}
               allowance={allowance}
-              allowanceFormUpdate={handleAllowanceEdit}
+              allowanceFormUpdate={handleAccountEdit}
             />
           </div>
         </Suspense>

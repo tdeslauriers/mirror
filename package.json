@@ -17,7 +17,8 @@
     "next": "^15.0.0-canary.177",
     "node-fetch": "^3.3.2",
     "react": "^18",
-    "react-dom": "^18"
+    "react-dom": "^18",
+    "remark-slug": "^7.0.1"
   },
   "devDependencies": {
     "@types/node": "^20",

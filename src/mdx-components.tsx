@@ -8,14 +8,22 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
       // check for href
       if (!href) return <a {...props}>{children}</a>;
       return (
-        <Link
-          className="locallink"
-          href={href}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          {children}
-        </Link>
+        <>
+          {href.startsWith("/") ? (
+            <Link className="locallink" href={href}>
+              {children}
+            </Link>
+          ) : (
+            <Link
+              className="locallink"
+              href={href}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              {children}
+            </Link>
+          )}
+        </>
       );
     },
 
