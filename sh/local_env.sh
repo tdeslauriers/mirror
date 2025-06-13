@@ -12,4 +12,7 @@ export MIRROR_SERVER_KEY=$(op document get "mirror_service_server_dev_key" --vau
 # gateway config
 export GATEWAY_SERVICE_URL=$(op read "op://world_site/erebor_service_container_dev/url"):$(op read "op://world_site/erebor_service_container_dev/port")
 
+# object storage config
+export OBJECT_STORAGE_URL=$(op read "op://world_site/pixie_minio_dev/url")
+
 

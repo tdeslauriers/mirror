@@ -17,7 +17,6 @@
   font-size: 1rem;
   font-family: "Montserrat", sans-serif;
   text-transform: uppercase;
-
   font-weight: bold;
 }
 
@@ -135,8 +134,6 @@ span.highlightError {
   transform: translateZ(0); /* trigger GPU acceleration */
   will-change: transform; /* inform the browser that this element will be animated */
 }
-
-
 
 @keyframes glow-input {
   0% {

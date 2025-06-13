@@ -27,8 +27,10 @@ const userAccessFlagsSchema = {
 };
 
 const galleryAccessFlagsSchema = {
-  gallery_read: "boolean",
-  gallery_write: "boolean",
+  album_read: "boolean",
+  album_write: "boolean",
+  image_read: "boolean",
+  image_write: "boolean",
 };
 
 const blogAccessFlagsSchema = {

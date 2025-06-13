@@ -1,0 +1,90 @@
+.imagecard {
+  position: relative;
+  width: 100%;
+  margin-top: 1rem;
+  aspect-ratio: 4 / 4; /* or 3 / 2 or 1 / 1 */
+  overflow: hidden;
+  border-radius: 14px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.image {
+  object-fit: cover;
+  object-position: center;
+}
+
+.content {
+  position: center;
+}
+
+.row {
+  display: flex;
+  margin: 1rem 0 1rem;
+}
+
+.box {
+  display: flex;
+  align-items: center;
+  justify-content: left;
+  width: auto;
+  font-size: 1.25rem;
+  font-family: "Montserrat", sans-serif;
+}
+
+.right {
+  padding-left: 0.75rem;
+  width: auto;
+  justify-content: right;
+}
+
+/* this label is used to style the label as a stand-in for <input type=file> which does not allow much custom styling */
+.buttonlabel {
+  border: 0;
+  border: none;
+  border-radius: 4px;
+  padding: 0.75rem 2rem;
+  background: linear-gradient(
+    90deg,
+    var(--primary-site-fade),
+    var(--primary-site-color)
+  );
+  width: auto;
+  cursor: pointer;
+  font: inherit;
+  font-size: 1.25rem;
+  font-weight: bold;
+  text-transform: uppercase;
+  color: rgb(var(--foreground-rgb));
+}
+
+.buttonlabel:hover,
+.buttonlabel:focus {
+  transition: 0.3s;
+  outline-style: none;
+  /* box-shadow: 0 0 40px var(--primary-site-color); */
+  animation: glow-input 5s ease-in-out infinite alternate;
+}
+
+@keyframes glow-input {
+  0% {
+    box-shadow: 0 0 5px var(--primary-site-color),
+      0 0 10px var(--primary-site-color), 0 0 15px var(--primary-site-color),
+      0 0 20px var(--primary-site-color);
+  }
+  100% {
+    box-shadow: 0 0 10px var(--primary-site-color),
+      0 0 20px var(--primary-site-color), 0 0 30px var(--primary-site-color),
+      0 0 40px var(--primary-site-color);
+  }
+}
+
+@media (max-width: 700px) {
+  .row {
+    flex-direction: column;
+  }
+
+  .box {
+    justify-content: left;
+    align-items: left;
+  }
+}

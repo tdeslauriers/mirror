@@ -5,17 +5,20 @@
     "Roboto Mono", "Oxygen Mono", "Ubuntu Monospace", "Source Code Pro",
     "Fira Mono", "Droid Sans Mono", "Courier New", monospace;
 
-  --foreground-rgb: 0, 0, 0;
+  --foreground-rgb: 177, 177, 177;
   --background-start-rgb: 196, 196, 196;
   --background-end-rgb: 255, 255, 255;
 
-  --test-rbg: rgb(196, 196, 196);
+  --test-rbg: rgb(221, 221, 221);
 
   --drawer-width: 10vw;
   --drawer-width-tablet: 20vw;
 
   --primary-border-color: rgb(188, 193, 188);
   --primary-border-fade: rgb(183, 185, 183);
+
+  --primary-title-color: rgb(255, 255, 255);
+  --primary-title-fade: rgb(177, 177, 177);
 
   --primary-site-color: rgb(21, 255, 0);
   --primary-site-fade: rgb(18, 209, 1);
@@ -49,7 +52,7 @@
     "Roboto Mono", "Oxygen Mono", "Ubuntu Monospace", "Source Code Pro",
     "Fira Mono", "Droid Sans Mono", "Courier New", monospace;
 
-  --foreground-rgb: 255, 255, 255;
+  --foreground-rgb: 225, 225, 225;
   --background-start-rgb: 0, 0, 0;
   --background-end-rgb: 44, 43, 43;
 
@@ -61,6 +64,9 @@
 
   --menu-button-primary: rgb(90, 93, 90);
   --menu-button-fade: rgb(59, 61, 59);
+
+  --primary-title-color: rgb(255, 255, 255);
+  --primary-title-fade: rgb(220, 220, 220);
 
   --primary-site-color: rgb(21, 255, 0);
   --primary-site-fade: rgb(144, 250, 144);
@@ -97,6 +103,12 @@
     #ffffff10,
     #ffffff10,
     #ffffff80
+  );
+
+  --highlight-title: linear-gradient(
+    to left,
+    var(--primary-title-color),
+    var(--primary-title-fade)
   );
 
   --highlight-text: linear-gradient(
@@ -151,7 +163,7 @@
   padding: 0;
   margin: 0;
   /* border: 1px solid red; */
-  /* outline: 1px solid rgb(3, 196, 255); */
+  
 }
 
 html,
@@ -169,6 +181,20 @@ body {
       rgb(var(--background-end-rgb))
     )
     rgb(var(--background-start-rgb));
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  background: var(--highlight-title);
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+  font-weight: bold;
 }
 
 a {

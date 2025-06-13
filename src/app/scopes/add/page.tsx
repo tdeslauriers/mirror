@@ -1,8 +1,5 @@
 import GetCsrf from "@/components/csrf-token";
 import ScopeForm from "@/components/forms/scope-form";
-import GetOauthExchange from "@/components/oauth-exchange";
-import { cookies } from "next/headers";
-import { redirect } from "next/navigation";
 import { handleScopeAdd } from "./actions";
 import Link from "next/link";
 import { Suspense } from "react";

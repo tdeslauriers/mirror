@@ -59,7 +59,12 @@ export default async function ProfilePage() {
         </div>
         <div className={`card`}>
           <Suspense fallback={<Loading />}>
-            <UserForm csrf={csrf} profile={profile} userEdit={handleUserEdit} />
+            <UserForm
+              csrf={csrf}
+              profile={profile}
+              userEdit={handleUserEdit}
+              editAllowed={profile?.username === cookies.identity?.username}
+            />
           </Suspense>
         </div>
 

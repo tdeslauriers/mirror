@@ -3,6 +3,7 @@
 import style from "./nav-drawer.module.css";
 import { UxRender } from "@/app/api";
 import { ShowMenu } from ".";
+import Link from "next/link";
 
 export default function MenuGallery({
   visible,
@@ -31,9 +32,17 @@ export default function MenuGallery({
         {visible["gallery"] && (
           <div className={`${style.submenu}`}>
             <ul>
-              <li>
-                <span className={`highlight`}>Coming Soon!</span>
-              </li>
+              {render && render.gallery?.image_write && (
+                <li>
+                  <Link
+                    className={`locallink`}
+                    href={"/images/add"}
+                    onClick={linkClick}
+                  >
+                    Add Image
+                  </Link>
+                </li>
+              )}
             </ul>
           </div>
         )}

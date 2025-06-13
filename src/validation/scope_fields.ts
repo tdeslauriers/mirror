@@ -1,5 +1,3 @@
-import { SERVICENAME_MAX_LENGTH, SERVICENAME_MIN_LENGTH, SERVICENAME_REGEX } from "./service_client_field";
-
 export const SCOPE_MIN_LENGTH = 7; // r:ran:*
 export const SCOPE_MAX_LENGTH = 64;
 const SCOPE_REGEX: RegExp = /^[a-z0-9\:\*]+$/;

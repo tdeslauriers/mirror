@@ -7,6 +7,7 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
     a: ({ href, children, ...props }) => {
       // check for href
       if (!href) return <a {...props}>{children}</a>;
+
       return (
         <>
           {href.startsWith("/") ? (
