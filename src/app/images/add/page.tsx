@@ -39,13 +39,18 @@ export default async function AddImagePage() {
         <div className="center"></div>
         <h1 className="page-title">Upload Image/Photo</h1>
         <hr className={`page-title`} />
+        <div className="banner">
+          This is adding the photo to staging. Behind the scenes it will be
+          picked up by the image processing pipeline to have thumbnails created
+          and exif data persisted.
+        </div>
         <div className="card-title">
-          <h2>Add Image/Photo Record Metadata</h2>
+          <h2>Image/Photo Record Metadata</h2>
         </div>
 
         <Suspense fallback={<Loading />}>
           <div className="card">
-            <UploadForm csrf={csrf}/>
+            <UploadForm csrf={csrf} />
           </div>
         </Suspense>
       </main>

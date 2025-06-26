@@ -45,14 +45,14 @@ export default async function Page({
               paddingRight: "1rem",
             }}
           >
-            <h1>Picture Title</h1>
+            <h1>{imageData.title}</h1>
           </div>
         </div>
         <hr className="page-title" />
 
-        {imageData && imageData?.image_date && (
-          <div className="banner">
-            {new Date(imageData.image_date).toLocaleDateString("en-US", {
+        {imageData && imageData?.created_at && (
+          <div className={`banner`}>
+            {new Date(imageData.created_at).toLocaleDateString("en-US", {
               year: "numeric",
               month: "long",
               day: "numeric",
@@ -64,12 +64,13 @@ export default async function Page({
           <div className={styles.imagecard}>
             <Image
               src={imageData.signed_url}
-              alt={""}
+              alt={imageData.title}
               width={1000}
               height={1000}
               className={styles.image}
             />
           </div>
+          <div className={styles.description}>{imageData.description}</div>
         </div>
       </main>
     </>

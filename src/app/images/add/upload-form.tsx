@@ -54,15 +54,13 @@ export default function UploadForm({ csrf }: { csrf?: string | null }) {
       alert("File size exceeds the limit of 10 MB.");
       return;
     }
-    setStatus("uploading");
 
     // check description --> regex validation (not possible in textarea element)
     const check = checkImageDescription(description);
     if (!check.isValid) {
       alert(`Description validation failed: ${check.messages.join(", ")}`);
-      setServerErrors({
-        description: check.messages,
-      });
+      setStatus("error");
+      return;
     }
 
     // build the form data
@@ -74,18 +72,59 @@ export default function UploadForm({ csrf }: { csrf?: string | null }) {
     metadata.append("file_size", file.size.toString());
 
     // stage 1: upload the metadata and request the presigned PUT upload URL
+    setStatus("uploading");
     const metaDataResponse = await requestPresignedUrl(metadata);
     if (
       metaDataResponse?.errors &&
       Object.keys(metaDataResponse.errors).length > 0
     ) {
       setServerErrors(metaDataResponse.errors);
-      setStatus("idle");
+      setStatus("error");
+      return;
+    }
+
+    // stage 2: upload the file to the presigned URL
+    if (metaDataResponse?.signedUrl) {
+      // for dev --> need a proxy to handle CORS client http --> https minio server
+      const targetUrl =
+        process.env.NODE_ENV === "development"
+          ? `/api/upload?url=${encodeURIComponent(metaDataResponse.signedUrl)}`
+          : metaDataResponse.signedUrl;
+      // send file to minio server
+      const uploadResponse = await fetch(targetUrl, {
+        method: "PUT",
+        headers: {
+          "Content-Type": file.type,
+        },
+        body: file,
+      });
+
+      if (uploadResponse.ok) {
+        const success = await uploadResponse.json();
+        setStatus("success");
+        fileInputRef.current?.value && (fileInputRef.current.value = "");
+        setTitle(""); // reset title input
+        setDescription(""); // reset description input
+        setFile(null); // reset file input
+      } else {
+        const errorData = await uploadResponse.json();
+        console.error("Upload failed:", errorData);
+        setServerErrors({ upload: ["Failed to upload image."] });
+        setStatus("error");
+      }
     }
   }
 
   return (
     <form onSubmit={handleSubmit} className={`form`}>
+      {/* server errors */}
+      {serverErrors && serverErrors.server && (
+        <ErrorField errorMsgs={serverErrors.server} />
+      )}
+      {/* upload errors */}
+      {serverErrors && serverErrors.upload && (
+        <ErrorField errorMsgs={serverErrors.upload} />
+      )}
       {/* csrf errors */}
       {serverErrors && serverErrors.csrf && (
         <ErrorField errorMsgs={serverErrors.csrf} />
@@ -106,9 +145,10 @@ export default function UploadForm({ csrf }: { csrf?: string | null }) {
             type="text"
             minLength={IMAGE_TITLE_MIN_LENGTH}
             maxLength={IMAGE_TITLE_MAX_LENGTH}
-            pattern={`^[a-zA-Z0-9 ]+$`}
+            // pattern={`^[a-zA-Z0-9 ]+$`}
             title={`Title must be between ${IMAGE_TITLE_MIN_LENGTH} and ${IMAGE_TITLE_MAX_LENGTH} alpha/numeric characters`}
             placeholder="Image/Photo Title"
+            value={title}
             onChange={(e) => setTitle(e.target.value)}
             required
           />
@@ -131,6 +171,7 @@ export default function UploadForm({ csrf }: { csrf?: string | null }) {
             maxLength={IMAGE_DESCRIPTION_MAX_LENGTH}
             title={`Description must be between ${IMAGE_DESCRIPTION_MIN_LENGTH} and ${IMAGE_DESCRIPTION_MAX_LENGTH} characters`}
             placeholder="Image/Photo Description"
+            value={description}
             onChange={(e) => setDescription(e.target.value)}
             required
           />

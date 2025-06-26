@@ -30,8 +30,8 @@ export type AddImageCmd = {
 
   title: string;
   description: string;
-  content_type: string;
-  file_size: number;
+  file_type: string;
+  size: number;
 };
 
 // validate the metadata for the first stage of the image upload
@@ -70,15 +70,15 @@ export function validateImageData(data: AddImageCmd) {
   }
 
   // validate content type
-  if (!data.content_type || data.content_type.trim().length === 0) {
+  if (!data.file_type || data.file_type.trim().length === 0) {
     errors.file = errors.file ?? [];
     errors.file.push("Content type is required.");
   }
 
   if (
-    data.content_type &&
-    data.content_type.trim().length > 0 &&
-    !ALLOWED_IMAGE_FILE_TYPES.includes(data.content_type)
+    data.file_type &&
+    data.file_type.trim().length > 0 &&
+    !ALLOWED_IMAGE_FILE_TYPES.includes(data.file_type)
   ) {
     errors.file = errors.file ?? [];
     errors.file.push(
@@ -89,10 +89,10 @@ export function validateImageData(data: AddImageCmd) {
   }
 
   // validate file size
-  if (!data.file_size || data.file_size <= 0) {
+  if (!data.size || data.size <= 0) {
     errors.file = errors.file ?? [];
     errors.file_size = ["File size is required and must be greater than 0."];
-  } else if (data.file_size > 10 * 1024 * 1024) {
+  } else if (data.size > 10 * 1024 * 1024) {
     // 10 MB limit
     errors.file = errors.file ?? [];
     errors.file = ["File size must not exceed 10 MB."];
@@ -100,3 +100,4 @@ export function validateImageData(data: AddImageCmd) {
 
   return errors;
 }
+
