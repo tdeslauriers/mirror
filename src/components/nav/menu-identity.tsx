@@ -36,13 +36,14 @@ export default function MenuUser({
                 <li>
                   <Link
                     className={`locallink`}
-                    href={"/users"}
+                    href={"/permissions"}
                     onClick={linkClick}
                   >
-                    Users
+                    Permissions
                   </Link>
                 </li>
               )}
+
               {render && render.users?.scope_read && (
                 <li>
                   <Link
@@ -54,6 +55,7 @@ export default function MenuUser({
                   </Link>
                 </li>
               )}
+
               {render && render.users?.client_read && (
                 <li>
                   <Link
@@ -62,6 +64,18 @@ export default function MenuUser({
                     onClick={linkClick}
                   >
                     Services
+                  </Link>
+                </li>
+              )}
+
+              {render && render.users?.user_read && (
+                <li>
+                  <Link
+                    className={`locallink`}
+                    href={"/users"}
+                    onClick={linkClick}
+                  >
+                    Users
                   </Link>
                 </li>
               )}

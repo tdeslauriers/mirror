@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import style from "./nav-drawer.module.css";
 import Modal from "../modal";
 import Link from "next/link";
-import MenuUser from "./menu-user";
+import MenuUser from "./menu-identity";
 import { UxRender } from "@/app/api";
 import { ShowMenu } from ".";
 import MenuGallery from "./menu-gallery";

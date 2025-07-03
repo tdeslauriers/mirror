@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import style from "./nav-drawer.module.css";
 import { UxRender } from "@/app/api";
-import MenuUser from "./menu-user";
+import MenuUser from "./menu-identity";
 import { ShowMenu } from ".";
 import MenuGallery from "./menu-gallery";
 import MenuBlog from "./menu-blog";

@@ -128,7 +128,7 @@ export function validatePasswords(reset: ResetData) {
   }
 
   if (reset.new_password !== reset.confirm_password) {
-    console.log("New password and confirmation password do not match.");
+    console.log("Password and confirmation password do not match.");
     errors.confirm_password = [
       "New password and confirmation password do not match.",
     ];

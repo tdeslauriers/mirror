@@ -1,33 +1,27 @@
 "use client";
 
 import { ChangeEvent, useActionState, useState } from "react";
-import { ClientRegisterActionCmd } from ".";
 import ErrorField from "../errors/error-field";
+import { ExternalRegisterActionCmd } from "@/app/externals";
+import { SERVICENAME_MIN_LENGTH } from "@/validation/service_client_field";
+import { PasswordEntries, validatePasswords } from "@/app/register";
 import {
-  SERVICENAME_MAX_LENGTH,
-  SERVICENAME_MIN_LENGTH,
-} from "@/validation/service_client_field";
-import FormSubmit from "./form-submit";
-import {
-  NAME_MAX_LENGTH,
-  NAME_MIN_LENGTH,
   PASSWORD_MAX_LENGTH,
   PASSWORD_MIN_LENGTH,
 } from "@/validation/user_fields";
-import { PasswordEntries, validatePasswords } from "@/app/register";
-import Link from "next/link";
+import FormSubmit from "./form-submit";
 
 type Err = { [key: string]: string[] };
 
-export default function ClientRegistrationForm({
+export default function ExternalRegistrationForm({
   csrf,
-  handleClientRegister,
+  handleExternalRegister,
 }: {
   csrf: string;
-  handleClientRegister: (
-    prevState: ClientRegisterActionCmd,
+  handleExternalRegister: (
+    prevState: ExternalRegisterActionCmd,
     formData: FormData
-  ) => ClientRegisterActionCmd | Promise<ClientRegisterActionCmd>;
+  ) => ExternalRegisterActionCmd | Promise<ExternalRegisterActionCmd>;
 }) {
   const [passwords, setPasswords] = useState<PasswordEntries>({});
   const [showPassword, setShowPassword] = useState(false);
@@ -56,58 +50,76 @@ export default function ClientRegistrationForm({
     setFieldErrors(errors);
   };
 
-  const [clientState, formAction] = useActionState(handleClientRegister, {
+  const [externalState, formAction] = useActionState(handleExternalRegister, {
     csrf: csrf,
     complete: false,
     registration: {},
     errors: {},
   });
+
   return (
     <>
-      {!clientState.complete && (
+      {!externalState.complete && (
         <form className="form" action={formAction}>
-          {clientState.errors.server && (
-            <ErrorField errorMsgs={clientState.errors.server} />
+          {externalState.errors.server && (
+            <ErrorField errorMsgs={externalState.errors.server} />
           )}
 
+          {/* service/app name */}
           <div className="row">
             <div className="field">
               <label className="label" htmlFor="name">
-                Service Name
+                Service/App Name
               </label>
-              {clientState.errors.name && (
-                <ErrorField errorMsgs={clientState.errors.name} />
+              {externalState.errors.name && (
+                <ErrorField errorMsgs={externalState.errors.name} />
               )}
               <input
                 className="form"
-                name="name"
                 type="text"
+                name="name"
                 minLength={SERVICENAME_MIN_LENGTH}
-                maxLength={SERVICENAME_MAX_LENGTH}
+                maxLength={SERVICENAME_MIN_LENGTH}
                 pattern="[a-z ]+" // only lowercase letters
-                defaultValue={clientState.registration?.name}
-                placeholder="Service Name"
+                defaultValue={externalState.registration?.name}
+                placeholder="Service/App Name"
                 required
               />
             </div>
           </div>
 
+          {/* description */}
+          <div className="row">
+            <div className="field">
+              <label className="label" htmlFor="description">
+                Description
+              </label>
+              {externalState.errors.description && (
+                <ErrorField errorMsgs={externalState.errors.description} />
+              )}
+              <textarea
+                className="form"
+                name="description"
+                defaultValue={externalState.registration?.description}
+                placeholder="Description"
+              />
+            </div>
+          </div>
+
+          {/* owner's name */}
           <div className="row">
             <div className="field">
               <label className="label" htmlFor="owner">
                 Owner
               </label>
-              {clientState.errors.owner && (
-                <ErrorField errorMsgs={clientState.errors.owner} />
+              {externalState.errors.owner && (
+                <ErrorField errorMsgs={externalState.errors.owner} />
               )}
               <input
-                className="form"
-                name="owner"
                 type="text"
-                minLength={NAME_MIN_LENGTH}
-                maxLength={NAME_MAX_LENGTH}
-                pattern={`^[a-zA-Z\\-\'\_\ ]+`}
-                defaultValue={clientState.registration?.owner}
+                name="owner"
+                id="owner"
+                defaultValue={externalState.registration?.owner}
                 placeholder="Owner"
                 required
               />
@@ -123,8 +135,8 @@ export default function ClientRegistrationForm({
               {fieldErrors.password && (
                 <ErrorField errorMsgs={fieldErrors.password} />
               )}
-              {clientState.errors.password && (
-                <ErrorField errorMsgs={clientState.errors.password} />
+              {externalState.errors.password && (
+                <ErrorField errorMsgs={externalState.errors.password} />
               )}
               <input
                 className={`form`}
@@ -133,7 +145,7 @@ export default function ClientRegistrationForm({
                 title={`Password must be between ${PASSWORD_MIN_LENGTH} and ${PASSWORD_MAX_LENGTH} characters long.`}
                 minLength={PASSWORD_MIN_LENGTH}
                 maxLength={PASSWORD_MAX_LENGTH}
-                defaultValue={clientState.registration?.password}
+                defaultValue={externalState.registration?.password}
                 placeholder="Password"
                 onChange={handlePwChange}
                 onBlur={handleOnBlur}
@@ -151,8 +163,8 @@ export default function ClientRegistrationForm({
               {fieldErrors.confirm_password && (
                 <ErrorField errorMsgs={fieldErrors.confirm_password} />
               )}
-              {clientState.errors.confirm_password && (
-                <ErrorField errorMsgs={clientState.errors.confirm_password} />
+              {externalState.errors.confirm_password && (
+                <ErrorField errorMsgs={externalState.errors.confirm_password} />
               )}
               <input
                 className={`form`}
@@ -161,7 +173,7 @@ export default function ClientRegistrationForm({
                 title="Passwords must match"
                 minLength={PASSWORD_MIN_LENGTH}
                 maxLength={PASSWORD_MAX_LENGTH}
-                defaultValue={clientState.registration?.confirm_password}
+                defaultValue={externalState.registration?.confirm_password}
                 placeholder="Confirm Password"
                 onChange={handlePwChange}
                 onBlur={handleOnBlur}
@@ -185,7 +197,7 @@ export default function ClientRegistrationForm({
               </label>
             </div>
           </div>
-            |
+
           {/* submit button */}
           <div className="row" style={{ marginTop: "1.5rem" }}>
             <FormSubmit
@@ -194,36 +206,6 @@ export default function ClientRegistrationForm({
             />
           </div>
         </form>
-      )}
-
-      {clientState.complete && (
-        <div>
-          <h2>
-            <span className="highlight">{clientState.registration?.name}</span>{" "}
-            service registration successful!
-          </h2>
-          <p>
-            <ul>
-              <li>
-                To view the service or make changes click here:{" "}
-                <Link
-                  className="locallink"
-                  href={`/services/${clientState.registration?.slug}`}
-                >
-                  {clientState.registration?.name}
-                </Link>
-                .
-              </li>
-              <li>
-                Return to{" "}
-                <Link className="locallink" href="/services">
-                  Services
-                </Link>
-                .
-              </li>
-            </ul>
-          </p>
-        </div>
       )}
     </>
   );

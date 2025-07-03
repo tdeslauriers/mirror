@@ -1,6 +1,5 @@
 "use server";
 
-import { cookies } from "next/headers";
 import { handleServiceClientErrors, validateClientRegister } from "..";
 import {
   ClientRegisterActionCmd,
@@ -16,6 +15,7 @@ export default async function handleClientRegister(
   previousState: ClientRegisterActionCmd,
   formData: FormData
 ) {
+  // get the form data and csrf token
   let cmd: RegisterClient = {
     csrf: previousState.csrf, // field level check in validateClientRegister
 
@@ -25,6 +25,7 @@ export default async function handleClientRegister(
     confirm_password: formData.get("confirm_password") as string,
   };
 
+  // validate the form data
   const errors = validateClientRegister(cmd);
   if (Object.keys(errors).length > 0) {
     return {

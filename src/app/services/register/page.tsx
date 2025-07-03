@@ -1,10 +1,6 @@
 import GetCsrf from "@/components/csrf-token";
 import Loading from "@/components/loading";
-import GetOauthExchange from "@/components/oauth-exchange";
-import { cookies } from "next/headers";
-import { redirect } from "next/navigation";
 import { Suspense } from "react";
-
 import ClientRegistrationForm from "@/components/forms/client-registration-form";
 import handleClientRegister from "./actions";
 import Link from "next/link";
@@ -27,7 +23,7 @@ export default async function Page() {
     throw new Error(pageError + "You do not have permission to add services.");
   }
 
-  // get csrf token from gateway for profile form
+  // get csrf token from gateway for add/register service form
   const csrf = await GetCsrf(cookies.session ? cookies.session : "");
 
   if (!csrf) {
@@ -63,7 +59,14 @@ export default async function Page() {
         <hr className={`page-title`} />
 
         <div className="card-title">
-          <h2>Add Service</h2>
+          <h2>
+            Add Service
+            <sup>
+              <span className="highlight-info" style={{ fontSize: ".65em" }}>
+                *all fields are required
+              </span>
+            </sup>
+          </h2>
         </div>
         <Suspense fallback={<Loading />}>
           <div className="card">

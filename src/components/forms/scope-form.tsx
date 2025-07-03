@@ -107,7 +107,7 @@ export default function ScopeForm({
         <div className="row">
           <div className="field">
             <label className="label" htmlFor="name">
-              Name
+              Scope Name
             </label>
             {scopeState.errors.name && (
               <ErrorField errorMsgs={scopeState.errors.name} />
@@ -120,7 +120,7 @@ export default function ScopeForm({
               maxLength={SCOPE_NAME_MAX_LENGTH}
               pattern="[a-zA-Z0-9 ]+" // only letters and numbers
               defaultValue={scopeState.scope?.name}
-              placeholder="Name"
+              placeholder="Scope Name"
               required
               disabled={!editAllowed}
             />
