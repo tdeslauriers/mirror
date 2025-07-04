@@ -87,6 +87,7 @@ export async function getAuthCookies(page: string) {
     throw new Error(`Failed to load ${page} page: session cookie is missing`);
   }
 
+  // check session cookie is well formed
   const checkSession = checkUuid(hasSession?.value);
   if (!checkSession.isValid) {
     throw new Error(`Failed to load ${page} page: session cookie is invalid`);

@@ -3,6 +3,7 @@ import { getAuthCookies } from "@/components/checkCookies";
 import Loading from "@/components/loading";
 import { Suspense } from "react";
 import PermissionsTable from "./permissions_table";
+import Link from "next/link";
 
 export const metadata = {
   robots: "noindex, nofollow",
@@ -34,7 +35,21 @@ export default async function PermissionsPage() {
       <main className={`main main-drawer`}>
         <div className={`center`}></div>
         <div className={`page-title`}>
-          <h1>Permissions</h1>
+          <div
+            className="actions"
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              paddingRight: "1rem",
+            }}
+          >
+            <h1>Permissions</h1>
+            {cookies.identity?.ux_render?.users?.scope_write && (
+              <Link href="/permissions/add">
+                <button>Add Permission</button>
+              </Link>
+            )}
+          </div>
         </div>
         <hr className={`page-title`} />
         <div className="banner">

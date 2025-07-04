@@ -163,20 +163,6 @@ export default function ScopeForm({
           </div>
         </div>
 
-        {editAllowed && (
-          <div className={`row`}>
-            <FormSubmit
-              buttonLabel={
-                scopeState.scope?.slug ? "Update scope data" : "Add scope"
-              }
-              pendingLabel={
-                scopeState.scope?.slug
-                  ? "Updating scope record..."
-                  : "Adding scope..."
-              }
-            />
-          </div>
-        )}
       </form>
     </>
   );

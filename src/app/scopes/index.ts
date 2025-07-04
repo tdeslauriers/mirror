@@ -7,6 +7,8 @@ import {
 import { checkServiceName } from "@/validation/service_client_field";
 import { FieldValidation } from "@/validation/user_fields";
 
+const allowedServices = new Set(["pixie", "apprentice", "ran", "shaw"]);
+
 export function validateScope(scope: Scope) {
   const errors: { [key: string]: string[] } = {};
 
@@ -17,7 +19,7 @@ export function validateScope(scope: Scope) {
     scope.csrf.trim().length > 64
   ) {
     errors.csrf = [
-      "CSRF token is not well formed.  My cannot edit or tamper with this value.",
+      "CSRF token is not well formed.  Cannot edit or tamper with this value.",
     ];
   }
 
@@ -31,6 +33,20 @@ export function validateScope(scope: Scope) {
     if (!serviceName.isValid) {
       errors.service_name = serviceName.messages;
     }
+  }
+
+  // check if service is allowed
+  if (
+    scope.service_name &&
+    !allowedServices.has(scope.service_name.toLowerCase())
+  ) {
+    errors.service_name = [
+      `Service "${
+        scope.service_name
+      }" is not allowed. Allowed services are: ${Array.from(
+        allowedServices
+      ).join(", ")}`,
+    ];
   }
 
   // check scope

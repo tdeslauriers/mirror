@@ -1,20 +1,20 @@
+import { getAuthCookies } from "@/components/checkCookies";
 import GetCsrf from "@/components/csrf-token";
-import ScopeForm from "@/components/forms/scope-form";
-import { handleScopeAdd } from "./actions";
+import PermissionForm from "@/components/forms/permission-form";
+import Loading from "@/components/loading";
 import Link from "next/link";
 import { Suspense } from "react";
-import Loading from "@/components/loading";
-import { getAuthCookies } from "@/components/checkCookies";
+import { handlePermissionAdd } from "./actions";
 
 export const metadata = {
   robots: "noindex, nofollow",
 };
 
-const pageError = "Failed to load scope add page: ";
+const pageError = "Failed to load add permission page: ";
 
-export default async function ScopesAddPage() {
+export default async function PermissionsAddPage() {
   // quick for redirect if auth'd cookies not present
-  const cookies = await getAuthCookies("/scopes/add");
+  const cookies = await getAuthCookies("/permissions/add");
 
   // check if identity cookie has scopes_write permission
   // ie, gaurd pattern or access hint gating
@@ -28,10 +28,10 @@ export default async function ScopesAddPage() {
 
   if (!csrf) {
     console.log(
-      pageError + "CSRF token could not be retrieved for scope form."
+      pageError + "CSRF token could not be retrieved for permission form."
     );
     throw new Error(
-      pageError + "CSRF token could not be retrieved for scope form."
+      pageError + "CSRF token could not be retrieved for permission form."
     );
   }
 
@@ -49,10 +49,10 @@ export default async function ScopesAddPage() {
             }}
           >
             <h1>
-              Scope: <span className="highlight">add</span>
+              Permission: <span className="highlight">add</span>
             </h1>
-            <Link href="/scopes">
-              <button>Scopes Table</button>
+            <Link href="/permissions">
+              <button>Permissions Table</button>
             </Link>
           </div>
         </div>
@@ -60,24 +60,32 @@ export default async function ScopesAddPage() {
 
         {/* banner */}
         <div className="banner">
-          Scopes grant access to resources and services, specifically endpoints.
-          They can either be authorization in their own right, or combined with
-          fine fine-grain permssions.
+          <ul>
+            <li>
+              Permissions are fine-grained access controls that are attached to
+              users and resources, tying the two together.
+            </li>
+            <li>
+              <strong>Note:</strong> a permission alone will not grant access.
+              One must also have a scope allowing access to the resource&apos;s
+              or service&apos;s endpoint.
+            </li>
+          </ul>
         </div>
 
         <div className="card-title">
-          <h2>Add Scope</h2>
+          <h2>Add Permission</h2>
         </div>
 
-        {/* scope form */}
+        {/* permission form */}
         <Suspense fallback={<Loading />}>
           <div className="card">
-            <ScopeForm
+            <PermissionForm
               csrf={csrf}
               editAllowed={cookies.identity?.ux_render?.users?.scope_write}
               slug={null}
-              scope={null}
-              scopeFormUpdate={handleScopeAdd}
+              permission={null}
+              permissionFormUpdate={handlePermissionAdd}
             />
           </div>
         </Suspense>

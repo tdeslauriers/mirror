@@ -1,13 +1,12 @@
 "use server";
 
-import { validateScope } from "..";
-import { redirect } from "next/navigation";
 import { GatewayError, isGatewayError } from "@/app/api";
-import { Scope, ScopeActionCmd } from "@/components/forms";
 import { checkForSessionCookie } from "@/components/checkCookies";
+import { Permission, PermissionActionCmd, validatePermission } from "..";
+import { redirect } from "next/navigation";
 
-export async function handleScopeAdd(
-  previousState: ScopeActionCmd,
+export async function handlePermissionAdd(
+  previousState: PermissionActionCmd,
   formData: FormData
 ) {
   // get session token
@@ -22,30 +21,29 @@ export async function handleScopeAdd(
     );
   }
   // slug unnecessary, will be dropped even if submitted (which would indicate tampering from this page)
-  let add: Scope = {
+  let add: Permission = {
     csrf: csrf,
 
-    service_name: formData.get("service_name") as string,
-    scope: formData.get("scope") as string,
+    service: formData.get("service_name") as string,
     name: formData.get("name") as string,
     description: formData.get("description") as string,
     active: formData.get("active") === "on" ? true : false,
   };
 
   // validate form data
-  const errors = validateScope(add);
+  const errors = validatePermission(add);
   if (errors && Object.keys(errors).length > 0) {
     return {
       csrf: csrf,
-      scope: add,
+      permission: add,
       errors: errors,
-    } as ScopeActionCmd;
+    } as PermissionActionCmd;
   }
 
-  // send form data to gateway
+  // send form data to the gateway
   try {
     const response = await fetch(
-      `${process.env.GATEWAY_SERVICE_URL}/scopes/add`,
+      `${process.env.GATEWAY_SERVICE_URL}/permissions/add`,
       {
         method: "POST",
         headers: {
@@ -58,26 +56,30 @@ export async function handleScopeAdd(
 
     if (response.ok) {
       add = await response.json();
-      console.log("Scope record added successfully: ", add);
+      console.log("Permission added successfully:", add);
     } else {
-      const fail = await response.json();
-      if (isGatewayError(fail)) {
-        const errors = handleScopeErrors(fail);
+      const errorResponse = await response.json();
+      if (isGatewayError(errorResponse)) {
+        const gatewayError: GatewayError = errorResponse;
+        const errors = handlePermissionErrors(gatewayError);
         return {
           csrf: csrf,
-          scope: add,
+          permission: add,
           errors: errors,
-        } as ScopeActionCmd;
+        } as PermissionActionCmd;
+      } else {
+        throw new Error("Unhandled error calling the gateway service.");
       }
     }
   } catch (error) {
-    console.log(error);
-    throw new Error("Failed to add scope record.");
+    console.error("Error adding permission:", error);
+    throw new Error("Failed to add permission record.");
   }
-  redirect("/scopes");
+
+  redirect("/permissions");
 }
 
-function handleScopeErrors(gatewayError: GatewayError) {
+function handlePermissionErrors(gatewayError: GatewayError) {
   const errors: { [key: string]: string[] } = {};
 
   switch (gatewayError.code) {
@@ -98,11 +100,8 @@ function handleScopeErrors(gatewayError: GatewayError) {
       return errors;
     case 422:
       switch (true) {
-        case gatewayError.message.includes("service_name"):
-          errors.service_name = [gatewayError.message];
-          return errors;
-        case gatewayError.message.includes("scope"):
-          errors.scope = [gatewayError.message];
+        case gatewayError.message.includes("service"):
+          errors.service = [gatewayError.message];
           return errors;
         case gatewayError.message.includes("name"):
           errors.name = [gatewayError.message];
