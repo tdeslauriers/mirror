@@ -34,9 +34,21 @@ export async function handlePermissionEdit(
     );
   }
 
-  // check if service is allowed
-  // changing this value would indicate tampering from this page
   const service = previousState.service;
+
+  // build updated permission object
+  let updated: Permission = {
+    csrf: csrf,
+
+    // service is dropped upstream
+    // need to create a new permission in the applicable service, they cannot be moved from one to the other.
+    service: service as string, // needs to be added here because field disabled in form ==> null
+    name: formData.get("name") as string,
+    description: formData.get("description") as string,
+    active: formData.get("active") === "on" ? true : false,
+  };
+
+  // validate service name --> change would indicate tampering
   if (!service || !isAllowedService(service)) {
     const errors: { [key: string]: string[] } = {};
     errors.service = ["Service name is not allowed."];
@@ -44,21 +56,10 @@ export async function handlePermissionEdit(
       csrf: csrf,
       slug: slug,
       service: service,
-      permission: null,
+      permission: updated,
       errors: errors,
     } as PermissionActionCmd;
   }
-
-  let updated: Permission = {
-    csrf: csrf,
-
-    // service not included becuase it cannot be changed.
-    // need to create a new permission in the applicable service.
-    service: service, // needs to be added here because field disabled in form ==> null
-    name: formData.get("name") as string,
-    description: formData.get("description") as string,
-    active: formData.get("active") === "on" ? true : false,
-  };
 
   // validate form data
   const errors = validatePermission(updated);
