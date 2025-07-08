@@ -17,12 +17,14 @@ export default function PermissionForm({
   csrf,
   editAllowed,
   slug,
+  service,
   permission,
   permissionFormUpdate,
 }: {
   csrf: string | null;
-  editAllowed: boolean;
+  editAllowed?: boolean;
   slug: string | null;
+  service: string | null;
   permission: Permission | null;
   permissionFormUpdate: (
     prevState: PermissionActionCmd,
@@ -32,6 +34,7 @@ export default function PermissionForm({
   const [permissionState, formAction] = useActionState(permissionFormUpdate, {
     csrf: csrf,
     slug: slug,
+    service: service,
     permission: permission,
     errors: {},
   });
@@ -48,11 +51,19 @@ export default function PermissionForm({
       {/*Service Name */}
       <div className="row">
         <div className="field">
-          <label className="label" htmlFor="name">
+          <label className="label" htmlFor="service">
             Service
+            {permissionState.service !== null && (
+              <sup style={{ fontSize: "0.7rem" }}>
+                <span className="highlight-info">
+                  {" "}
+                  *Service cannot be changed
+                </span>
+              </sup>
+            )}
           </label>
-          {permissionState.errors.service_name && (
-            <ErrorField errorMsgs={permissionState.errors.service_name} />
+          {permissionState.errors.service && (
+            <ErrorField errorMsgs={permissionState.errors.service} />
           )}
           <input
             className="form"
@@ -65,7 +76,7 @@ export default function PermissionForm({
             defaultValue={permissionState.permission?.service}
             placeholder="Service Name"
             required
-            disabled={!editAllowed}
+            disabled={!editAllowed || permissionState.service !== null}
           />
         </div>
       </div>

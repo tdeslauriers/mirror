@@ -2,7 +2,12 @@
 
 import { GatewayError, isGatewayError } from "@/app/api";
 import { checkForSessionCookie } from "@/components/checkCookies";
-import { Permission, PermissionActionCmd, validatePermission } from "..";
+import {
+  isAllowedService,
+  Permission,
+  PermissionActionCmd,
+  validatePermission,
+} from "..";
 import { redirect } from "next/navigation";
 
 export async function handlePermissionAdd(
@@ -24,7 +29,8 @@ export async function handlePermissionAdd(
   let add: Permission = {
     csrf: csrf,
 
-    service: formData.get("service_name") as string,
+    // TODO: update service name to be dropdown
+    service: formData.get("service") as string,
     name: formData.get("name") as string,
     description: formData.get("description") as string,
     active: formData.get("active") === "on" ? true : false,
@@ -40,10 +46,21 @@ export async function handlePermissionAdd(
     } as PermissionActionCmd;
   }
 
+  // check if service is allowed
+  if (!add.service || !isAllowedService(add.service)) {
+    const errors: { [key: string]: string[] } = {};
+    errors.service = ["Service name is not allowed."];
+    return {
+      csrf: csrf,
+      permission: add,
+      errors: errors,
+    } as PermissionActionCmd;
+  }
+
   // send form data to the gateway
   try {
     const response = await fetch(
-      `${process.env.GATEWAY_SERVICE_URL}/permissions/add`,
+      `${process.env.GATEWAY_SERVICE_URL}/permissions`,
       {
         method: "POST",
         headers: {

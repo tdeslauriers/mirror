@@ -19,7 +19,10 @@ export default function PermissionsTable({ data }: PermissionsTableProps) {
       accessor: "name" as keyof Permission,
       sortable: true,
       render: (value: Permission[keyof Permission], row: Permission) => (
-        <Link className="locallink no-hover" href={`/permissions/${row.slug}`}>
+        <Link
+          className="locallink no-hover"
+          href={`/permissions/${row.service}/${row.slug}`}
+        >
           {value}
         </Link>
       ),

@@ -84,6 +84,7 @@ export default async function PermissionsAddPage() {
               csrf={csrf}
               editAllowed={cookies.identity?.ux_render?.users?.scope_write}
               slug={null}
+              service={null}
               permission={null}
               permissionFormUpdate={handlePermissionAdd}
             />

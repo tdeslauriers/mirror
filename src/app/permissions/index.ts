@@ -8,6 +8,7 @@ import { FieldValidation } from "@/validation/user_fields";
 export type PermissionActionCmd = {
   csrf?: string | null;
   slug?: string | null;
+  service?: string | null;
   permission?: Permission | null;
   errors: { [key: string]: string[] };
 };
@@ -24,6 +25,16 @@ export type Permission = {
   active?: boolean;
   slug?: string;
 };
+
+// not all services have fine-grained permissions, so check if the service is allowed
+const allowedServiceNames = new Set(["pixie", "apprentice"]);
+
+export function isAllowedService(serviceName: string): boolean {
+  if (!serviceName || serviceName.trim().length === 0) {
+    return false;
+  }
+  return allowedServiceNames.has(serviceName.toLowerCase());
+}
 
 export function validatePermission(permission: Permission) {
   const errors: { [key: string]: string[] } = {};

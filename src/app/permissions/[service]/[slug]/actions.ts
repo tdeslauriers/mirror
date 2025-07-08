@@ -1,12 +1,16 @@
 "use server";
 
-import { validateScope } from "..";
-import { GatewayError, isGatewayError } from "@/app/api";
-import { Scope, ScopeActionCmd } from "@/components/forms";
 import { checkForSessionCookie } from "@/components/checkCookies";
+import {
+  isAllowedService,
+  Permission,
+  PermissionActionCmd,
+  validatePermission,
+} from "../..";
+import { isGatewayError } from "@/app/api";
 
-export async function handleScopeEdit(
-  previousState: ScopeActionCmd,
+export async function handlePermissionEdit(
+  previousState: PermissionActionCmd,
   formData: FormData
 ) {
   // get session token
@@ -17,7 +21,7 @@ export async function handleScopeEdit(
   const csrf = previousState.csrf;
   if (!csrf || csrf.trim().length < 16 || csrf.trim().length > 64) {
     throw new Error(
-      "CSRF token is missing or not well formed.  This value is required and cannot be tampered with."
+      "CSRF token is missing or not well formed. This value is required and cannot be tampered with."
     );
   }
 
@@ -26,41 +30,58 @@ export async function handleScopeEdit(
   const slug = previousState.slug;
   if (!slug || slug.trim().length < 16 || slug.trim().length > 64) {
     throw new Error(
-      "Scope slug is missing or not well formed.  This value is required and cannot be tampered with."
+      "Scope slug is missing or not well formed. This value is required and cannot be tampered with."
     );
   }
 
-  let updated: Scope = {
+  // check if service is allowed
+  // changing this value would indicate tampering from this page
+  const service = previousState.service;
+  if (!service || !isAllowedService(service)) {
+    const errors: { [key: string]: string[] } = {};
+    errors.service = ["Service name is not allowed."];
+    return {
+      csrf: csrf,
+      slug: slug,
+      service: service,
+      permission: null,
+      errors: errors,
+    } as PermissionActionCmd;
+  }
+
+  let updated: Permission = {
     csrf: csrf,
 
-    // TODO: update service name to be dropdown
-    service_name: formData.get("service_name") as string,
-    scope: formData.get("scope") as string,
+    // service not included becuase it cannot be changed.
+    // need to create a new permission in the applicable service.
+    service: service, // needs to be added here because field disabled in form ==> null
     name: formData.get("name") as string,
     description: formData.get("description") as string,
     active: formData.get("active") === "on" ? true : false,
   };
 
   // validate form data
-  const errors = validateScope(updated);
+  const errors = validatePermission(updated);
   if (errors && Object.keys(errors).length > 0) {
     return {
       csrf: csrf,
       slug: slug,
-      scope: updated,
+      service: service,
+      permission: updated,
       errors: errors,
-    } as ScopeActionCmd;
+    } as PermissionActionCmd;
   }
 
-  // call gateway to update scope record
+  // submit update to the gateway
   try {
+    // call gateway to update permission record
     const apiResponse = await fetch(
-      `${process.env.GATEWAY_SERVICE_URL}/scopes/${slug}`,
+      `${process.env.GATEWAY_SERVICE_URL}/permissions/${service}/${slug}`,
       {
         method: "PUT",
         headers: {
-          Authorization: `${sessionCookie.value}`,
           "Content-Type": "application/json",
+          Authorization: `${sessionCookie.value}`,
         },
         body: JSON.stringify(updated),
       }
@@ -71,31 +92,35 @@ export async function handleScopeEdit(
       return {
         csrf: csrf,
         slug: slug,
-        scope: success as Scope,
-        errors: errors,
-      } as ScopeActionCmd;
+        service: service,
+        permission: success as Permission,
+        errors: {},
+      } as PermissionActionCmd;
     } else {
       const fail = await apiResponse.json();
       if (isGatewayError(fail)) {
-        const errors = handleScopeErrors(fail);
+        const errors = handlePermissionErrors(fail);
         return {
           csrf: csrf,
           slug: slug,
-          scope: updated,
+          service: service,
+          permission: updated,
           errors: errors,
-        } as ScopeActionCmd;
+        } as PermissionActionCmd;
       } else {
         throw new Error(
-          "Scope record could not be updated due to unhandled gateway error."
+          "Failed to update permission record due to unhandled gateway error."
         );
       }
     }
   } catch (error) {
-    throw new Error("Failed to update scope record due to unhandled error.");
+    throw new Error(
+      "Failed to update permission record due to unhandled error."
+    );
   }
 }
 
-function handleScopeErrors(gatewayError: GatewayError) {
+function handlePermissionErrors(gatewayError: any) {
   const errors: { [key: string]: string[] } = {};
 
   switch (gatewayError.code) {
@@ -116,11 +141,8 @@ function handleScopeErrors(gatewayError: GatewayError) {
       return errors;
     case 422:
       switch (true) {
-        case gatewayError.message.includes("service_name"):
+        case gatewayError.message.includes("service"):
           errors.service_name = [gatewayError.message];
-          return errors;
-        case gatewayError.message.includes("scope"):
-          errors.scope = [gatewayError.message];
           return errors;
         case gatewayError.message.includes("name"):
           errors.name = [gatewayError.message];
@@ -132,7 +154,7 @@ function handleScopeErrors(gatewayError: GatewayError) {
           break;
       }
     default:
-      errors.server = ["Unhandled error calling the gateway service."];
+      errors.server = ["An unexpected error occurred."];
       return errors;
   }
 }
