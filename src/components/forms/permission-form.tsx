@@ -7,11 +7,13 @@ import {
   SERVICENAME_MAX_LENGTH,
   SERVICENAME_MIN_LENGTH,
 } from "@/validation/service_client_field";
-import {
-  SCOPE_NAME_MAX_LENGTH,
-  SCOPE_NAME_MIN_LENGTH,
-} from "@/validation/scope_fields";
 import FormSubmit from "./form-submit";
+import {
+  PERMISSION_MAX_LENGTH,
+  PERMISSION_MIN_LENGTH,
+  PERMISSION_NAME_MAX_LENGTH,
+  PERMISSION_NAME_MIN_LENGTH,
+} from "@/validation/permission-fields";
 
 export default function PermissionForm({
   csrf,
@@ -51,32 +53,64 @@ export default function PermissionForm({
       {/*Service Name */}
       <div className="row">
         <div className="field">
-          <label className="label" htmlFor="service">
+          <label className="label" htmlFor="service_name">
             Service
-            {permissionState.service !== null && (
-              <sup style={{ fontSize: "0.7rem" }}>
-                <span className="highlight-info">
-                  {" "}
-                  *Service cannot be changed
+            {permissionState.service !== null &&
+              permissionState.slug !== null && (
+                <sup style={{ fontSize: "0.7rem" }}>
+                  <span className="highlight">
+                    {" "}
+                    *Service cannot be changed
+                  </span>
+                </sup>
+              )}
+          </label>
+          {permissionState.errors.service_name && (
+            <ErrorField errorMsgs={permissionState.errors.service_name} />
+          )}
+          <input
+            className="form"
+            name="service_name"
+            type="text"
+            minLength={SERVICENAME_MIN_LENGTH}
+            maxLength={SERVICENAME_MAX_LENGTH}
+            pattern="[a-z]+" // only lowercase letters
+            title="Only lowercase letters allowed"
+            defaultValue={permissionState.permission?.service_name}
+            placeholder="Service Name"
+            required
+            disabled={!editAllowed || (service !== null && slug !== null)}
+          />
+        </div>
+      </div>
+
+      {/* Permission */}
+      <div className="row">
+        <div className="field">
+          <label className="label" htmlFor="permission">
+            permission{" "}
+            {slug && (
+              <sup style={{ fontSize: ".7rem" }}>
+                <span className="highlight">
+                  *Be very careful changing this field
                 </span>
               </sup>
             )}
           </label>
-          {permissionState.errors.service && (
-            <ErrorField errorMsgs={permissionState.errors.service} />
+          {permissionState.errors.permission && (
+            <ErrorField errorMsgs={permissionState.errors.permission} />
           )}
           <input
             className="form"
-            name="service"
+            name="permission"
             type="text"
-            minLength={SERVICENAME_MIN_LENGTH}
-            maxLength={SERVICENAME_MAX_LENGTH}
-            pattern="[a-z ]+" // only lowercase letters
-            title="Only lowercase letters allowed"
-            defaultValue={permissionState.permission?.service}
-            placeholder="Service Name"
+            minLength={PERMISSION_MIN_LENGTH}
+            maxLength={PERMISSION_MAX_LENGTH}
+            pattern="[A-Z0-9_]+" // only capital letters and numbers
+            defaultValue={permissionState.permission?.permission}
+            placeholder="Permission"
             required
-            disabled={!editAllowed || permissionState.service !== null}
+            disabled={!editAllowed}
           />
         </div>
       </div>
@@ -85,7 +119,7 @@ export default function PermissionForm({
       <div className="row">
         <div className="field">
           <label className="label" htmlFor="name">
-            permission
+            permission name
           </label>
           {permissionState.errors.name && (
             <ErrorField errorMsgs={permissionState.errors.name} />
@@ -94,9 +128,9 @@ export default function PermissionForm({
             className="form"
             name="name"
             type="text"
-            minLength={SCOPE_NAME_MIN_LENGTH}
-            maxLength={SCOPE_NAME_MAX_LENGTH}
-            pattern="[a-zA-Z0-9]+" // only letters and numbers
+            minLength={PERMISSION_NAME_MIN_LENGTH}
+            maxLength={PERMISSION_NAME_MAX_LENGTH}
+            pattern="[a-zA-Z0-9 ]+" // only letters and numbers
             defaultValue={permissionState.permission?.name}
             placeholder="Permission Name"
             required

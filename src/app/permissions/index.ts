@@ -1,4 +1,5 @@
 import {
+  checkPermission,
   checkPermissionDescription,
   checkPermissionName,
 } from "@/validation/permission-fields";
@@ -18,8 +19,9 @@ const allowedServices = new Set(["pixie", "apprentice"]);
 export type Permission = {
   csrf?: string;
   uuid?: string;
+  service_name?: string;
+  permission?: string;
   name?: string;
-  service?: string;
   description?: string;
   created_at?: string;
   active?: boolean;
@@ -51,12 +53,14 @@ export function validatePermission(permission: Permission) {
   }
 
   // validate service name
-  if (!permission.service || permission.service.trim().length === 0) {
+  if (!permission.service_name || permission.service_name.trim().length === 0) {
     errors.service_name = ["Service name is required."];
   }
 
-  if (permission.service && permission.service.trim().length > 0) {
-    const serviceName: FieldValidation = checkServiceName(permission.service);
+  if (permission.service_name && permission.service_name.trim().length > 0) {
+    const serviceName: FieldValidation = checkServiceName(
+      permission.service_name
+    );
     if (!serviceName.isValid) {
       errors.service_name = serviceName.messages;
     }
@@ -64,16 +68,30 @@ export function validatePermission(permission: Permission) {
 
   // check if service is allowed
   if (
-    permission.service &&
-    !allowedServices.has(permission.service.toLowerCase())
+    permission.service_name &&
+    !allowedServices.has(permission.service_name.toLowerCase())
   ) {
     errors.service_name = [
       `Service "${
-        permission.service
+        permission.service_name
       }" is not allowed. Allowed services are: ${Array.from(
         allowedServices
       ).join(", ")}`,
     ];
+  }
+
+  // check permission
+  if (!permission.permission || permission.permission.trim().length === 0) {
+    errors.permission = ["Permission is required."];
+  }
+
+  if (permission.permission && permission.permission.trim().length > 0) {
+    const permissionCheck: FieldValidation = checkPermission(
+      permission.permission
+    );
+    if (!permissionCheck.isValid) {
+      errors.permission = permissionCheck.messages;
+    }
   }
 
   // check permission name

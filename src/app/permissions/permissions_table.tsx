@@ -16,20 +16,25 @@ export default function PermissionsTable({ data }: PermissionsTableProps) {
   const columns: TableColumn<Permission>[] = [
     {
       header: "Permission",
-      accessor: "name" as keyof Permission,
+      accessor: "permission" as keyof Permission,
       sortable: true,
       render: (value: Permission[keyof Permission], row: Permission) => (
         <Link
           className="locallink no-hover"
-          href={`/permissions/${row.service}/${row.slug}`}
+          href={`/permissions/${row.service_name}/${row.slug}`}
         >
           {value}
         </Link>
       ),
     },
     {
+      header: "Name",
+      accessor: "name" as keyof Permission,
+      sortable: true,
+    },
+    {
       header: "Service",
-      accessor: "service" as keyof Permission,
+      accessor: "service_name" as keyof Permission,
       sortable: true,
     },
     {
@@ -80,7 +85,7 @@ export default function PermissionsTable({ data }: PermissionsTableProps) {
           data={data}
           columns={columns}
           search={search}
-          filterKeys={["name", "service", "description"]}
+          filterKeys={["permission", "name", "service_name", "description"]}
           pageSize={10}
         />
       </Suspense>

@@ -89,14 +89,14 @@ export default function Table<T>({
   }, [filteredData, sortConfig]);
 
   // pagination
-  const totalPages = Math.ceil(sortedData.length / pageSize);
+  const totalPages = Math.ceil(sortedData?.length / pageSize);
   const paginatedData = useMemo(() => {
     if (currentPage > totalPages || totalPages === 0) {
       setCurrentPage(1);
     }
     const startIndex = (currentPage - 1) * pageSize;
     const endIndex = startIndex + pageSize;
-    return sortedData.slice(startIndex, endIndex);
+    return sortedData?.slice(startIndex, endIndex);
   }, [sortedData, currentPage, pageSize, totalPages]);
 
   const handleSort = (key: keyof T) => {
@@ -133,7 +133,7 @@ export default function Table<T>({
           </tr>
         </thead>
         <tbody>
-          {paginatedData.map((row, index) => (
+          {paginatedData?.map((row, index) => (
             <tr key={index}>
               {columns.map((column) => (
                 <td key={String(column.accessor)} data-label={column.header}>

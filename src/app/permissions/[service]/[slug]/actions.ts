@@ -42,7 +42,8 @@ export async function handlePermissionEdit(
 
     // service is dropped upstream
     // need to create a new permission in the applicable service, they cannot be moved from one to the other.
-    service: service as string, // needs to be added here because field disabled in form ==> null
+    service_name: service as string, // needs to be added here because field disabled in form ==> null
+    permission: formData.get("permission") as string,
     name: formData.get("name") as string,
     description: formData.get("description") as string,
     active: formData.get("active") === "on" ? true : false,
@@ -73,7 +74,7 @@ export async function handlePermissionEdit(
     } as PermissionActionCmd;
   }
 
-  // submit update to the gateway
+  //   submit update to the gateway
   try {
     // call gateway to update permission record
     const apiResponse = await fetch(

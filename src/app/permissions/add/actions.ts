@@ -30,15 +30,17 @@ export async function handlePermissionAdd(
     csrf: csrf,
 
     // TODO: update service name to be dropdown
-    service: formData.get("service") as string,
+    service_name: formData.get("service_name") as string, // needs to be added here because field disabled in form ==> null
+    permission: formData.get("permission") as string,
     name: formData.get("name") as string,
     description: formData.get("description") as string,
     active: formData.get("active") === "on" ? true : false,
   };
 
-  // validate form data
-  const errors = validatePermission(add);
-  if (errors && Object.keys(errors).length > 0) {
+  // check if service is allowed
+  if (!add.service_name || !isAllowedService(add.service_name)) {
+    const errors: { [key: string]: string[] } = {};
+    errors.service = ["Service name is not allowed."];
     return {
       csrf: csrf,
       permission: add,
@@ -46,10 +48,9 @@ export async function handlePermissionAdd(
     } as PermissionActionCmd;
   }
 
-  // check if service is allowed
-  if (!add.service || !isAllowedService(add.service)) {
-    const errors: { [key: string]: string[] } = {};
-    errors.service = ["Service name is not allowed."];
+  // validate form data
+  const errors = validatePermission(add);
+  if (errors && Object.keys(errors).length > 0) {
     return {
       csrf: csrf,
       permission: add,
@@ -72,8 +73,8 @@ export async function handlePermissionAdd(
     );
 
     if (response.ok) {
-      add = await response.json();
-      console.log("Permission added successfully:", add);
+      const added = await response.json();
+      console.log("Permission added successfully:", added);
     } else {
       const errorResponse = await response.json();
       if (isGatewayError(errorResponse)) {
@@ -117,7 +118,7 @@ function handlePermissionErrors(gatewayError: GatewayError) {
       return errors;
     case 422:
       switch (true) {
-        case gatewayError.message.includes("service"):
+        case gatewayError.message.includes("service name"):
           errors.service = [gatewayError.message];
           return errors;
         case gatewayError.message.includes("name"):
