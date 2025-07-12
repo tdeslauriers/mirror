@@ -4,9 +4,10 @@ import { Suspense } from "react";
 import UserForm from "@/components/forms/user-form";
 import Loading from "@/components/loading";
 import { handleScopesUpdate, handleUserEdit } from "./actions";
-import ScopesManageForm from "@/components/forms/scopes-manage-form";
+import ManageAccessForm from "@/components/forms/manage-access-form";
 import { getAuthCookies } from "@/components/checkCookies";
 import callGatewayData from "@/components/call-gateway-data";
+import ManageScopesForm from "@/components/forms/manage-scopes-form";
 
 export const metadata = {
   robots: "noindex, nofollow",
@@ -124,10 +125,10 @@ export default async function Page({
         </div>
         <Suspense fallback={<Loading />}>
           <div className="card">
-            <ScopesManageForm
+            <ManageScopesForm
               csrf={csrf}
               editAllowed={cookies.identity?.ux_render?.users?.user_write}
-              slug={slug}
+              entitySlug={slug}
               entityScopes={user?.scopes}
               menuScopes={allScopes}
               updateScopes={handleScopesUpdate}

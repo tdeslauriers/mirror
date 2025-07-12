@@ -1,3 +1,4 @@
+import { Scope } from "@/app/scopes";
 import { TaskTemplate } from "@/app/templates";
 import {
   checkPassword,
@@ -6,25 +7,7 @@ import {
   PASSWORD_MIN_LENGTH,
 } from "@/validation/user_fields";
 
-export type Scope = {
-  csrf?: string;
 
-  scope_id?: string;
-  service_name?: string;
-  scope?: string;
-  name?: string;
-  description?: string;
-  created_at?: string;
-  active?: boolean;
-  slug?: string;
-};
-
-export type ScopeActionCmd = {
-  csrf?: string | null;
-  slug?: string | null;
-  scope?: Scope | null;
-  errors: { [key: string]: string[] };
-};
 
 export type ServiceClient = {
   csrf?: string;

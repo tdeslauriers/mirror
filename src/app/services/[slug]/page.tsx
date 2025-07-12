@@ -4,7 +4,7 @@ import Loading from "@/components/loading";
 import { Suspense } from "react";
 import { handleClientEdit, handleReset, handleScopesUpdate } from "./actions";
 import ResetForm from "@/components/forms/reset-form";
-import ScopesManageForm from "@/components/forms/scopes-manage-form";
+import ManageAccessForm from "@/components/forms/manage-access-form";
 import Link from "next/link";
 import { getAuthCookies } from "@/components/checkCookies";
 import callGatewayData from "@/components/call-gateway-data";
@@ -162,13 +162,13 @@ export default async function Page({
         </div>
         <Suspense fallback={<Loading />}>
           <div className="card">
-            <ScopesManageForm
+            <ManageAccessForm
               csrf={csrf}
               editAllowed={cookies.identity.ux_render?.users?.client_write}
-              slug={slug}
-              entityScopes={client.scopes}
-              menuScopes={allScopes}
-              updateScopes={handleScopesUpdate}
+              entitySlug={slug}
+              entityAccessItems={client.scopes}
+              menuAccessItems={allScopes}
+              updateAccessItems={handleScopesUpdate}
             />
           </div>
         </Suspense>

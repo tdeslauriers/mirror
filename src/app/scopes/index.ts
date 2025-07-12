@@ -1,4 +1,3 @@
-import { Scope } from "@/components/forms";
 import {
   checkScope,
   checkScopeDescription,
@@ -8,6 +7,26 @@ import { checkServiceName } from "@/validation/service_client_field";
 import { FieldValidation } from "@/validation/user_fields";
 
 const allowedServices = new Set(["pixie", "apprentice", "ran", "shaw"]);
+
+export type Scope = {
+  csrf?: string;
+
+  scope_id?: string;
+  service_name?: string;
+  scope?: string;
+  name?: string;
+  description?: string;
+  created_at?: string;
+  active?: boolean;
+  slug?: string;
+};
+
+export type ScopeActionCmd = {
+  csrf?: string | null;
+  slug?: string | null;
+  scope?: Scope | null;
+  errors: { [key: string]: string[] };
+};
 
 export function validateScope(scope: Scope) {
   const errors: { [key: string]: string[] } = {};
