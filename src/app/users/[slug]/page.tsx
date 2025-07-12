@@ -4,7 +4,6 @@ import { Suspense } from "react";
 import UserForm from "@/components/forms/user-form";
 import Loading from "@/components/loading";
 import { handleScopesUpdate, handleUserEdit } from "./actions";
-import ManageAccessForm from "@/components/forms/manage-access-form";
 import { getAuthCookies } from "@/components/checkCookies";
 import callGatewayData from "@/components/call-gateway-data";
 import ManageScopesForm from "@/components/forms/manage-scopes-form";

@@ -185,7 +185,7 @@ export default function ClientRegistrationForm({
               </label>
             </div>
           </div>
-            |
+
           {/* submit button */}
           <div className="row" style={{ marginTop: "1.5rem" }}>
             <FormSubmit
