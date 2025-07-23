@@ -1,4 +1,4 @@
-import { Scope } from "@/components/forms";
+import { Scope } from "../scopes";
 
 export type User = {
   csrf?: string;
@@ -22,4 +22,15 @@ export type UserScopesCmd = {
   csrf?: string;
   user_slug?: string;
   scope_slugs: string[];
+};
+
+export type UserPermissionsCmd = {
+  csrf?: string;
+  entity_slug?: string;
+  service_permissions: ServicePermission[];
+};
+
+export type ServicePermission = {
+  service_name: string;
+  permission_slug: string;
 };

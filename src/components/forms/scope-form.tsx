@@ -10,11 +10,12 @@ import {
 } from "@/validation/scope_fields";
 import FormSubmit from "@/components/forms/form-submit";
 import ErrorField from "@/components/errors/error-field";
-import { Scope, ScopeActionCmd } from ".";
+
 import {
   SERVICENAME_MAX_LENGTH,
   SERVICENAME_MIN_LENGTH,
 } from "@/validation/service_client_field";
+import { Scope, ScopeActionCmd } from "@/app/scopes";
 
 export default function ScopeForm({
   csrf,
@@ -163,6 +164,21 @@ export default function ScopeForm({
           </div>
         </div>
 
+        {/* submit button */}
+        {editAllowed && (
+          <div className={`row`}>
+            <FormSubmit
+              buttonLabel={
+                scopeState.scope?.slug ? "Update scope data" : "Add scope"
+              }
+              pendingLabel={
+                scopeState.scope?.slug
+                  ? "Updating scope record..."
+                  : "Adding scope..."
+              }
+            />
+          </div>
+        )}
       </form>
     </>
   );

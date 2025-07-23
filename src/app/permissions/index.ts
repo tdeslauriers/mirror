@@ -4,7 +4,7 @@ import {
   checkPermissionName,
 } from "@/validation/permission-fields";
 import { checkServiceName } from "@/validation/service_client_field";
-import { FieldValidation } from "@/validation/user_fields";
+import { checkUuid, FieldValidation } from "@/validation/user_fields";
 
 export type PermissionActionCmd = {
   csrf?: string | null;
@@ -14,6 +14,7 @@ export type PermissionActionCmd = {
   errors: { [key: string]: string[] };
 };
 
+// services that have fine-grained permissions
 const allowedServices = new Set(["pixie", "apprentice"]);
 
 export type Permission = {
@@ -119,6 +120,50 @@ export function validatePermission(permission: Permission) {
       errors.description = descriptionCheck.messages;
     }
   }
+
+  return errors;
+}
+
+export function validatePermissionSlugs(slugs: string[]) {
+  const errors: { [key: string]: string[] } = {};
+
+  // split slugs by service name if prepended
+  let seviceNames: string[] = [];
+  let serviceSlugs: string[] = [];
+  slugs.forEach((s) => {
+    if (s.includes("_")) {
+      const parts = s.split("_");
+      seviceNames.push(parts[0]);
+      serviceSlugs.push(parts[1]);
+    } else {
+      serviceSlugs.push(s);
+    }
+  });
+
+  // check if service names are allowed
+  seviceNames.forEach((serviceName, i) => {
+    if (!allowedServices.has(serviceName.toLowerCase())) {
+      errors.server = [`Service name at index ${i} is not allowed. `];
+    }
+  });
+
+  // check if slugs are well formed uuids
+  serviceSlugs.forEach((s, i) => {
+    if (s.trim().length < 16 || s.trim().length > 64) {
+      errors.server = [
+        `Scope slug index ${i} is not well formed. Must be between 16 and 64 characters.`,
+      ];
+    }
+
+    const slug = checkUuid(s.trim());
+    if (!slug.isValid) {
+      errors.server = [
+        `Scope slug, index ${i}: ${s.substring(0, 9)}xxxxx, is invalid: slug ${
+          slug.messages
+        }`,
+      ];
+    }
+  });
 
   return errors;
 }

@@ -3,10 +3,16 @@ import Link from "next/link";
 import { Suspense } from "react";
 import UserForm from "@/components/forms/user-form";
 import Loading from "@/components/loading";
-import { handleScopesUpdate, handleUserEdit } from "./actions";
+import {
+  handlePermissionsUpdate,
+  handleScopesUpdate,
+  handleUserEdit,
+} from "./actions";
 import { getAuthCookies } from "@/components/checkCookies";
 import callGatewayData from "@/components/call-gateway-data";
 import ManageScopesForm from "@/components/forms/manage-scopes-form";
+import ManagePermissionsForm from "@/components/forms/manage-permissions-form";
+import { all } from "axios";
 
 export const metadata = {
   robots: "noindex, nofollow",
@@ -62,6 +68,12 @@ export default async function Page({
     session: cookies.session,
   });
 
+  // get permissions data from the gateway for permissions dropdown
+  const allPermissions = await callGatewayData({
+    endpoint: "/permissions",
+    session: cookies.session,
+  });
+
   return (
     <>
       <main className={`main main-drawer`}>
@@ -110,6 +122,33 @@ export default async function Page({
           </div>
         </Suspense>
 
+        {/* manage permissions form */}
+        <div className="card-title">
+          <h2>
+            Permissions:{" "}
+            {cookies.identity.ux_render?.users?.client_write && (
+              <sup>
+                <span className="highlight-info" style={{ fontSize: ".65em" }}>
+                  * must click &lsquo;Update Permissions&lsquo; to save changes
+                </span>
+              </sup>
+            )}
+          </h2>
+        </div>
+        <Suspense fallback={<Loading />}>
+          <div className="card">
+            <ManagePermissionsForm
+              csrf={csrf}
+              editAllowed={cookies.identity.ux_render?.users?.client_write}
+              entitySlug={slug}
+              entityPermissions={user?.permissions}
+              menuPermissions={allPermissions}
+              updatePermissions={handlePermissionsUpdate}
+            />
+          </div>
+        </Suspense>
+
+        {/* manage scopes form */}
         <div className="card-title">
           <h2>
             Scopes:{" "}

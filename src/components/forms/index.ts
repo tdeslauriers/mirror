@@ -7,8 +7,6 @@ import {
   PASSWORD_MIN_LENGTH,
 } from "@/validation/user_fields";
 
-
-
 export type ServiceClient = {
   csrf?: string;
 
@@ -120,9 +118,16 @@ export function validatePasswords(reset: ResetData) {
   return errors;
 }
 
+// the command the updates an entity's scopes
 export type EntityScopesActionCmd = {
   csrf?: string | null;
-  slug?: string | null;
+  entitySlug?: string | null;
+  errors: { [key: string]: string[] };
+};
+
+export type EntityPermissionsActionCmd = {
+  csrf?: string | null;
+  entitySlug?: string | null;
   errors: { [key: string]: string[] };
 };
 

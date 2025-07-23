@@ -1,7 +1,7 @@
 "use client";
 
 import { useActionState, useState } from "react";
-import { EntityScopesActionCmd } from ".";
+import { EntityPermissionsActionCmd, EntityScopesActionCmd } from ".";
 import styles from "./manage-access-form.module.css";
 import Link from "next/link";
 import FormSubmit from "./form-submit";
@@ -38,12 +38,12 @@ export default function ManageAccessForm({
   entityAccessItems: AccessItem[] | null;
   menuAccessItems: AccessItem[];
   updateAccessItems: (
-    previousState: EntityScopesActionCmd,
+    previousState: EntityScopesActionCmd | EntityPermissionsActionCmd,
     formData: FormData
   ) =>
     | EntityScopesActionCmd
-    | PermissionActionCmd
-    | Promise<EntityScopesActionCmd | PermissionActionCmd>;
+    | EntityPermissionsActionCmd
+    | Promise<EntityScopesActionCmd | EntityPermissionsActionCmd>;
 }) {
   const [currentAccessItems, setCurrentAccessItems] = useState<
     AccessItem[] | null
@@ -86,7 +86,7 @@ export default function ManageAccessForm({
 
   const [entityAccessState, formAction] = useActionState(updateAccessItems, {
     csrf: csrf,
-    slug: entitySlug,
+    entitySlug: entitySlug,
     // entityActionItems not needed because access items are coming from useState currentScopes variable
     errors: {},
   });
@@ -137,13 +137,15 @@ export default function ManageAccessForm({
               * A {`${accessLabel}`} may only be added once below.
             </sub>
 
-            {/* submit form button */}
-            <div className={`row`} style={{ marginTop: "2rem" }}>
-              <FormSubmit
-                buttonLabel={`Update ${accessLabel}s`}
-                pendingLabel={`updating assigned ${accessLabel}s...`}
-              />
-            </div>
+            {/* top of form submit form button */}
+            {currentAccessItems && currentAccessItems.length > 5 && (
+              <div className={`row`} style={{ marginTop: "2rem" }}>
+                <FormSubmit
+                  buttonLabel={`Update ${accessLabel}s`}
+                  pendingLabel={`updating assigned ${accessLabel}s...`}
+                />
+              </div>
+            )}
 
             <hr style={{ marginTop: "2rem" }} />
           </>
@@ -154,7 +156,7 @@ export default function ManageAccessForm({
           // if no acccess items exist
           <>
             <div className={styles.scopecard}>
-              <span className="highlight-info">{`No {${accessLabel}s assigned.`}</span>
+              <span className="highlight-info">{`No ${accessLabel}s assigned.`}</span>
             </div>
           </>
         )}
@@ -214,19 +216,21 @@ export default function ManageAccessForm({
               <input
                 type="hidden"
                 name={`${accessLabel}s[]`}
-                value={item.slug}
+                value={`${item.service_name}_${item.slug}`}
               />
             </div>
           ))}
 
         {/* submit form button */}
-        {editAllowed && (
-          <div className={`row`}>
-            <FormSubmit
-              buttonLabel={`Update ${accessLabel}s`}
-              pendingLabel={`updating assigned ${accessLabel}s...`}
-            />
-          </div>
+        {editAllowed && currentAccessItems && currentAccessItems.length > 0 && (
+          <>
+            <div className={`row`}>
+              <FormSubmit
+                buttonLabel={`Update ${accessLabel}s`}
+                pendingLabel={`updating assigned ${accessLabel}s...`}
+              />
+            </div>
+          </>
         )}
       </form>
     </>

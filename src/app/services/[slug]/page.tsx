@@ -8,6 +8,7 @@ import Link from "next/link";
 import { getAuthCookies } from "@/components/checkCookies";
 import callGatewayData from "@/components/call-gateway-data";
 import ManageScopesForm from "@/components/forms/manage-scopes-form";
+import ManagePermissionsForm from "@/components/forms/manage-permissions-form";
 
 export const metadata = {
   robots: "noindex, nofollow",
@@ -148,6 +149,7 @@ export default async function Page({
           </>
         )}
 
+        {/* manage scopes form */}
         <div className="card-title">
           <h2>
             Scopes:{" "}

@@ -221,7 +221,7 @@ export async function handleScopesUpdate(
 
   // if this is tampered with, the gateway will error because
   // the slug will not be found, or invalid, etc.
-  const slug = previousState.slug;
+  const slug = previousState.entitySlug;
   if (!slug || slug.trim().length < 16 || slug.trim().length > 64) {
     throw new Error(
       "Service client slug is missing or not well formed.  This value is required and cannot be tampered with."
@@ -232,12 +232,22 @@ export async function handleScopesUpdate(
   // Note: array of scope slugs
   const scopeSlugs = formData.getAll("scopes[]") as string[];
 
+  // removed prepended service from scope slugs -> not needed for scopes, only permissions
+  scopeSlugs.forEach((s, i) => {
+    // remove prepended service name from scope slug
+    // ie, "pixie_read" -> "read"
+    if (s.includes("_")) {
+      const parts = s.split("_");
+      scopeSlugs[i] = parts[1];
+    }
+  });
+
   //  validate scope slugs are well formed uuids
   const errors = validateScopeSlugs(scopeSlugs);
   if (errors && Object.keys(errors).length > 0) {
     return {
       csrf: csrf,
-      slug: slug,
+      entitySlug: slug,
       errors: errors,
     } as EntityScopesActionCmd;
   }
@@ -268,7 +278,7 @@ export async function handleScopesUpdate(
     if (apiResponse.ok) {
       return {
         csrf: csrf,
-        slug: slug,
+        entitySlug: slug,
         errors: {},
       } as EntityScopesActionCmd;
     } else {
@@ -277,7 +287,7 @@ export async function handleScopesUpdate(
         const errors = handleServiceClientErrors(fail);
         return {
           csrf: csrf,
-          slug: slug,
+          entitySlug: slug,
           errors: errors,
         } as EntityScopesActionCmd;
       } else {

@@ -55,14 +55,14 @@ export function validateScopeSlugs(slugs: string[]) {
 
   slugs.forEach((s, i) => {
     if (s.trim().length < 16 || s.trim().length > 64) {
-      errors.scopes = [
+      errors.server = [
         `Scope slug index ${i} is not well formed. Must be between 16 and 64 characters.`,
       ];
     }
 
     const slug = checkUuid(s.trim());
     if (!slug.isValid) {
-      errors.scopes = [
+      errors.server = [
         `Scope slug, index ${i}: ${s.substring(0, 9)}xxxxx, is invalid: slug ${
           slug.messages
         }`,
