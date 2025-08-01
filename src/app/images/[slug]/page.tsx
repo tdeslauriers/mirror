@@ -1,7 +1,10 @@
 import callGatewayData from "@/components/call-gateway-data";
 import { getAuthCookies } from "@/components/checkCookies";
-import Image from "next/image";
 import styles from "../image.module.css";
+import Link from "next/link";
+import ImageDisplay from "./image-display";
+import GetCsrf from "@/components/csrf-token";
+import { imageFormUpdate } from "./actions";
 
 export const metadata = {
   robots: "noindex, nofollow",
@@ -32,6 +35,25 @@ export default async function Page({
     session: cookies.session,
   });
 
+  // check if identity cookie has images_write permission and get csrf if so for image form
+  const editAllowed = cookies.identity.ux_render?.gallery?.image_write;
+
+  // if edit is allowed, fetch the CSRF token for the form
+  let csrf: string | null = null;
+  if (editAllowed) {
+    // get csrf token from gateway for scope form
+    csrf = await GetCsrf(cookies.session ? cookies.session : "");
+
+    if (!csrf) {
+      console.log(
+        pageError + "CSRF token could not be retrieved for scope form."
+      );
+      throw new Error(
+        pageError + "CSRF token could not be retrieved for scope form."
+      );
+    }
+  }
+
   return (
     <>
       <main className="main main-drawer">
@@ -45,33 +67,30 @@ export default async function Page({
               paddingRight: "1rem",
             }}
           >
-            <h1>{imageData.title}</h1>
+            {/* title */}
+            <h1>
+              Link:{" "}
+              <Link className="locallink" href={`/images/${slug}`}>
+                {`/images/${slug}`}
+              </Link>
+            </h1>
+
+            {/* link to scopes table */}
+            <Link href={`/album`}>
+              <button>Album Placeholder</button>
+            </Link>
           </div>
         </div>
         <hr className="page-title" />
 
-        {imageData && imageData?.created_at && (
-          <div className={`banner`}>
-            {new Date(imageData.created_at).toLocaleDateString("en-US", {
-              year: "numeric",
-              month: "long",
-              day: "numeric",
-            })}
-          </div>
-        )}
-
-        <div className={styles.content}>
-          <div className={styles.imagecard}>
-            <Image
-              src={imageData.signed_url}
-              alt={imageData.title}
-              width={1000}
-              height={1000}
-              className={styles.image}
-            />
-          </div>
-          <div className={styles.description}>{imageData.description}</div>
-        </div>
+        {/* Display the image data */}
+        <ImageDisplay
+          csrf={csrf}
+          editAllowed={editAllowed}
+          slug={slug}
+          imageData={imageData}
+          imageFormUpdate={imageFormUpdate}
+        />
       </main>
     </>
   );

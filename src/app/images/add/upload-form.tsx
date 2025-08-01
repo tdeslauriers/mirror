@@ -145,7 +145,7 @@ export default function UploadForm({ csrf }: { csrf?: string | null }) {
             type="text"
             minLength={IMAGE_TITLE_MIN_LENGTH}
             maxLength={IMAGE_TITLE_MAX_LENGTH}
-            // pattern={`^[a-zA-Z0-9 ]+$`}
+            pattern={`^[a-zA-Z0-9 ]+$`}
             title={`Title must be between ${IMAGE_TITLE_MIN_LENGTH} and ${IMAGE_TITLE_MAX_LENGTH} alpha/numeric characters`}
             placeholder="Image/Photo Title"
             value={title}
@@ -166,7 +166,7 @@ export default function UploadForm({ csrf }: { csrf?: string | null }) {
           )}
           <textarea
             className="form"
-            name="title"
+            name="description"
             minLength={IMAGE_DESCRIPTION_MIN_LENGTH}
             maxLength={IMAGE_DESCRIPTION_MAX_LENGTH}
             title={`Description must be between ${IMAGE_DESCRIPTION_MIN_LENGTH} and ${IMAGE_DESCRIPTION_MAX_LENGTH} characters`}
@@ -217,7 +217,7 @@ export default function UploadForm({ csrf }: { csrf?: string | null }) {
       {/* form submission */}
       <div className={`${styles.row}`}>
         <div className={`actions`}>
-          <button className="" type="submit" disabled={status === "uploading"}>
+          <button type="submit" disabled={status === "uploading"}>
             {status === "uploading" ? "Uploading..." : "Upload Image/Photo"}
           </button>
         </div>

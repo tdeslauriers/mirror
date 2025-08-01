@@ -1,27 +1,49 @@
 .imagecard {
-  position: relative;
-  width: 100%;
+  display: flex;
+  flex-direction: row;
+  width: 70vw;
   margin-top: 1rem;
-  aspect-ratio: 4 / 4; /* or 3 / 2 or 1 / 1 */
-  overflow: hidden;
   border-radius: 4px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  border: 1px solid var(--primary-border-color);
+  box-shadow: 1px 0 55px rgba(7, 8, 7, 0.5);
 }
 
 .image {
+  width: 70%;
+  height: auto;
   object-fit: cover;
   object-position: center;
+  flex-shrink: 0;
+  /* border-radius: 4px; */
 }
 
-.content {
-  position: center;
+.cardtext {
+  width: 30%;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: top;
 }
 
-.description {
-  padding: 1rem;
+.title {
+  font-size: 1.75rem;
+  font-weight: bold;
+  font-family: "Montserrat", sans-serif;
+  margin-bottom: 0.5rem;
+}
+
+.date {
   font-size: 1.25rem;
   font-style: italic;
   font-family: "Montserrat", sans-serif;
+  margin: 0.5rem 0 0.5rem;
+}
+
+.description {
+  font-size: 1.25rem;
+  font-style: italic;
+  font-family: "Montserrat", sans-serif;
+  margin: 0.75rem 0 0.5rem;
 }
 
 .row {
@@ -85,6 +107,23 @@
   }
 }
 
+@media (min-width: 700px) and (max-width: 1500px) {
+  .imagecard {
+    width: 70vw;
+    flex-direction: column;
+    min-height: unset;
+  }
+
+  .image {
+    width: 100%;
+    height: auto;
+  }
+
+  .cardtext {
+    width: 100%;
+  }
+}
+
 @media (max-width: 700px) {
   .row {
     flex-direction: column;
@@ -93,5 +132,20 @@
   .box {
     justify-content: left;
     align-items: left;
+  }
+
+  .imagecard {
+    width: 80vw;
+    flex-direction: column;
+    min-height: unset;
+  }
+
+  .image {
+    width: 100%;
+    height: auto;
+  }
+
+  .cardtext {
+    width: 100%;
   }
 }

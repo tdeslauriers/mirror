@@ -15,25 +15,14 @@ import {
 } from "@/components/forms";
 import { validateScopeSlugs } from "@/app/services";
 import { validatePermissionSlugs } from "@/app/permissions";
+import { checkForSessionCookie } from "@/components/checkCookies";
 
 export async function handleUserEdit(
   previousState: ProfileActionCmd,
   formData: FormData
 ) {
   // get session token
-  const cookieStore = await cookies();
-  const hasSession = cookieStore.has("session_id")
-    ? cookieStore.get("session_id")
-    : null;
-  if (
-    !hasSession ||
-    hasSession.value.trim().length < 16 ||
-    hasSession.value.trim().length > 64
-  ) {
-    throw new Error(
-      "Session cookie is missing or not well formed.  This value is required and cannot be tampered with."
-    );
-  }
+  const sessionCookie = await checkForSessionCookie();
 
   // light-weight validation of csrf token
   // true validation happpens in the gateway
@@ -77,7 +66,7 @@ export async function handleUserEdit(
         method: "PUT",
         headers: {
           Content_Type: "application/json",
-          Authorization: `${hasSession?.value}`,
+          Authorization: `${sessionCookie?.value}`,
         },
         body: JSON.stringify(updated),
       }
@@ -121,19 +110,7 @@ export async function handleScopesUpdate(
   formData: FormData
 ) {
   // get session token
-  const cookieStore = await cookies();
-  const hasSession = cookieStore.has("session_id")
-    ? cookieStore.get("session_id")
-    : null;
-  if (
-    !hasSession ||
-    hasSession.value.trim().length < 16 ||
-    hasSession.value.trim().length > 64
-  ) {
-    throw new Error(
-      "Session cookie is missing or not well formed.  This value is required and cannot be tampered with."
-    );
-  }
+  const sessionCookie = await checkForSessionCookie();
 
   // lightweight validation of csrf token
   // true validation happens in the gateway
@@ -191,7 +168,7 @@ export async function handleScopesUpdate(
       {
         method: "PUT",
         headers: {
-          Authorization: `${hasSession?.value}`,
+          Authorization: `${sessionCookie?.value}`,
           "Content-Type": "application/json",
         },
         body: JSON.stringify(cmd),
@@ -232,19 +209,7 @@ export async function handlePermissionsUpdate(
   formData: FormData
 ) {
   // get session token
-  const cookieStore = await cookies();
-  const hasSession = cookieStore.has("session_id")
-    ? cookieStore.get("session_id")
-    : null;
-  if (
-    !hasSession ||
-    hasSession.value.trim().length < 16 ||
-    hasSession.value.trim().length > 64
-  ) {
-    throw new Error(
-      "Session cookie is missing or not well formed.  This value is required and cannot be tampered with."
-    );
-  }
+  const sessionCookie = await checkForSessionCookie();
 
   // lightweight validation of csrf token
   // true validation happens in the gateway
@@ -297,7 +262,6 @@ export async function handlePermissionsUpdate(
     entity_slug: slug,
     service_permissions: svcPermissions,
   };
-  console.log("cmd", cmd);
 
   // call the gateway to update the service client permissions
   // Note: only the slug values submitted with the entity uuid and csrf.
@@ -308,7 +272,7 @@ export async function handlePermissionsUpdate(
       {
         method: "PUT",
         headers: {
-          Authorization: `${hasSession?.value}`,
+          Authorization: `${sessionCookie?.value}`,
           "Content-Type": "application/json",
         },
         body: JSON.stringify(cmd),
@@ -332,13 +296,13 @@ export async function handlePermissionsUpdate(
         } as EntityPermissionsActionCmd;
       } else {
         throw new Error(
-          "An unhandled gateway error occured when attempting to update user permissions.  Please try again."
+          "A gateway error occured when attempting to update user permissions.  Please try again."
         );
       }
     }
   } catch (error) {
     throw new Error(
-      "Unhandled error occured when attempting to update user permissions.  Please try again."
+      "Unhandled error occured when attempting to contact gateway.  Please try again."
     );
   }
 }

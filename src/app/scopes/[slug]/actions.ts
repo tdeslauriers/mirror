@@ -60,7 +60,7 @@ export async function handleScopeEdit(
         method: "PUT",
         headers: {
           Authorization: `${sessionCookie.value}`,
-          "Content-Type": "application/json",
+          Content_Type: "application/json",
         },
         body: JSON.stringify(updated),
       }

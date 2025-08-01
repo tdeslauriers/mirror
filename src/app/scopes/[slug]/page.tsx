@@ -66,12 +66,15 @@ export default async function Page({
               paddingRight: "1rem",
             }}
           >
+            {/* title */}
             <h1>
               Scope:{" "}
               {scope && scope.scope && (
                 <span className="highlight">{scope.scope}</span>
               )}
             </h1>
+
+            {/* // link to scopes table */}
             <Link href={`/scopes`}>
               <button>Scopes Table</button>
             </Link>
