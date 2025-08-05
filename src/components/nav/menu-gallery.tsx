@@ -32,6 +32,7 @@ export default function MenuGallery({
         {visible["gallery"] && (
           <div className={`${style.submenu}`}>
             <ul>
+              {/* add image */}
               {render && render.gallery?.image_write && (
                 <li>
                   <Link
@@ -40,6 +41,32 @@ export default function MenuGallery({
                     onClick={linkClick}
                   >
                     Add Image
+                  </Link>
+                </li>
+              )}
+
+              {/* add album */}
+              {render && render.gallery?.album_write && (
+                <li>
+                  <Link
+                    className={`locallink`}
+                    href={"/albums/add"}
+                    onClick={linkClick}
+                  >
+                    Add Album
+                  </Link>
+                </li>
+              )}
+
+              {/* albums */}
+              {render && render.gallery?.album_read && (
+                <li>
+                  <Link
+                    className={`locallink`}
+                    href={"/albums"}
+                    onClick={linkClick}
+                  >
+                    Albums
                   </Link>
                 </li>
               )}

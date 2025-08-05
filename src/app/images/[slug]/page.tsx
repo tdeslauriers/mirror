@@ -1,6 +1,5 @@
 import callGatewayData from "@/components/call-gateway-data";
 import { getAuthCookies } from "@/components/checkCookies";
-import styles from "../image.module.css";
 import Link from "next/link";
 import ImageDisplay from "./image-display";
 import GetCsrf from "@/components/csrf-token";

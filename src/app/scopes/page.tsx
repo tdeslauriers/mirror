@@ -15,7 +15,7 @@ export default async function ScopesPage() {
   // quick for redirect if auth'd cookies not present
   const cookies = await getAuthCookies("/scopes");
 
-  // check if identity cookie has scopes_read permission
+  // check if identity cookie has scopes_read access
   // ie, gaurd pattern or access hint gating
   if (!cookies.identity || !cookies.identity.ux_render?.users?.scope_read) {
     console.log(pageError + "User does not have scopes_read permission.");

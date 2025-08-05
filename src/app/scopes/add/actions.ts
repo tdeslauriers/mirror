@@ -67,11 +67,15 @@ export async function handleScopeAdd(
           scope: add,
           errors: errors,
         } as ScopeActionCmd;
+      } else {
+        throw new Error(
+          "Failed to add scope record due to unhandled gateway error."
+        );
       }
     }
   } catch (error) {
     console.log(error);
-    throw new Error("Failed to add scope record.");
+    throw new Error("Unhandled error while attempting to call the gateway.");
   }
   redirect("/scopes");
 }
