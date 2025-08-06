@@ -1,5 +1,8 @@
+import callGatewayData from "@/components/call-gateway-data";
 import { getAuthCookies } from "@/components/checkCookies";
 import Link from "next/link";
+import { Album } from ".";
+import Tile from "@/components/tile";
 
 export const metadata = {
   robots: "noindex, nofollow",
@@ -17,7 +20,16 @@ export default async function AlbumsPage() {
     throw new Error(pageError + "you do not have rights to view albums.");
   }
 
-
+  // get albums data from gateway
+  const albums: Album[] = await callGatewayData({
+    endpoint: "/albums",
+    session: cookies.session,
+  });
+  if (!albums || albums.length === 0) {
+    throw new Error(
+      "It appears you have not been granted access to any albums and/or photos yet."
+    );
+  }
 
   return (
     <>
@@ -42,10 +54,20 @@ export default async function AlbumsPage() {
         </div>
         <hr className={`page-title`} />
         <div className="banner">
-          To navigate to a specific album record, click on the album below:
+          To navigate to a specific album, click on the album tile below:
         </div>
 
-        
+        {/* albums: display albums in a grid */}
+        <div className="grid">
+          {albums.map((album) => (
+            <Tile
+              key={album.slug}
+              title={album.title ? album.title : "Untitled Album"}
+              slug={album.slug ? album.slug : ""}
+              signed_url={null}
+            />
+          ))}
+        </div>
       </main>
     </>
   );

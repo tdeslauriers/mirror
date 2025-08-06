@@ -14,7 +14,7 @@ export type Album = {
   created_at?: string;
   updated_at?: string;
   is_archived?: boolean;
-  cover_image_url?: string | null;
+  signed_url?: string | null; // album cover photo: signed URL from gateway/object storage
 };
 
 export function validateAlbum(album: Album) {

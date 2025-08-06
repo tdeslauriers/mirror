@@ -90,10 +90,8 @@ hr.page-title {
   margin: 1rem 0 2rem;
   border: 1px solid var(--primary-border-color);
   box-shadow: 1px 0 55px rgba(7, 8, 7, 0.5);
-  /* border-radius: 4px;
-  border: 1px solid var(--primary-border-color);
-  box-shadow: 1px 0 55px rgba(139, 150, 139, 0.5); */
 }
+
 
 .card li,
 .card p {
@@ -174,6 +172,13 @@ hr.page-title {
     transparent
   );
   margin: 2rem 0 0rem;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 1.5rem;
+  padding: 2rem;
 }
 
 /* Mobile */
