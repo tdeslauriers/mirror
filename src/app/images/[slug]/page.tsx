@@ -53,6 +53,8 @@ export default async function Page({
     }
   }
 
+  console.log("Image data fetched successfully:", imageData);
+
   return (
     <>
       <main className="main main-drawer">

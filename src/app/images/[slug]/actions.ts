@@ -17,14 +17,14 @@ export async function imageFormUpdate(
   const csrf = previousState.csrf;
   if (!csrf || csrf.trim().length < 16 || csrf.trim().length > 64) {
     throw new Error(
-      "User update CSRF token missing or not well formed.  This value is required and cannot be tampered with."
+      "Image update CSRF token missing or not well formed.  This value is required and cannot be tampered with."
     );
   }
 
   const slug = previousState.slug;
   if (!slug || slug.trim().length < 16 || slug.trim().length > 64) {
     throw new Error(
-      "User slug is missing or not well formed.  This value is required and cannot be tampered with."
+      "Image slug is missing or not well formed.  This value is required and cannot be tampered with."
     );
   }
 

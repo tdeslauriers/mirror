@@ -63,7 +63,7 @@ export default async function AlbumsPage() {
             <Tile
               key={album.slug}
               title={album.title ? album.title : "Untitled Album"}
-              slug={album.slug ? album.slug : ""}
+              link={album.slug ? `/albums/${album.slug}` : ""}
               signed_url={null}
             />
           ))}

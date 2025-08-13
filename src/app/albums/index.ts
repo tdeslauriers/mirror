@@ -4,6 +4,7 @@ import {
 } from "@/validation/album_fields";
 import { checkUuid } from "@/validation/user_fields";
 import { GatewayError } from "../api";
+import { ImageData } from "../images";
 
 export type Album = {
   csrf?: string | null; // CSRF token for form submission
@@ -15,6 +16,9 @@ export type Album = {
   updated_at?: string;
   is_archived?: boolean;
   signed_url?: string | null; // album cover photo: signed URL from gateway/object storage
+
+  // slice of image thumbnails associated with the album: may not be present or may be empty
+  images?: ImageData[];
 };
 
 export function validateAlbum(album: Album) {
@@ -55,6 +59,26 @@ export function validateAlbum(album: Album) {
   if (!checkDescription.isValid) {
     errors.description = errors.description ?? [];
     errors.description.push(...checkDescription.messages);
+  }
+
+  // validate slug
+  if (
+    album.slug &&
+    (album.slug.trim().length < 16 || album.slug.trim().length > 64)
+  ) {
+    errors.slug = [
+      "Album slug is required and must be between 16 and 64 characters long.",
+    ];
+  }
+
+  // validate slug if it exists
+  if (album.slug && album.slug.trim().length > 0) {
+    // regex slug check
+    const checkSlug = checkUuid(album.slug);
+    if (!checkSlug.isValid) {
+      errors.slug = errors.slug ?? [];
+      errors.slug.push(...checkSlug.messages);
+    }
   }
 
   return errors;

@@ -12,9 +12,8 @@ export async function handleAlbumAdd(
   // get session token
   const sessionCookie = await checkForSessionCookie();
 
-  // extract the CSRF token from the previous state
+  // extract the CSRF token from the previous stat
   const csrf = previousScope.csrf;
-  const slug = previousScope.slug;
 
   // validate CSRF token
   if (!csrf || csrf.trim().length < 16 || csrf.trim().length > 64) {
