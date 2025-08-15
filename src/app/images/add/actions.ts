@@ -14,6 +14,9 @@ export async function requestPresignedUrl(formdata: FormData) {
   const description = formdata.get("description") as string;
   const contentType = formdata.get("content_type") as string;
   const fileSize = formdata.get("file_size") as string;
+  const permissions = formdata.get("permissions[]") as string;
+
+  const perms = JSON.parse(permissions || "[]");
 
   // build command object
   const addImageCmd = {
@@ -22,6 +25,7 @@ export async function requestPresignedUrl(formdata: FormData) {
     description: description,
     file_type: contentType,
     size: parseInt(fileSize, 10),
+    permissions: perms,
   } as AddImageCmd;
 
   // validate the command object
@@ -33,41 +37,43 @@ export async function requestPresignedUrl(formdata: FormData) {
     };
   }
 
-  // send request to gateway for presigned URL
-  try {
-    const response = await fetch(
-      `${process.env.GATEWAY_SERVICE_URL}/images/upload`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `${sessionCookie.value}`,
-        },
-        body: JSON.stringify(addImageCmd),
-      }
-    );
+  console.log("Requesting presigned URL with command:", addImageCmd);
 
-    if (response.ok) {
-      const data = await response.json();
-      return {
-        signedUrl: data.signed_url,
-        errors: null,
-      };
-    } else {
-      const fail = await response.json();
-      if (isGatewayError(fail)) {
-        const errors = handleUploadError(fail);
-        console.error("Gateway error:", errors);
-        return {
-          signedUrl: null,
-          errors: errors,
-        };
-      }
-    }
-  } catch (error) {
-    console.error("Error requesting presigned URL:", error);
-    throw new Error("An error occurred while requesting the presigned URL.");
-  }
+  // // send request to gateway for presigned URL
+  // try {
+  //   const response = await fetch(
+  //     `${process.env.GATEWAY_SERVICE_URL}/images/upload`,
+  //     {
+  //       method: "POST",
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //         Authorization: `${sessionCookie.value}`,
+  //       },
+  //       body: JSON.stringify(addImageCmd),
+  //     }
+  //   );
+
+  //   if (response.ok) {
+  //     const data = await response.json();
+  //     return {
+  //       signedUrl: data.signed_url,
+  //       errors: null,
+  //     };
+  //   } else {
+  //     const fail = await response.json();
+  //     if (isGatewayError(fail)) {
+  //       const errors = handleUploadError(fail);
+  //       console.error("Gateway error:", errors);
+  //       return {
+  //         signedUrl: null,
+  //         errors: errors,
+  //       };
+  //     }
+  //   }
+  // } catch (error) {
+  //   console.error("Error requesting presigned URL:", error);
+  //   throw new Error("An error occurred while requesting the presigned URL.");
+  // }
 }
 
 function handleUploadError(gatewayError: GatewayError) {

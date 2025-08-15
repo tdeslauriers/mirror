@@ -5,6 +5,9 @@ import GetCsrf from "@/components/csrf-token";
 import Tile from "@/components/tile";
 import AlbumDisplay from "./album-display";
 import { handleAlbumUpdate } from "./actions";
+import { headers } from "next/headers";
+import ClipboardButton from "@/components/clipboard-button";
+import Link from "next/link";
 
 export const metadata = {
   robots: "noindex, nofollow",
@@ -28,6 +31,12 @@ export default async function AlbumPage({
     console.log(pageError + "user does not have rights to view this album.");
     throw new Error(pageError + "you do not have rights to view this album.");
   }
+
+  // get the header data to build up the copy link for sharing
+  const h = await headers();
+  const proto = h.get("x-forwarded-proto") ?? "http";
+  const host = h.get("x-forwarded-host") ?? h.get("host");
+  const baseUrl = `${proto}://${host}`;
 
   // get album data from gateway
   const album: Album = await callGatewayData({
@@ -57,16 +66,30 @@ export default async function AlbumPage({
     }
   }
 
-  console.log("Album data fetched successfully:", album);
-
   return (
     <>
       <main className="main main-drawer">
         <div className="center"></div>
         <div className="page-title">
-          <h1>
-            Album: <span className="highlight">{album.title}</span>
-          </h1>
+          <div
+            className="actions"
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              paddingRight: "1rem",
+            }}
+          >
+            {/* share album - copy link button */}
+            <ClipboardButton
+              text={album ? `${baseUrl}/albums/${slug}` : "Album"}
+              label={album ? `'${album.title}'` : "Album"}
+            />
+
+            {/* link to albums table */}
+            <Link href={`/albums`}>
+              <button>Albums List</button>
+            </Link>
+          </div>
         </div>
         <hr className={`page-title`} />
 

@@ -3,6 +3,8 @@ import GetCsrf from "@/components/csrf-token";
 import Loading from "@/components/loading";
 import { Suspense } from "react";
 import UploadForm from "./upload-form";
+import callGatewayData from "@/components/call-gateway-data";
+import { Album } from "@/app/albums";
 
 export const metadata = {
   robots: "noindex, nofollow",
@@ -33,6 +35,22 @@ export default async function AddImagePage() {
     );
   }
 
+  // get albums data from gateway
+  // this is used to render the albums dropdown in the form
+  const albums: Album[] = await callGatewayData({
+    endpoint: "/albums",
+    session: cookies.session,
+  });
+
+  console.log("Albums data for add-image form:", albums);
+
+  // get permissions menu items -> gallery permissions only
+  // this is used to render the permissions dropdown in the form
+  const galleryPermissions = await callGatewayData({
+    endpoint: "/images/permissions",
+    session: cookies.session,
+  });
+
   return (
     <>
       <main className="main main-drawer">
@@ -40,17 +58,18 @@ export default async function AddImagePage() {
         <h1 className="page-title">Upload Image/Photo</h1>
         <hr className={`page-title`} />
         <div className="banner">
-          This is adding the photo to staging. Behind the scenes it will be
+          This form adds the photo to staging. Behind the scenes it will be
           picked up by the image processing pipeline to have thumbnails created
           and exif data persisted.
         </div>
-        <div className="card-title">
-          <h2>Image/Photo Record Metadata</h2>
-        </div>
 
         <Suspense fallback={<Loading />}>
-          <div className="card">
-            <UploadForm csrf={csrf} />
+          <div>
+            <UploadForm
+              csrf={csrf}
+              albums={albums}
+              permissions={galleryPermissions}
+            />
           </div>
         </Suspense>
       </main>

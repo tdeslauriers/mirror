@@ -12,11 +12,28 @@ import {
 } from "@/validation/image_fields";
 import { requestPresignedUrl } from "./actions";
 import ErrorField from "@/components/errors/error-field";
+import { Permission } from "@/app/permissions";
+import AssignmentSelect from "@/components/forms/assignment-select";
+import { Album } from "@/app/albums";
 
-export default function UploadForm({ csrf }: { csrf?: string | null }) {
+export default function UploadForm({
+  csrf,
+  albums,
+  permissions,
+}: {
+  csrf?: string | null;
+  albums?: Album[];
+  permissions?: Permission[];
+}) {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [file, setFile] = useState<File | null>(null);
+  const [currentAlbums, setCurrentAlbums] = useState<Album[]>([]);
+  const [selectedAlbum, setSelectedAlbum] = useState("");
+  const [currentPermissions, setCurrentPermissions] = useState<Permission[]>(
+    []
+  );
+  const [selectedPermission, setSelectedPermission] = useState("");
   const [status, setStatus] = useState<
     "idle" | "uploading" | "success" | "error"
   >("idle");
@@ -24,6 +41,89 @@ export default function UploadForm({ csrf }: { csrf?: string | null }) {
     string,
     string[]
   > | null>(null);
+
+  // to map albums to the assignment-select component
+  const albumToAssignable = (album: Album) => ({
+    id: album.id,
+    service_name: "gallery",
+    item_name: album.title,
+    name: album.title,
+    description: album.description,
+    created_at: album.created_at,
+    // no active field in Album
+    slug: album.slug,
+    link: `/albums/${album.slug}`,
+  });
+
+  // handle album selection
+  const handleSelectAlbum = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setSelectedAlbum(e.target.value);
+  };
+
+  // add selected album to the form data
+  const addAlbum = (albumSlug: string) => {
+    if (!albums || !albumSlug) return;
+    const album = albums.find((a) => a.slug === albumSlug);
+
+    // check if album already exists
+    const exists = currentAlbums.find((a) => a.slug === albumSlug);
+    if (album && !exists) {
+      setCurrentAlbums([...currentAlbums, album]);
+    } else {
+      alert("Album already added.");
+    }
+    setSelectedAlbum(""); // reset selection
+  };
+
+  // remove album from the form data
+  const removeAlbum = (albumSlug: string | undefined) => {
+    if (!albumSlug) return;
+    const updatedAlbums = currentAlbums.filter((a) => a.slug !== albumSlug);
+    setCurrentAlbums(updatedAlbums);
+  };
+
+  // to map permissions to the assignment-select component
+  const permissionToAssignable = (p: Permission) => ({
+    id: p.uuid,
+    service_name: p.service_name,
+    item_name: p.permission,
+    name: p.name,
+    description: p.description,
+    created_at: p.created_at,
+    active: p.active,
+    slug: p.slug,
+    link: `/permissions/${p.service_name}/${p.slug}`,
+  });
+
+  // handle permission selection
+  const handleSelectPermission = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setSelectedPermission(e.target.value);
+  };
+
+  // add selected permission to the form data
+  const addPermission = (permissionSlug: string) => {
+    if (!permissions || !permissionSlug) return;
+    const permission = permissions.find((p) => p.slug === permissionSlug);
+
+    // check if permission already exists
+    const exists = currentPermissions.find((p) => p.slug === permissionSlug);
+    if (permission && !exists) {
+      setCurrentPermissions([...currentPermissions, permission]);
+    } else {
+      alert("Permission already added.");
+    }
+
+    setSelectedPermission(""); // reset selection
+  };
+
+  // remove permission from the form data
+  const removePermission = (permissionSlug: string | undefined) => {
+    if (!permissionSlug) return;
+    const updatedPermissions = currentPermissions.filter(
+      (p) => p.slug !== permissionSlug
+    );
+    setCurrentPermissions(updatedPermissions);
+  };
 
   // ref for file input to reset after upload
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -70,6 +170,7 @@ export default function UploadForm({ csrf }: { csrf?: string | null }) {
     metadata.append("description", description);
     metadata.append("content_type", file.type);
     metadata.append("file_size", file.size.toString());
+    metadata.append("permissions[]", JSON.stringify(currentPermissions));
 
     // stage 1: upload the metadata and request the presigned PUT upload URL
     setStatus("uploading");
@@ -130,92 +231,127 @@ export default function UploadForm({ csrf }: { csrf?: string | null }) {
         <ErrorField errorMsgs={serverErrors.csrf} />
       )}
 
-      {/* image title */}
-      <div className={`${styles.row}`}>
-        <div className={`field`}>
-          <label className={`label`} htmlFor="title">
-            Title
-          </label>
-          {serverErrors && serverErrors.title && (
-            <ErrorField errorMsgs={serverErrors.title} />
-          )}
-          <input
-            className="form"
-            name="title"
-            type="text"
-            minLength={IMAGE_TITLE_MIN_LENGTH}
-            maxLength={IMAGE_TITLE_MAX_LENGTH}
-            pattern={`^[a-zA-Z0-9 ]+$`}
-            title={`Title must be between ${IMAGE_TITLE_MIN_LENGTH} and ${IMAGE_TITLE_MAX_LENGTH} alpha/numeric characters`}
-            placeholder="Image/Photo Title"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            required
-          />
+      <div className="card-title">
+        <h2 className={styles.header}>Image/Photo Record Metadata</h2>
+      </div>
+      <div className={styles.imagecard}>
+        {/* image title */}
+        <div className={`${styles.row}`}>
+          <div className={`field`}>
+            <label className={`label`} htmlFor="title">
+              Title
+            </label>
+            {serverErrors && serverErrors.title && (
+              <ErrorField errorMsgs={serverErrors.title} />
+            )}
+            <input
+              className="form"
+              name="title"
+              type="text"
+              minLength={IMAGE_TITLE_MIN_LENGTH}
+              maxLength={IMAGE_TITLE_MAX_LENGTH}
+              pattern={`^[a-zA-Z0-9 ]+$`}
+              title={`Title must be between ${IMAGE_TITLE_MIN_LENGTH} and ${IMAGE_TITLE_MAX_LENGTH} alpha/numeric characters`}
+              placeholder="Image/Photo Title"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              required
+            />
+          </div>
+        </div>
+
+        {/* image description */}
+        <div className={`${styles.row}`}>
+          <div className={`field`}>
+            <label className={`label`} htmlFor="title">
+              Description
+            </label>
+            {serverErrors && serverErrors.description && (
+              <ErrorField errorMsgs={serverErrors.description} />
+            )}
+            <textarea
+              className="form"
+              name="description"
+              minLength={IMAGE_DESCRIPTION_MIN_LENGTH}
+              maxLength={IMAGE_DESCRIPTION_MAX_LENGTH}
+              title={`Description must be between ${IMAGE_DESCRIPTION_MIN_LENGTH} and ${IMAGE_DESCRIPTION_MAX_LENGTH} characters`}
+              placeholder="Image/Photo Description"
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              required
+            />
+          </div>
+        </div>
+
+        {/* image upload */}
+        <label className={`label`}>File</label>
+        {serverErrors && serverErrors.file && (
+          <ErrorField errorMsgs={serverErrors.file} />
+        )}
+        <div className={`${styles.row} `} style={{ marginTop: "0.5rem" }}>
+          <div className={`${styles.box}`}>
+            {/* this label is used to style the label as a stand-in for <input type=file> which does not allow much custom styling */}
+            <label className={styles.buttonlabel} htmlFor="imageupload">
+              Select File
+            </label>
+
+            {/* the actual input mechanism is hidden, but the label is htmlFor its functionality */}
+            <input
+              hidden
+              id="imageupload"
+              type="file"
+              name="imagefile"
+              accept="image/*"
+              ref={fileInputRef}
+              onChange={(e) => {
+                setFile(e.target.files?.[0] ?? null);
+              }}
+              // required: removing required since this is hidden -> error handled on submit
+            />
+          </div>
+          <div className={`${styles.box} ${styles.right}`}>
+            <span
+              className={file ? `highlight` : `highlight-info`}
+              style={{ alignItems: "left" }}
+            >
+              {file?.name || "No file selected"}
+            </span>
+          </div>
         </div>
       </div>
 
-      {/* image description */}
-      <div className={`${styles.row}`}>
-        <div className={`field`}>
-          <label className={`label`} htmlFor="title">
-            Description
-          </label>
-          {serverErrors && serverErrors.description && (
-            <ErrorField errorMsgs={serverErrors.description} />
-          )}
-          <textarea
-            className="form"
-            name="description"
-            minLength={IMAGE_DESCRIPTION_MIN_LENGTH}
-            maxLength={IMAGE_DESCRIPTION_MAX_LENGTH}
-            title={`Description must be between ${IMAGE_DESCRIPTION_MIN_LENGTH} and ${IMAGE_DESCRIPTION_MAX_LENGTH} characters`}
-            placeholder="Image/Photo Description"
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            required
-          />
-        </div>
+      {/* albums select */}
+      <h2 className={styles.header}>Assign Album(s)</h2>
+      <div className={styles.imagecard}>
+        <AssignmentSelect
+          label={"album"}
+          selectedItem={selectedAlbum}
+          handleSelectItem={handleSelectAlbum}
+          menuItems={albums?.map(albumToAssignable) ?? []}
+          addItem={addAlbum}
+          currentItems={currentAlbums.map(albumToAssignable) ?? []}
+          removeItem={removeAlbum}
+          errors={serverErrors}
+        />
       </div>
 
-      {/* image upload */}
-      <label className={`label`}>File</label>
-      {serverErrors && serverErrors.file && (
-        <ErrorField errorMsgs={serverErrors.file} />
-      )}
-      <div className={`${styles.row} `} style={{ marginTop: "0.5rem" }}>
-        <div className={`${styles.box}`}>
-          {/* this label is used to style the label as a stand-in for <input type=file> which does not allow much custom styling */}
-          <label className={styles.buttonlabel} htmlFor="imageupload">
-            Select File
-          </label>
-
-          {/* the actual input mechanism is hidden, but the label is htmlFor its functionality */}
-          <input
-            hidden
-            id="imageupload"
-            type="file"
-            name="imagefile"
-            accept="image/*"
-            ref={fileInputRef}
-            onChange={(e) => {
-              setFile(e.target.files?.[0] ?? null);
-            }}
-            // required: removing required since this is hidden -> error handled on submit
-          />
-        </div>
-        <div className={`${styles.box} ${styles.right}`}>
-          <span
-            className={file ? `highlight` : `highlight-info`}
-            style={{ alignItems: "left" }}
-          >
-            {file?.name || "*No file selected"}
-          </span>
-        </div>
+      {/* permissions select */}
+      <h2 className={styles.header}>Assign Permission(s)</h2>
+      <div className={styles.imagecard}>
+        <AssignmentSelect
+          label={"permission"}
+          selectedItem={selectedPermission}
+          handleSelectItem={handleSelectPermission}
+          menuItems={permissions?.map(permissionToAssignable) ?? []}
+          addItem={addPermission}
+          currentItems={currentPermissions.map(permissionToAssignable) ?? []}
+          removeItem={removePermission}
+          errors={serverErrors}
+        />
       </div>
 
       {/* form submission */}
-      <div className={`${styles.row}`}>
+      <div className={`${styles.row}`} style={{ marginTop: "2rem" }}>
         <div className={`actions`}>
           <button type="submit" disabled={status === "uploading"}>
             {status === "uploading" ? "Uploading..." : "Upload Image/Photo"}

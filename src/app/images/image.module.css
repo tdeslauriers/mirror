@@ -1,8 +1,10 @@
 .imagecard {
-  display: flex;
+  display: block;
   flex-direction: row;
-  width: 70vw;
+  width: 40vw;
   margin-top: 1rem;
+  margin-bottom: 1rem;
+  padding: 2rem;
   border-radius: 4px;
   border: 1px solid var(--primary-border-color);
   box-shadow: 1px 0 55px rgba(7, 8, 7, 0.5);
@@ -15,6 +17,10 @@
   object-position: center;
   flex-shrink: 0;
   /* border-radius: 4px; */
+}
+
+.header {
+  margin-top: 2rem;
 }
 
 .cardtext {
@@ -48,6 +54,7 @@
 
 .row {
   display: flex;
+
   margin: 1rem 0 1rem;
 }
 

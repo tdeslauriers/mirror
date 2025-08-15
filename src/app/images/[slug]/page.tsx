@@ -4,6 +4,8 @@ import Link from "next/link";
 import ImageDisplay from "./image-display";
 import GetCsrf from "@/components/csrf-token";
 import { imageFormUpdate } from "./actions";
+import ClipboardButton from "@/components/clipboard-button";
+import { headers } from "next/headers";
 
 export const metadata = {
   robots: "noindex, nofollow",
@@ -29,6 +31,12 @@ export default async function Page({
     throw new Error(pageError + "You do not have permission to view scopes.");
   }
 
+  // get the header data to build up the copy link for sharing
+  const h = await headers();
+  const proto = h.get("x-forwarded-proto") ?? "http";
+  const host = h.get("x-forwarded-host") ?? h.get("host");
+  const baseUrl = `${proto}://${host}`;
+
   const imageData = await callGatewayData({
     endpoint: `/images/${slug}`,
     session: cookies.session,
@@ -53,8 +61,6 @@ export default async function Page({
     }
   }
 
-  console.log("Image data fetched successfully:", imageData);
-
   return (
     <>
       <main className="main main-drawer">
@@ -68,13 +74,11 @@ export default async function Page({
               paddingRight: "1rem",
             }}
           >
-            {/* title */}
-            <h1>
-              Link:{" "}
-              <Link className="locallink" href={`/images/${slug}`}>
-                {`/images/${slug}`}
-              </Link>
-            </h1>
+            {/* share image - copy link button */}
+            <ClipboardButton
+              text={imageData ? `${baseUrl}/images/${slug}` : "Image"}
+              label={imageData ? `'${imageData.title}'` : "Image"}
+            />
 
             {/* link to scopes table */}
             <Link href={`/album`}>
