@@ -42,8 +42,6 @@ export default async function AddImagePage() {
     session: cookies.session,
   });
 
-  console.log("Albums data for add-image form:", albums);
-
   // get permissions menu items -> gallery permissions only
   // this is used to render the permissions dropdown in the form
   const galleryPermissions = await callGatewayData({
