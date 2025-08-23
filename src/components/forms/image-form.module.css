@@ -1,0 +1,12 @@
+.header {
+  margin-top: 2rem;
+}
+
+.imagecard {
+  display: flex;
+  flex-direction: column;
+
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+
+}

@@ -16,9 +16,9 @@
 .tile:active,
 .tile:focus {
   transform: scale(1.02);
-  /* text-shadow: var(--highlight-link-glow); need to override green higlight on focus  */
+  text-shadow: var(--highlight-link-glow);
   outline-style: none;
-  /* box-shadow: 0 0 40px var(--secondary-site-color); */
+  box-shadow: 0 0 40px var(--secondary-site-color);
   animation: glow-input 5s ease-in-out infinite alternate;
 }
 

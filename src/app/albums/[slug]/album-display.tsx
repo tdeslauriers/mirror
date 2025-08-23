@@ -54,26 +54,29 @@ export default function AlbumDisplay({
       </div>
 
       {/* title divider */}
-      <hr  />
+      <hr />
 
       {/* description */}
-        {/* hide when editing */}
-        {!isEditing && (
-      <div className={styles.description}>
-        <p>{albumData ? albumData.description : "No description available."}</p>
-      </div>) }
+      {/* hide when editing */}
+      {!isEditing && (
+        <div className={styles.description}>
+          <p>
+            {albumData ? albumData.description : "No description available."}
+          </p>
+        </div>
+      )}
 
-        {/* album form */}
-        {isEditing && (
-            <div className={styles.form}>
-                <AlbumForm
-                    csrf={csrf}
-                    slug={slug}
-                    album={albumData}
-                    handleAlbumForm={albumFormUpdate}
-                />
-            </div>
-        )}
+      {/* album form */}
+      {isEditing && (
+        <div className={styles.form}>
+          <AlbumForm
+            csrf={csrf}
+            slug={slug}
+            album={albumData}
+            handleAlbumForm={albumFormUpdate}
+          />
+        </div>
+      )}
     </div>
   );
 }

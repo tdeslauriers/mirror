@@ -6,18 +6,24 @@ import { Suspense, useState } from "react";
 import Loading from "@/components/loading";
 import { ImageData, UpdateImageCmd } from "..";
 import ImageForm from "@/components/forms/image-form";
+import { Permission } from "@/app/permissions";
+import { Album } from "@/app/albums";
 
 export default function ImageDisplay({
   csrf,
   editAllowed,
   slug,
   imageData,
+  menuAlbums,
+  menuPermissions,
   imageFormUpdate,
 }: {
   csrf: string | null;
   editAllowed?: boolean;
   slug: string | null;
   imageData: ImageData | null;
+  menuAlbums: Album[];
+  menuPermissions: Permission[];
   imageFormUpdate: (prevState: any, formData: FormData) => any | Promise<any>;
 }) {
   const [isEditing, setIsEditing] = useState(false);
@@ -45,12 +51,23 @@ export default function ImageDisplay({
       image_date_year: year,
       is_published: imageData.is_published,
       is_archived: imageData.is_archived,
+      albums: imageData.albums ?? [],
+      permissions: imageData.permissions ?? [],
     };
   }
 
   return (
     <>
-      <div className={styles.imagecard}>
+      <div className={styles.imagedisplay}>
+        {/* image display */}
+        <Image
+          className={styles.image}
+          src={imageData?.signed_url ? imageData.signed_url : ""}
+          alt={imageData?.title ? imageData.title : "site image"}
+          width={1000}
+          height={1000}
+        />
+
         <div className={styles.cardtext}>
           {/* // edit button switches from display to form */}
           {editAllowed && (
@@ -127,21 +144,15 @@ export default function ImageDisplay({
                 <ImageForm
                   csrf={csrf}
                   slug={slug}
-                  data={update}
+                  imageData={update}
+                  menuAlbums={menuAlbums}
+                  menuPermissions={menuPermissions}
                   imageFormUpdate={imageFormUpdate}
                 />
               )}
             </>
           )}
         </div>
-        {/* image display */}
-        <Image
-          className={styles.image}
-          src={imageData?.signed_url ? imageData.signed_url : ""}
-          alt={imageData?.title ? imageData.title : "site image"}
-          width={1000}
-          height={1000}
-        />
       </div>
     </>
   );

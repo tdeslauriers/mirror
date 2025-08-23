@@ -92,7 +92,6 @@ hr.page-title {
   box-shadow: 1px 0 55px rgba(7, 8, 7, 0.5);
 }
 
-
 .card li,
 .card p {
   padding-left: 0.5rem;
@@ -179,6 +178,7 @@ hr.page-title {
   grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
   gap: 1.5rem;
   padding: 2rem;
+  width: 65vw;
 }
 
 /* Mobile */
@@ -220,6 +220,10 @@ hr.page-title {
   .card-title {
     width: 85vw;
   }
+
+  .grid {
+    width: auto;
+  }
 }
 
 @media (min-width: 700px) and (max-width: 1500px) {
@@ -229,6 +233,10 @@ hr.page-title {
 
   .card,
   .card-title {
+    width: 65vw;
+  }
+
+  .grid {
     width: 65vw;
   }
 }

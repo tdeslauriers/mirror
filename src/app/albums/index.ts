@@ -25,20 +25,23 @@ export function validateAlbum(album: Album) {
   const errors: { [key: string]: string[] } = {};
 
   // check csrf
-  if (
-    album.csrf &&
-    (album.csrf.trim().length < 16 || album.csrf.trim().length > 64)
-  ) {
-    errors.csrf = [
-      "CSRF token is not well formed. Cannot edit or tamper with this value.",
-    ];
+  if (album.csrf && album.csrf.trim().length > 0) {
+    if (album.csrf.trim().length < 16 || album.csrf.trim().length > 64) {
+      {
+        errors.csrf = [
+          "CSRF token is not well formed. Cannot edit or tamper with this value.",
+        ];
+      }
+    }
   }
 
   // regex csrf check
-  const checkCsrf = checkUuid(album.csrf ?? "");
-  if (!checkCsrf.isValid) {
-    errors.csrf = errors.csrf ?? [];
-    errors.csrf.push(...checkCsrf.messages);
+  if (album.csrf && album.csrf.trim().length > 0) {
+    const checkCsrf = checkUuid(album.csrf ?? "");
+    if (!checkCsrf.isValid) {
+      errors.csrf = errors.csrf ?? [];
+      errors.csrf.push(...checkCsrf.messages);
+    }
   }
 
   // validate title

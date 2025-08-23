@@ -171,6 +171,7 @@ export default function UploadForm({
     metadata.append("content_type", file.type);
     metadata.append("file_size", file.size.toString());
     metadata.append("permissions[]", JSON.stringify(currentPermissions));
+    metadata.append("albums[]", JSON.stringify(currentAlbums));
 
     // stage 1: upload the metadata and request the presigned PUT upload URL
     setStatus("uploading");
@@ -209,7 +210,7 @@ export default function UploadForm({
         setFile(null); // reset file input
       } else {
         const errorData = await uploadResponse.json();
-        console.error("Upload failed:", errorData);
+        console.error("File upload failed:", errorData);
         setServerErrors({ upload: ["Failed to upload image."] });
         setStatus("error");
       }
@@ -322,7 +323,11 @@ export default function UploadForm({
 
       {/* albums select */}
       <h2 className={styles.header}>Assign Album(s)</h2>
+
       <div className={styles.imagecard}>
+        {serverErrors && serverErrors.albums && (
+          <ErrorField errorMsgs={serverErrors.albums} />
+        )}
         <AssignmentSelect
           label={"album"}
           selectedItem={selectedAlbum}

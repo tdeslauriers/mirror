@@ -6,6 +6,8 @@ import GetCsrf from "@/components/csrf-token";
 import { imageFormUpdate } from "./actions";
 import ClipboardButton from "@/components/clipboard-button";
 import { headers } from "next/headers";
+import { Album } from "@/app/albums";
+import { Permission } from "@/app/permissions";
 
 export const metadata = {
   robots: "noindex, nofollow",
@@ -37,10 +39,13 @@ export default async function Page({
   const host = h.get("x-forwarded-host") ?? h.get("host");
   const baseUrl = `${proto}://${host}`;
 
+  // get image record data from gateway
   const imageData = await callGatewayData({
     endpoint: `/images/${slug}`,
     session: cookies.session,
   });
+
+  console.log("imageData", imageData);
 
   // check if identity cookie has images_write permission and get csrf if so for image form
   const editAllowed = cookies.identity.ux_render?.gallery?.image_write;
@@ -59,6 +64,26 @@ export default async function Page({
         pageError + "CSRF token could not be retrieved for scope form."
       );
     }
+  }
+
+  // get albums data from gateway
+  // this is used to render the albums dropdown in the form
+  let menuAlbums: Album[] = [];
+  if (editAllowed) {
+    menuAlbums = await callGatewayData({
+      endpoint: "/albums",
+      session: cookies.session,
+    });
+  }
+
+  // get permissions menu items -> gallery permissions only
+  // this is used to render the permissions dropdown in the form
+  let menuPermissions: Permission[] = [];
+  if (editAllowed) {
+    menuPermissions = await callGatewayData({
+      endpoint: "/images/permissions",
+      session: cookies.session,
+    });
   }
 
   return (
@@ -94,6 +119,8 @@ export default async function Page({
           editAllowed={editAllowed}
           slug={slug}
           imageData={imageData}
+          menuAlbums={menuAlbums}
+          menuPermissions={menuPermissions}
           imageFormUpdate={imageFormUpdate}
         />
       </main>

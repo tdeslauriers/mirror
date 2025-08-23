@@ -19,3 +19,9 @@
 .form {
   margin-top: 1rem;
 }
+
+@media (max-width: 700px) {
+  .title {
+    flex-direction: column;
+  }
+}

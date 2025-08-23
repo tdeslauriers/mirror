@@ -1,6 +1,7 @@
 "use client";
 
-import { useActionState } from "react";
+import styles from "./image-form.module.css";
+import { useActionState, useState } from "react";
 import ErrorField from "../errors/error-field";
 import FormSubmit from "./form-submit";
 import {
@@ -10,25 +11,125 @@ import {
   IMAGE_TITLE_MIN_LENGTH,
 } from "@/validation/image_fields";
 import { ImageActionCmd, UpdateImageCmd } from "@/app/images";
+import { Album } from "@/app/albums";
+import { Permission } from "@/app/permissions";
+import AssignmentSelect from "./assignment-select";
 
 export default function ImageForm({
   csrf,
   slug,
-  data,
+  imageData,
+  menuAlbums,
+  menuPermissions,
   imageFormUpdate,
 }: {
   csrf: string | null;
   slug: string | null;
-  data: UpdateImageCmd | null;
+  imageData: UpdateImageCmd | null;
+  menuAlbums: Album[];
+  menuPermissions: Permission[];
   imageFormUpdate: (
     prevState: ImageActionCmd,
     formData: FormData
   ) => ImageActionCmd | Promise<ImageActionCmd>;
 }) {
+  const [currentAlbums, setCurrentAlbums] = useState<Album[]>(
+    imageData && imageData.albums ? imageData.albums : []
+  );
+  const [selectedAlbum, setSelectedAlbum] = useState("");
+  const [currentPermissions, setCurrentPermissions] = useState<Permission[]>(
+    imageData && imageData.permissions ? imageData.permissions : []
+  );
+  const [selectedPermission, setSelectedPermission] = useState("");
+
+  // to map albums to the assignment-select component
+  const albumToAssignable = (album: Album) => ({
+    id: album.id,
+    service_name: "gallery",
+    item_name: album.title,
+    name: album.title,
+    description: album.description,
+    created_at: album.created_at,
+    // no active field in Album
+    slug: album.slug,
+    link: `/albums/${album.slug}`,
+  });
+
+  // handle album selection
+  const handleSelectAlbum = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setSelectedAlbum(e.target.value);
+  };
+
+  // add selected album to the form data
+  const addAlbum = (albumSlug: string) => {
+    if (!menuAlbums || !albumSlug) return;
+    const album = menuAlbums.find((a) => a.slug === albumSlug);
+
+    // check if album already exists
+    const exists = currentAlbums.find((a) => a.slug === albumSlug);
+    if (album && !exists) {
+      setCurrentAlbums([...currentAlbums, album]);
+    } else {
+      alert("Album already added.");
+    }
+    setSelectedAlbum(""); // reset selection
+  };
+
+  // remove album from the form data
+  const removeAlbum = (albumSlug: string | undefined) => {
+    if (!albumSlug) return;
+    const updatedAlbums = currentAlbums.filter((a) => a.slug !== albumSlug);
+    setCurrentAlbums(updatedAlbums);
+  };
+
+  // to map permissions to the assignment-select component
+  const permissionToAssignable = (p: Permission) => ({
+    id: p.uuid,
+    service_name: p.service_name,
+    item_name: p.permission,
+    name: p.name,
+    description: p.description,
+    created_at: p.created_at,
+    active: p.active,
+    slug: p.slug,
+    link: `/permissions/${p.service_name}/${p.slug}`,
+  });
+
+  // handle permission selection
+  const handleSelectPermission = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setSelectedPermission(e.target.value);
+  };
+
+  // add selected permission to the form data
+  const addPermission = (permissionSlug: string) => {
+    if (!menuPermissions || !permissionSlug) return;
+    const permission = menuPermissions.find((p) => p.slug === permissionSlug);
+
+    // check if permission already exists
+    const exists = currentPermissions.find((p) => p.slug === permissionSlug);
+    if (permission && !exists) {
+      setCurrentPermissions([...currentPermissions, permission]);
+    } else {
+      alert("Permission already added.");
+    }
+
+    setSelectedPermission(""); // reset selection
+  };
+
+  // remove permission from the form data
+  const removePermission = (permissionSlug: string | undefined) => {
+    if (!permissionSlug) return;
+    const updatedPermissions = currentPermissions.filter(
+      (p) => p.slug !== permissionSlug
+    );
+    setCurrentPermissions(updatedPermissions);
+  };
+
+  // form actions and state management
   const [imageState, formAction] = useActionState(imageFormUpdate, {
     csrf: csrf,
     slug: slug,
-    updateCmd: data,
+    updateCmd: imageData,
     errors: {},
   });
 
@@ -185,8 +286,58 @@ export default function ImageForm({
         </div>
       </div>
 
+      {/* albums select */}
+      <h2 className={styles.header}>Assign Album(s)</h2>
+      <div className={styles.imagecard}>
+        <AssignmentSelect
+          label={"album"}
+          selectedItem={selectedAlbum}
+          handleSelectItem={handleSelectAlbum}
+          menuItems={menuAlbums?.map(albumToAssignable) ?? []}
+          addItem={addAlbum}
+          currentItems={currentAlbums.map(albumToAssignable) ?? []}
+          removeItem={removeAlbum}
+          errors={imageState.errors}
+        />
+      </div>
+
+      {/* hidden fields for current albums */}
+      {currentAlbums.map((album) => (
+        <input
+          key={album.slug}
+          type="hidden"
+          name="albums[]"
+          value={album.slug}
+        />
+      ))}
+
+      {/* permissions select */}
+      <h2 className={styles.header}>Assign Permission(s)</h2>
+      <div className={styles.imagecard}>
+        <AssignmentSelect
+          label={"permission"}
+          selectedItem={selectedPermission}
+          handleSelectItem={handleSelectPermission}
+          menuItems={menuPermissions?.map(permissionToAssignable) ?? []}
+          addItem={addPermission}
+          currentItems={currentPermissions.map(permissionToAssignable) ?? []}
+          removeItem={removePermission}
+          errors={imageState.errors}
+        />
+      </div>
+
+      {/* hidden fields for current permissions */}
+      {currentPermissions.map((permission) => (
+        <input
+          key={permission.slug}
+          type="hidden"
+          name="permissions[]"
+          value={permission.slug}
+        />
+      ))}
+
       {/* submit button */}
-      <div className={`row`}>
+      <div className={`row`} style={{ marginTop: "2rem" }}>
         <FormSubmit
           buttonLabel={"Update image data"}
           pendingLabel={"Updateing image data..."}
