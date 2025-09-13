@@ -112,7 +112,7 @@ export default async function AlbumPage({
                     key={image.slug}
                     title={image.title ? image.title : "Untitled Image"}
                     link={image.slug ? `/images/${image.slug}` : ""}
-                    signed_url={image.signed_url}
+                    // signed_url={image.signed_url}
                   />
                 ) : (
                   <p className={`${"placeholder"} `}>

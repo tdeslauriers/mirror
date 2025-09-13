@@ -66,7 +66,7 @@ export default async function Page({
     }
   }
 
-  // get albums data from gateway
+  // get albums data from gateway (only if needed)
   // this is used to render the albums dropdown in the form
   let menuAlbums: Album[] = [];
   if (editAllowed) {
@@ -76,7 +76,7 @@ export default async function Page({
     });
   }
 
-  // get permissions menu items -> gallery permissions only
+  // get permissions menu items -> gallery permissions only -> only if needed
   // this is used to render the permissions dropdown in the form
   let menuPermissions: Permission[] = [];
   if (editAllowed) {

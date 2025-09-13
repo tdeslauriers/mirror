@@ -15,6 +15,7 @@ import {
 } from "@/validation/user_fields";
 import { GatewayError } from "../api";
 
+// validate service client fields before sending to gateway
 export function validateServiceClient(serviceClient: ServiceClient) {
   let errors: { [key: string]: string[] } = {};
 
@@ -50,6 +51,7 @@ export function validateServiceClient(serviceClient: ServiceClient) {
   return errors;
 }
 
+// validate scope slugs before sending to gateway
 export function validateScopeSlugs(slugs: string[]) {
   const errors: { [key: string]: string[] } = {};
 
@@ -73,12 +75,14 @@ export function validateScopeSlugs(slugs: string[]) {
   return errors;
 }
 
+// command for registering a new service client
 export type ClientScopesCmd = {
   csrf?: string | null;
   client_slug?: string | null;
   scope_slugs: string[];
 };
 
+// validate the command before sending to the gateway service
 export function validateClientRegister(cmd: RegisterClient) {
   let errors: { [key: string]: string[] } = {};
 
@@ -144,6 +148,65 @@ export function validateClientRegister(cmd: RegisterClient) {
   if (cmd.confirm_password && cmd.confirm_password.trim().length > 0) {
     if (cmd.password !== cmd.confirm_password) {
       errors.confirm_password = ["Passwords do not match."];
+    }
+  }
+
+  return errors;
+}
+
+// command for generating PAT for service client
+export type PatActionCmd = {
+  csrf?: string | null;
+  slug?: string | null;
+  success?: boolean;
+  pat?: string | null;
+  errors?: { [key: string]: string[] };
+};
+
+// gateway/service command for generating PAT for service client
+export type GeneratePatCmd = {
+  csrf?: string | null;
+  slug?: string | null;
+};
+
+// validate the command before sending to the gateway service
+export function validateGeneratePatCmd(cmd: GeneratePatCmd) {
+  let errors: { [key: string]: string[] } = {};
+
+  // check csrf
+  if (
+    cmd.csrf &&
+    (cmd.csrf.trim().length < 16 || cmd.csrf.trim().length > 64)
+  ) {
+    errors.csrf = [
+      "CSRF token is not well formed.  My cannot edit or tamper with this value.",
+    ];
+  }
+
+  if (cmd.csrf && cmd.csrf.trim().length > 0) {
+    const csrf = checkUuid(cmd.csrf.trim());
+    if (!csrf.isValid) {
+      errors.server = ["CSRF token is not well formed: ", ...csrf.messages];
+    }
+  }
+
+  // check slug
+  if (
+    cmd.slug &&
+    (cmd.slug.trim().length < 16 || cmd.slug.trim().length > 64)
+  ) {
+    errors.slug = [
+      "Service client slug is not well formed.  My cannot edit or tamper with this value.",
+    ];
+  }
+
+  if (cmd.slug && cmd.slug.trim().length > 0) {
+    const slug = checkUuid(cmd.slug.trim());
+    if (!slug.isValid) {
+      errors.server = [
+        "Service client slug is not well formed: ",
+        ...slug.messages,
+      ];
     }
   }
 

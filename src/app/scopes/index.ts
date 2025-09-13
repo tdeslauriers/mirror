@@ -6,7 +6,13 @@ import {
 import { checkServiceName } from "@/validation/service_client_field";
 import { FieldValidation } from "@/validation/user_fields";
 
-const allowedServices = new Set(["pixie", "apprentice", "ran", "shaw"]);
+const allowedServices = new Set([
+  "apprentice",
+  "erebor",
+  "pixie",
+  "ran",
+  "shaw",
+]);
 
 export type Scope = {
   csrf?: string;

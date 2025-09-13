@@ -2,13 +2,18 @@ import GetCsrf from "@/components/csrf-token";
 import ClientForm from "@/components/forms/client-form";
 import Loading from "@/components/loading";
 import { Suspense } from "react";
-import { handleClientEdit, handleReset, handleScopesUpdate } from "./actions";
+import {
+  genPatToken,
+  handleClientEdit,
+  handleReset,
+  handleScopesUpdate,
+} from "./actions";
 import ResetForm from "@/components/forms/reset-form";
 import Link from "next/link";
 import { getAuthCookies } from "@/components/checkCookies";
 import callGatewayData from "@/components/call-gateway-data";
 import ManageScopesForm from "@/components/forms/manage-scopes-form";
-import ManagePermissionsForm from "@/components/forms/manage-permissions-form";
+import PatGenForm from "@/components/forms/pat-gen-form";
 
 export const metadata = {
   robots: "noindex, nofollow",
@@ -174,6 +179,20 @@ export default async function Page({
             />
           </div>
         </Suspense>
+
+        {/* generate pat tokens form */}
+        {cookies.identity.ux_render?.users?.client_write && (
+          <>
+            <div className="card-title">
+              <h2>Generate PAT Token</h2>
+            </div>
+            <Suspense fallback={<Loading />}>
+              <div className="card">
+                <PatGenForm csrf={csrf} slug={slug} genPatToken={genPatToken} />
+              </div>
+            </Suspense>
+          </>
+        )}
       </main>
     </>
   );

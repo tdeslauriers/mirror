@@ -208,6 +208,8 @@ export default function UploadForm({
         setTitle(""); // reset title input
         setDescription(""); // reset description input
         setFile(null); // reset file input
+        setCurrentAlbums([]); // reset albums
+        setCurrentPermissions([]); // reset permissions
       } else {
         const errorData = await uploadResponse.json();
         console.error("File upload failed:", errorData);

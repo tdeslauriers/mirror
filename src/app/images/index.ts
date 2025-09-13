@@ -35,11 +35,37 @@ export type ImageData = {
   is_archived?: boolean; // Indicates if the image is archived
   is_published?: boolean; // Indicates if the image is published and visible to users
 
-  signed_url?: string; // The signed URL for the image, used to access the image in object storage
-
+  signed_urls?: SignedUrl[]; // Array of signed URLs for accessing the image in different sizes
+  blur_url?: string; // A low-resolution, blurred version of the image for placeholder purposes
   // associated albums and permissions
   albums?: Album[]; // Array of albums the image belongs to
   permissions?: Permission[]; // Array of permissions associated with the image
+};
+
+export type SignedUrl = {
+  width: number; // The width of the image in pixels
+  signed_url: string; // The signed URL for the image, used to access the image in object storage
+};
+
+// Placeholder is a lightweight version of ImageData returned from an upload image request
+export type Placeholder = {
+  id?: string; // Unique identifier for the image record
+  title: string; // Title of the image
+  description?: string; // Description of the image
+  file_name?: string; // Name of the file with its extension, e.g., "slug.jpg"
+  file_type?: string; // MIME type of the image, e.g., "image/jpeg", "image/png"
+  object_key?: string; // The key used to store the image in object storage, e.g., "2025/slug.jpg"
+  slug?: string; // ENCRYPTED: a unique slug for the image, used in URLs
+  width?: number; // Width of the image in pixels
+  height?: number; // Height of the image in pixels
+  size?: number; // Size of the image file in bytes
+  image_date?: string; // Date when the image was taken or created, i.e., from EXIF metadata
+  created_at?: string; // Timestamp when the image was created
+  updated_at?: string; // Timestamp when the image was last updated
+  is_archived?: boolean; // Indicates if the image is archived
+  is_published?: boolean; // Indicates if the image is published and visible to users
+
+  signed_url?: string;
 };
 
 export type AddImageCmd = {
@@ -172,8 +198,12 @@ export type UpdateImageCmd = {
   is_published?: boolean; // Indicates if the image is published
   is_archived?: boolean; // Indicates if the image is archived
 
-  albums?: Album[]; // Array of albums the image belongs to
-  permissions?: Permission[]; // Array of permissions to be applied to the image
+  albums?: Album[]; // Array of albums the image belongs to for edit requests
+  permissions?: Permission[]; // Array of permissions to be applied to the image for edit requests
+
+  // captures the slugs of associated albums and permissions for edit requests
+  album_slugs?: string[]; // Array of albums the image belongs to
+  permission_slugs?: string[]; // Array of permissions to be applied to the image
 };
 
 export function validateUpdateImageCmd(image: UpdateImageCmd): {
@@ -268,7 +298,39 @@ export function validateUpdateImageCmd(image: UpdateImageCmd): {
     ];
   }
 
+  // check album slugs provided, if any
+  if (image.album_slugs && image.album_slugs.length > 0) {
+    image.album_slugs.forEach((slug) => {
+      const checkSlug = checkUuid(slug);
+      if (!checkSlug.isValid) {
+        if (Object.keys(errors).length > 0) {
+          errors.albums = errors.albums ?? [];
+          errors.albums.push(
+            `Album ${slug} has errors: ${Object.values(checkSlug.messages)
+              .flat()
+              .join(", ")}`
+          );
+        }
+      }
+    });
+  }
+
+  // check permission slugs provided, if any
+  if (image.permission_slugs && image.permission_slugs.length > 0) {
+    image.permission_slugs.forEach((slug) => {
+      const checkSlug = checkUuid(slug);
+      if (!checkSlug.isValid) {
+        if (Object.keys(errors).length > 0) {
+          errors.permissions = errors.permissions ?? [];
+          errors.permissions.push(
+            `Permission ${slug} has errors: ${Object.values(checkSlug.messages)
+              .flat()
+              .join(", ")}`
+          );
+        }
+      }
+    });
+  }
+
   return errors;
 }
-
-// check

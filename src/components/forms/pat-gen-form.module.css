@@ -1,0 +1,11 @@
+.pat {
+  display: block;
+  width: 40vw;
+  font-size: 1rem;
+  font-family: "Montserrat", sans-serif;
+  border-radius: 4px;
+  padding: 2rem;
+  margin: 1rem 0 2rem;
+  border: 1px solid var(--primary-site-color);
+  box-shadow: 1px 0 55px rgba(7, 8, 7, 0.5);
+}

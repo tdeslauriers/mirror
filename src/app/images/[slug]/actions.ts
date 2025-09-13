@@ -40,6 +40,8 @@ export async function imageFormUpdate(
     image_date_year: parseInt(formData.get("image_date_year") as string),
     is_published: formData.get("is_published") === "on" ? true : false,
     is_archived: formData.get("is_archived") === "on" ? true : false,
+    album_slugs: formData.getAll("albums[]") as string[],
+    permission_slugs: formData.getAll("permissions[]") as string[],
   };
 
   // validate the updated image data
@@ -63,8 +65,6 @@ export async function imageFormUpdate(
       errors: errors,
     } as ImageActionCmd;
   }
-
-  console.log("Image update command: ", updated);
 
   // send the update command to the gateway
   try {

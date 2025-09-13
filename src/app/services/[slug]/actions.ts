@@ -1,5 +1,6 @@
 "use server";
 
+import { GeneratePatCmd } from "@/app/services";
 import {
   ResetData,
   ResetPwActionCmd,
@@ -10,7 +11,9 @@ import {
 } from "@/components/forms";
 import {
   ClientScopesCmd,
+  PatActionCmd,
   handleServiceClientErrors,
+  validateGeneratePatCmd,
   validateScopeSlugs,
   validateServiceClient,
 } from "..";
@@ -299,6 +302,82 @@ export async function handleScopesUpdate(
   } catch (error) {
     throw new Error(
       "Service client scopes form could not be updated.  Please try again."
+    );
+  }
+}
+
+export async function genPatToken(
+  previousState: PatActionCmd,
+  formData: FormData
+) {
+  // get session token
+  const sessionCookie = await checkForSessionCookie();
+
+  // build generate PAT command
+  const csrf = previousState.csrf;
+  const slug = previousState.slug;
+
+  const cmd: GeneratePatCmd = {
+    csrf: csrf,
+    slug: slug,
+  };
+
+  // validate command
+  const errors = validateGeneratePatCmd(cmd);
+  if (errors && Object.keys(errors).length > 0) {
+    return {
+      csrf: csrf,
+      slug: slug,
+      success: false,
+      pat: null,
+      errors: errors,
+    };
+  }
+
+  // call gateway to generate PAT for service client record
+  try {
+    const apiResponse = await fetch(
+      `${process.env.GATEWAY_SERVICE_URL}/clients/generate/pat`,
+      {
+        method: "POST",
+        headers: {
+          Authorization: `${sessionCookie?.value}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(cmd),
+      }
+    );
+
+    if (apiResponse.ok) {
+      const success = await apiResponse.json();
+      console.log("successfully generated pat token: ", success);
+      return {
+        csrf: csrf,
+        slug: slug,
+        success: true,
+        pat: success.token,
+        errors: {},
+      };
+    } else {
+      const fail = await apiResponse.json();
+      if (isGatewayError(fail)) {
+        const errors = handleServiceClientErrors(fail);
+        return {
+          csrf: csrf,
+          slug: slug,
+          success: false,
+          pat: null,
+          errors: errors,
+        };
+      } else {
+        throw new Error(
+          "Personal Access Token could not be generated due to unhandled gateway error.  Please try again."
+        );
+      }
+    }
+  } catch (error) {
+    throw new Error(
+      "Unable to call client service gateway.  Please try again."
     );
   }
 }
