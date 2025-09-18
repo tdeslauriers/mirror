@@ -64,7 +64,7 @@ export default async function AlbumsPage() {
               key={album.slug}
               title={album.title ? album.title : "Untitled Album"}
               link={album.slug ? `/albums/${album.slug}` : ""}
-              imageData={album.images[0]}
+              imageData={album?.images?.[0] ?? null}
             />
           ))}
         </div>
