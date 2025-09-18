@@ -1,115 +1,60 @@
 .imagedisplay {
-  display: flex;
-  flex-direction: row;
-  width: 50vw;
-  margin-top: 1rem;
-  margin-bottom: 1rem;
-  padding: 2rem;
-  border-radius: 4px;
-  border: 1px solid var(--primary-border-color);
-  box-shadow: 1px 0 55px rgba(7, 8, 7, 0.5);
-}
-
-.image {
-  width: 65%;
-  height: auto;
-  object-fit: cover;
-  object-position: center;
-  flex-shrink: 0;
-  /* border-radius: 4px; */
-}
-
-.header {
-  margin-top: 2rem;
-}
-
-.imagecard {
-  display: flex;
-  flex-direction: column;
+  --gap: 2rem;
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); /* image | meta */
+  gap: var(--gap);
+  align-items: start;
+  margin-inline: auto;
+  max-width: 1800px;
   padding: 1rem;
-  margin-top: 1rem;
+
   margin-bottom: 1rem;
   border-radius: 4px;
   border: 1px solid var(--primary-border-color);
   box-shadow: 1px 0 55px rgba(7, 8, 7, 0.5);
 }
 
-.cardtext {
-  width: 35%;
-  padding-left: 1.5rem;
-  display: flex;
-  flex-direction: column;
-  justify-content: top;
+@media (max-width: 1500px) {
+  .imagedisplay {
+    grid-template-columns: 1fr;
+
+    z-index: 1;
+  }
+}
+
+@media (max-width: 1200px) {
+  .imagedisplay {
+    grid-template-columns: 1fr;
+  }
+}
+
+.metadata {
+
+  font-family: "Montserrat", sans-serif;
+}
+
+@media (max-width: 1500px) {
+  .metadata {
+    padding-right: 0; /*dont need room for the scroll bar with this layout*/
+  }
 }
 
 .title {
   font-size: 1.75rem;
   font-weight: bold;
-  font-family: "Montserrat", sans-serif;
   margin-bottom: 0.5rem;
 }
 
 .date {
   font-size: 1.25rem;
   font-style: italic;
-  font-family: "Montserrat", sans-serif;
   margin: 0.5rem 0 0.5rem;
 }
 
 .description {
   font-size: 1.25rem;
   font-style: italic;
-  font-family: "Montserrat", sans-serif;
   margin: 0.75rem 0 0.5rem;
-}
-
-.row {
-  display: flex;
-
-  margin: 1rem 0 1rem;
-}
-
-.box {
-  display: flex;
-  align-items: center;
-  justify-content: left;
-  width: auto;
-  font-size: 1.25rem;
-  font-family: "Montserrat", sans-serif;
-}
-
-.right {
-  padding-left: 0.75rem;
-  width: auto;
-  justify-content: right;
-}
-
-/* this label is used to style the label as a stand-in for <input type=file> which does not allow much custom styling */
-.buttonlabel {
-  border: 0;
-  border: none;
-  border-radius: 4px;
-  padding: 0.75rem 2rem;
-  background: linear-gradient(
-    90deg,
-    var(--primary-site-fade),
-    var(--primary-site-color)
-  );
-  width: auto;
-  cursor: pointer;
-  font: inherit;
-  font-size: 1.25rem;
-  font-weight: bold;
-  text-transform: uppercase;
-  color: rgb(var(--foreground-rgb));
-}
-
-.buttonlabel:hover,
-.buttonlabel:focus {
-  transition: 0.3s;
-  outline-style: none;
-  /* box-shadow: 0 0 40px var(--primary-site-color); */
-  animation: glow-input 5s ease-in-out infinite alternate;
 }
 
 @keyframes glow-input {
@@ -122,48 +67,5 @@
     box-shadow: 0 0 10px var(--primary-site-color),
       0 0 20px var(--primary-site-color), 0 0 30px var(--primary-site-color),
       0 0 40px var(--primary-site-color);
-  }
-}
-
-@media (min-width: 700px) and (max-width: 1500px) {
-  .imagecard {
-    width: 70vw;
-    flex-direction: column;
-    min-height: unset;
-  }
-
-  .image {
-    width: 100%;
-    height: auto;
-  }
-
-  .cardtext {
-    width: 100%;
-  }
-}
-
-@media (max-width: 700px) {
-  .row {
-    flex-direction: column;
-  }
-
-  .box {
-    justify-content: left;
-    align-items: left;
-  }
-
-  .imagecard {
-    width: 80vw;
-    flex-direction: column;
-    min-height: unset;
-  }
-
-  .image {
-    width: 100%;
-    height: auto;
-  }
-
-  .cardtext {
-    width: 100%;
   }
 }

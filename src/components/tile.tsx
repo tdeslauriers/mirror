@@ -1,24 +1,31 @@
+"use client";
+
 import Link from "next/link";
 import styles from "./tile.module.css";
-import Image from "next/image";
+import { ImageData } from "@/app/images";
+import Image from "@/components/image";
 
 type TileProps = {
   title: string;
   link: string;
-  signed_url?: string | null;
+  imageData: ImageData;
 };
 
-export default function Tile({ title, link, signed_url }: TileProps) {
+export default function Tile({ title, link, imageData }: TileProps) {
   return (
     <>
       <Link className={styles.tile} href={link}>
-        {signed_url ? (
-          <Image src={signed_url} alt={title} className={styles.thumbnail} />
-        ) : (
-          <div className={`no-thumbnail`} style={{ paddingTop: "1rem" }}>
-            <span className={`highlight-error `}>No Thumbnail</span>
-          </div>
-        )}
+        {/* image thumbnail */}
+        <div className={styles.thumbnail}>
+          <Image
+            alt={imageData.title ?? "Image thumbnail"}
+            imageData={imageData}
+            sizes="(max-width: 480px) 50vw,
+       (max-width: 768px) 33vw,
+       (max-width: 1200px) 25vw,
+       20vw"
+          />
+        </div>
         <div className={`${styles.title} locallink`}>{title}</div>
       </Link>
     </>

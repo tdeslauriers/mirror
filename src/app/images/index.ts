@@ -35,14 +35,14 @@ export type ImageData = {
   is_archived?: boolean; // Indicates if the image is archived
   is_published?: boolean; // Indicates if the image is published and visible to users
 
-  signed_urls?: SignedUrl[]; // Array of signed URLs for accessing the image in different sizes
+  image_targets?: ImageTarget[]; // Array of signed URLs for accessing the image in different sizes
   blur_url?: string; // A low-resolution, blurred version of the image for placeholder purposes
   // associated albums and permissions
   albums?: Album[]; // Array of albums the image belongs to
   permissions?: Permission[]; // Array of permissions associated with the image
 };
 
-export type SignedUrl = {
+export type ImageTarget = {
   width: number; // The width of the image in pixels
   signed_url: string; // The signed URL for the image, used to access the image in object storage
 };

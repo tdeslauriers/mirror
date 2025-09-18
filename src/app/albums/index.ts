@@ -15,7 +15,7 @@ export type Album = {
   created_at?: string;
   updated_at?: string;
   is_archived?: boolean;
-  signed_url?: string | null; // album cover photo: signed URL from gateway/object storage
+  blur_url?: string | null; // album cover photo: signed URL from gateway/object storage
 
   // slice of image thumbnails associated with the album: may not be present or may be empty
   images?: ImageData[];

@@ -1,11 +1,12 @@
 .tile {
   display: flex;
   flex-direction: column;
+  overflow: hidden;
+
+  min-width: 0;
   text-align: center;
   font-size: 1rem;
   font-family: "Montserrat", sans-serif;
-
-  overflow: hidden;
   border: 1px solid var(--primary-border-color);
   border-radius: 4px;
   box-shadow: 1px 0 55px rgba(7, 8, 7, 0.5);
@@ -23,9 +24,16 @@
 }
 
 .thumbnail {
+  position: relative;
+  aspect-ratio: 4 / 3; /* pick what works: 4:3, 3:2, 1:1 */
+
+  overflow: hidden;
+}
+
+.thumbnail img {
+  display: block;
+  flex-direction: column;
   width: 100%;
-  height: 200px;
-  object-fit: cover;
 }
 
 .title {
