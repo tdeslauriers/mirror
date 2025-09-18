@@ -8,6 +8,7 @@ import ClipboardButton from "@/components/clipboard-button";
 import { headers } from "next/headers";
 import { Album } from "@/app/albums";
 import { Permission } from "@/app/permissions";
+import BackButton from "@/components/nav/back";
 
 export const metadata = {
   robots: "noindex, nofollow",
@@ -103,10 +104,9 @@ export default async function Page({
               label={imageData ? `'${imageData.title}'` : "Image"}
             />
 
-            {/* link to scopes table */}
-            <Link href={`/album`}>
-              <button>Album Placeholder</button>
-            </Link>
+            {/* back button */}
+            {/* setting it to albums generically since cant know what access is */}
+            <BackButton fallback="/albums" destination="albums" />
           </div>
         </div>
         <hr className="page-title" />

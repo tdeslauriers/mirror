@@ -16,7 +16,7 @@ export default function Tile({ title, link, imageData }: TileProps) {
     <>
       <Link className={styles.tile} href={link}>
         {/* image thumbnail */}
-        {imageData ? (
+        {imageData && imageData.blur_url ? (
           <div className={styles.thumbnail}>
             <Image
               alt={imageData.title ?? "Image thumbnail"}
@@ -25,11 +25,7 @@ export default function Tile({ title, link, imageData }: TileProps) {
             />
           </div>
         ) : (
-          <div className={styles.thumbnail}>
-            <div>
-              <span className="highlight-info">No Tile Image Available</span>
-            </div>
-          </div>
+          null
         )}
 
         <div className={`${styles.title} locallink`}>{title}</div>

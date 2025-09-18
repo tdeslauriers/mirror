@@ -9,6 +9,7 @@ import { headers } from "next/headers";
 import ClipboardButton from "@/components/clipboard-button";
 import Link from "next/link";
 import styles from "../album.module.css";
+import BackButton from "@/components/nav/back";
 
 export const metadata = {
   robots: "noindex, nofollow",
@@ -86,10 +87,8 @@ export default async function AlbumPage({
               label={album ? `'${album.title}'` : "Album"}
             />
 
-            {/* link to albums table */}
-            <Link href={`/albums`}>
-              <button>Albums List</button>
-            </Link>
+            {/* back button */}
+            <BackButton destination="albums" fallback="/albums" />
           </div>
         </div>
         <hr className={`page-title`} />
@@ -113,7 +112,11 @@ export default async function AlbumPage({
                   <Tile
                     key={image.slug}
                     title={image.title}
-                    link={`/images/${image.slug}`}
+                    link={`/images/${image.slug}?returnUrl=${encodeURIComponent(
+                      `/albums/${slug}`
+                    )}&returnDestination=${encodeURIComponent(
+                      album.title ?? "album"
+                    )}`}
                     imageData={image}
                   />
                 ) : (
