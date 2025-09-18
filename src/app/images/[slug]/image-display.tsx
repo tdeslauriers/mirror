@@ -1,13 +1,12 @@
 "use client";
 
-import Image from "next/image";
 import styles from "../image.module.css";
-import { Suspense, useState } from "react";
-import Loading from "@/components/loading";
+import { useState } from "react";
 import { ImageData, UpdateImageCmd } from "..";
 import ImageForm from "@/components/forms/image-form";
 import { Permission } from "@/app/permissions";
 import { Album } from "@/app/albums";
+import Image from "@/components/image";
 
 export default function ImageDisplay({
   csrf,
@@ -61,18 +60,16 @@ export default function ImageDisplay({
       <div className={styles.imagedisplay}>
         {/* image display */}
         <Image
-          className={styles.image}
-          src={imageData?.signed_url ? imageData.signed_url : ""}
-          alt={imageData?.title ? imageData.title : "site image"}
-          width={1000}
-          height={1000}
+          alt={imageData?.title ?? "Image"}
+          imageData={imageData}
+          sizes={`(max-width: 700px) 100vw, (max-width: 1200px) 85vw, 75vw`}
         />
 
-        <div className={styles.cardtext}>
+        <div className={styles.metadata}>
           {/* // edit button switches from display to form */}
           {editAllowed && (
             <div
-              className={isEditing ? `actionsError` : `actions`}
+              className={isEditing ? `actionsError ` : `actions`}
               style={{ paddingBottom: "1rem" }}
             >
               <button
@@ -85,6 +82,7 @@ export default function ImageDisplay({
             </div>
           )}
 
+          {/* standard user display vs edit mode */}
           {!isEditing ? (
             // standard user display
             <>

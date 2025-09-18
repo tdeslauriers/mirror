@@ -8,6 +8,7 @@ import { handleAlbumUpdate } from "./actions";
 import { headers } from "next/headers";
 import ClipboardButton from "@/components/clipboard-button";
 import Link from "next/link";
+import styles from "../album.module.css";
 
 export const metadata = {
   robots: "noindex, nofollow",
@@ -103,30 +104,29 @@ export default async function AlbumPage({
         />
 
         {/* images: display the thumbnail images of an album in a grid */}
-        <div className="grid">
-          {album.images && album.images.length > 0 ? (
+        <div className={styles.tiledisplay}>
+          {album.images &&
+            album.images.length > 0 &&
             album.images.map((image) => (
               <>
                 {image.id ? (
                   <Tile
                     key={image.slug}
-                    title={image.title ? image.title : "Untitled Image"}
-                    link={image.slug ? `/images/${image.slug}` : ""}
-                    // signed_url={image.signed_url}
+                    title={image.title}
+                    link={`/images/${image.slug}`}
+                    imageData={image}
                   />
                 ) : (
-                  <p className={`${"placeholder"} `}>
-                    <span className="highlight-info">
-                      There are no images/pictures in this album.
-                    </span>
+                  <p>
+                    <span className="highlight-error">Empty image record.</span>
                   </p>
                 )}
               </>
-            ))
-          ) : (
+            ))}
+          {(!album.images || album.images.length <= 0) && (
             <p>
               <span className="highlight-info">
-                There are no images/pictures in this album.
+                No images found in this album.
               </span>
             </p>
           )}

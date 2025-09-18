@@ -1,3 +1,15 @@
+.tiledisplay {
+  display: grid;
+  grid-template-columns: repeat(
+    auto-fill,
+    minmax(250px, 1fr)
+  ); /* flexible cols */
+  gap: 1.5rem;
+  inline-size: min(100%, 1800px);
+  margin-inline: auto;
+  padding: 1rem;
+}
+
 .edit {
   width: auto;
   align-self: right;
@@ -18,10 +30,4 @@
 
 .form {
   margin-top: 1rem;
-}
-
-@media (max-width: 700px) {
-  .title {
-    flex-direction: column;
-  }
 }

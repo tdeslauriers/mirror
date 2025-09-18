@@ -45,8 +45,6 @@ export default async function Page({
     session: cookies.session,
   });
 
-  console.log("imageData", imageData);
-
   // check if identity cookie has images_write permission and get csrf if so for image form
   const editAllowed = cookies.identity.ux_render?.gallery?.image_write;
 

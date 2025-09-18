@@ -8,6 +8,24 @@
   width: 75vw;
   margin: auto;
   margin-top: 7rem;
+
+  font-family: "Montserrat", sans-serif;
+}
+
+@media (min-width: 700px) and (max-width: 1500px) {
+  .main {
+    padding: 0rem 0rem;
+    width: 75vw;
+    margin-top: 6rem;
+  }
+}
+
+@media (max-width: 700px) {
+  .main {
+    padding: 0rem 0rem;
+    width: 90vw;
+    margin-top: 5rem;
+  }
 }
 
 .main-drawer {
@@ -58,10 +76,10 @@
 /* used to left justify the title of a page if makes sense visually */
 .page-title {
   margin-top: 1rem;
-  width: 100%;
+  width: 75vw;
   align-items: left;
   flex-direction: column;
-  width: 75vw;
+  /* width: 75vw; */
   font-family: "Montserrat", sans-serif;
 }
 
@@ -189,7 +207,6 @@ hr.page-title {
 
   .page-title {
     flex-direction: column;
-    width: 75vw;
   }
 
   .content {
