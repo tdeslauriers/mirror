@@ -90,7 +90,7 @@ export function validateAlbum(album: Album) {
 export type AlbumActionCmd = {
   csrf?: string | null; // CSRF token for form submission
   slug?: string | null; // Unique identifier for the album, used in URLs
-  album?: Album; // The album data to be updated or created
+  album?: Album | null; // The album data to be updated or created
   errors: { [key: string]: string[] }; // Validation errors, if any
 };
 

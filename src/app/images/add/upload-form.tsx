@@ -202,7 +202,6 @@ export default function UploadForm({
       });
 
       if (uploadResponse.ok) {
-        const success = await uploadResponse.json();
         setStatus("success");
         fileInputRef.current?.value && (fileInputRef.current.value = "");
         setTitle(""); // reset title input

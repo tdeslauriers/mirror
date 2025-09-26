@@ -34,8 +34,6 @@ export default function Image({
     return null;
   }
 
- 
-
   return (
     <>
       <div className={styles.imagecontainer}>

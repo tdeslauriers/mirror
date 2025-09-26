@@ -7,7 +7,6 @@ import AlbumDisplay from "./album-display";
 import { handleAlbumUpdate } from "./actions";
 import { headers } from "next/headers";
 import ClipboardButton from "@/components/clipboard-button";
-import Link from "next/link";
 import styles from "../album.module.css";
 import BackButton from "@/components/nav/back";
 

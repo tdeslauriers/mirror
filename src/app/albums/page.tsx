@@ -26,9 +26,11 @@ export default async function AlbumsPage() {
     session: cookies.session,
   });
   if (!albums || albums.length === 0) {
-    throw new Error(
-      "It appears you have not been granted access to any albums and/or photos yet."
-    );
+    // TODO: fix digest error here
+    // throw new Error(
+    //   "It appears you have not been granted access to any albums and/or photos yet."
+    // );
+    console.log(pageError + "no albums data returned from gateway.");
   }
 
   return (
@@ -59,14 +61,24 @@ export default async function AlbumsPage() {
 
         {/* albums: display albums in a grid */}
         <div className="grid">
-          {albums.map((album) => (
-            <Tile
-              key={album.slug}
-              title={album.title ? album.title : "Untitled Album"}
-              link={album.slug ? `/albums/${album.slug}` : ""}
-              imageData={album?.images?.[0] ?? null}
-            />
-          ))}
+          {albums && albums.length > 0 ? (
+            albums.map((album) => (
+              <Tile
+                key={album.slug}
+                title={album.title ? album.title : "Untitled Album"}
+                link={album.slug ? `/albums/${album.slug}` : ""}
+                imageData={album?.images?.[0] ?? null}
+              />
+            ))
+          ) : (
+            <div className="content" style={{ textAlign: "center" }}>
+              <p>
+                <span className="highlight-error">
+                  It appears you have not been granted access to any albums yet.
+                </span>
+              </p>
+            </div>
+          )}
         </div>
       </main>
     </>

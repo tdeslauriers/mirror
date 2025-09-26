@@ -29,7 +29,7 @@ export default async function Page({
 
   // check if identity cookie has scopes_read permission
   // ie, gaurd pattern or access hint gating
-  if (!cookies.identity || !cookies.identity.ux_render?.users?.scope_read) {
+  if (!cookies.identity || !cookies.identity.ux_render?.gallery?.image_read) {
     console.log(pageError + "User does not have images_read permission.");
     throw new Error(pageError + "You do not have permission to view scopes.");
   }

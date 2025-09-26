@@ -2,6 +2,7 @@
 
 import { useRouter, useSearchParams } from "next/navigation";
 import { getSafeReturnParams, ReturnParams } from ".";
+import { useEffect, useMemo, useState } from "react";
 
 export default function BackButton({
   fallback,
@@ -10,30 +11,34 @@ export default function BackButton({
   fallback?: string;
   destination?: string;
 }) {
+  const [canGoBack, setCanGoBack] = useState(false);
+
   const router = useRouter();
   const params = useSearchParams();
 
-  const target: ReturnParams = getSafeReturnParams(
-    params,
-    fallback ?? fallback,
-    destination ?? destination
+  useEffect(() => {
+    // compute after mount to avoid ssr "window" access
+    if (typeof window !== "undefined") {
+      setCanGoBack(window.history.length > 1);
+    }
+  }, []);
+
+  const target: ReturnParams = useMemo(
+    () => getSafeReturnParams(params, fallback, destination),
+    [params, fallback, destination]
   );
 
-  console.log("BackButton target:", target);
-
   const handleBack = () => {
-
-    router.push(target.returnUrl);
+    if (typeof window !== "undefined" && window.history.length > 1) {
+      router.back();
+    } else {
+      router.push(target.returnUrl);
+    }
   };
-
   return (
     <>
       <div className={`actions`} style={{ width: "auto" }}>
-        <button
-          className="back"
-          onClick={handleBack}
-          disabled={window.history.length < 1}
-        >
+        <button className="back" onClick={handleBack} disabled={!canGoBack}>
           <strong>{`Back to ${target.returnDestination}`}</strong>
         </button>
       </div>

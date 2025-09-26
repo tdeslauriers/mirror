@@ -64,7 +64,10 @@ export default function UserTable({ data }: UserTableProps) {
               ✔️
             </span>
           ) : (
-            <span className="highlight-error no-hover" aria-label="disabled">
+            <span
+              className="highlight-error no-hover-error"
+              aria-label="disabled"
+            >
               ❌
             </span>
           )}

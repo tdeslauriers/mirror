@@ -41,7 +41,7 @@ export default function ManagePermissionsForm({
       editAllowed={editAllowed}
       entitySlug={entitySlug}
       entityAccessItems={entityPermissions?.map(toAssignable) ?? []}
-      menuAccessItems={menuPermissions.map(toAssignable)}
+      menuAccessItems={menuPermissions?.map(toAssignable) ?? []}
       updateAccessItems={updatePermissions}
     />
   );
