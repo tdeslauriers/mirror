@@ -1,7 +1,7 @@
 import callGatewayData from "@/components/call-gateway-data";
 import { getAuthCookies } from "@/components/checkCookies";
 import Link from "next/link";
-import { Album } from ".";
+import { Album, albumComparator } from ".";
 import Tile from "@/components/tile";
 
 export const metadata = {
@@ -33,6 +33,9 @@ export default async function AlbumsPage() {
     console.log(pageError + "no albums data returned from gateway.");
   }
 
+  // sort albums by title (alphabetically) then by year (descending)
+  const sortedAlbums = albums.sort(albumComparator);
+
   return (
     <>
       <main className="main main-drawer">
@@ -61,8 +64,8 @@ export default async function AlbumsPage() {
 
         {/* albums: display albums in a grid */}
         <div className="grid">
-          {albums && albums.length > 0 ? (
-            albums.map((album) => (
+          {sortedAlbums && sortedAlbums.length > 0 ? (
+            sortedAlbums.map((album) => (
               <Tile
                 key={album.slug}
                 title={album.title ? album.title : "Untitled Album"}

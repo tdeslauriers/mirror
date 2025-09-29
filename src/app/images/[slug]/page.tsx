@@ -6,7 +6,7 @@ import GetCsrf from "@/components/csrf-token";
 import { imageFormUpdate } from "./actions";
 import ClipboardButton from "@/components/clipboard-button";
 import { headers } from "next/headers";
-import { Album } from "@/app/albums";
+import { Album, albumComparator } from "@/app/albums";
 import { Permission } from "@/app/permissions";
 import BackButton from "@/components/nav/back";
 
@@ -73,6 +73,8 @@ export default async function Page({
       endpoint: "/albums",
       session: cookies.session,
     });
+
+    menuAlbums = menuAlbums.sort(albumComparator);
   }
 
   // get permissions menu items -> gallery permissions only -> only if needed

@@ -132,3 +132,55 @@ export function handleAlbumErrors(gatewayError: GatewayError): {
       return errors;
   }
 }
+
+// sorting logic for albums -> split into proper names and years with proper names first, then years
+
+// check if name is a year like '1999' or '2020'
+const isYear = (title?: string): boolean => {
+  if (!title) return false;
+
+  const y = title.trim();
+
+  return /^[12]\d{3}$/.test(y); // -> starts with 1 or 2, followed by 3 digits
+};
+
+// album comparator function
+export const albumComparator = (a: Album, b: Album): number => {
+  const titleA = (a.title ?? "").trim();
+  const titleB = (b.title ?? "").trim();
+
+  // handle empty titles -> SHOULD NEVER HAPPEN
+  const hasTitleA = titleA.length > 0;
+  const hasTitleB = titleB.length > 0;
+
+  if (!hasTitleA && !hasTitleB) return hasTitleA ? -1 : 1; // both empty, maintain order
+
+  // if both blank, keep stable by slug as tiebreaker
+  if (!hasTitleA && hasTitleB) {
+    return (a.slug ?? "").localeCompare(b.slug ?? "");
+  }
+
+  const aIsYear = isYear(titleA);
+  const bIsYear = isYear(titleB);
+
+  // non-year titles go first (since there will be fewer of them)
+  if (aIsYear !== bIsYear) return aIsYear ? 1 : -1;
+
+  if (!aIsYear) {
+    // alphabetical sort for proper name titles like "soccer"
+    return titleA.localeCompare(titleB, undefined, { sensitivity: "base" });
+  }
+
+  // numerical sort for year titles like "1999"
+  const yearA = parseInt(titleA, 10);
+  const yearB = parseInt(titleB, 10);
+
+  // check for NaN just in case
+  // fall back to string compare if parsing fails
+  if (isNaN(yearA) || isNaN(yearB)) {
+    return titleA.localeCompare(titleB, undefined, { sensitivity: "base" });
+  }
+
+  // descending order for years
+  return yearB - yearA;
+};

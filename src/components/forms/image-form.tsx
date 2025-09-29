@@ -11,7 +11,7 @@ import {
   IMAGE_TITLE_MIN_LENGTH,
 } from "@/validation/image_fields";
 import { ImageActionCmd, UpdateImageCmd } from "@/app/images";
-import { Album } from "@/app/albums";
+import { Album, albumComparator } from "@/app/albums";
 import { Permission } from "@/app/permissions";
 import AssignmentSelect from "./assignment-select";
 
@@ -64,14 +64,22 @@ export default function ImageForm({
   const addAlbum = (albumSlug: string) => {
     if (!menuAlbums || !albumSlug) return;
     const album = menuAlbums.find((a) => a.slug === albumSlug);
+    if (!album) return;
 
-    // check if album already exists
-    const exists = currentAlbums.find((a) => a.slug === albumSlug);
-    if (album && !exists) {
-      setCurrentAlbums([...currentAlbums, album]);
-    } else {
-      alert("Album already added.");
-    }
+    setCurrentAlbums((prev) => {
+      // check if album already exists to avoid duplicates
+      if (prev.find((a) => a.slug === albumSlug)) {
+        alert("Album already added.");
+        return prev;
+      }
+
+      // add + sort
+      const updated = [...prev, album];
+      updated.sort(albumComparator);
+
+      return updated;
+    });
+
     setSelectedAlbum(""); // reset selection
   };
 

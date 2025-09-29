@@ -4,7 +4,7 @@ import Loading from "@/components/loading";
 import { Suspense } from "react";
 import UploadForm from "./upload-form";
 import callGatewayData from "@/components/call-gateway-data";
-import { Album } from "@/app/albums";
+import { Album, albumComparator } from "@/app/albums";
 
 export const metadata = {
   robots: "noindex, nofollow",
@@ -42,6 +42,8 @@ export default async function AddImagePage() {
     session: cookies.session,
   });
 
+  const sortedAlbums = albums.sort(albumComparator);
+
   // get permissions menu items -> gallery permissions only
   // this is used to render the permissions dropdown in the form
   const galleryPermissions = await callGatewayData({
@@ -65,7 +67,7 @@ export default async function AddImagePage() {
           <div>
             <UploadForm
               csrf={csrf}
-              albums={albums}
+              albums={sortedAlbums}
               permissions={galleryPermissions}
             />
           </div>
