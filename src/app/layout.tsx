@@ -33,7 +33,7 @@ export default async function RootLayout({
         <MainHeader />
         {children}
         <footer>
-          <div style={{ fontStyle: "italic" }}>
+          <div style={{ fontStyle: "italic", fontFamily: "Montserrat, sans-serif" }}>
             Designed, deployed, and administered by{" "}
             <span className={"highlight"}>Tom des Lauriers</span>.
           </div>

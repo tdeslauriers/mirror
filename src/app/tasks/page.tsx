@@ -90,6 +90,7 @@ export default async function TasksPage({
         csrfResult.error.message
       );
     }
+    csrf = csrfResult.data.csrf_token;
   }
 
   return (

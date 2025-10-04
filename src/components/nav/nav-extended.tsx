@@ -35,7 +35,7 @@ export default function ExtendedNav() {
         <>
           <li>
             <Link className={style.locallink} href="/privacy">
-              Privacy Notice
+              Privacy
             </Link>
           </li>
           <li>
