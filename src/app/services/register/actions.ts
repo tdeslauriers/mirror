@@ -1,10 +1,11 @@
 "use server";
 
-import { handleServiceClientErrors, validateClientRegister } from "..";
 import {
-  ClientRegisterActionCmd,
+  handleServiceClientErrors,
   RegisterClient,
-} from "./../../../components/forms/index";
+  validateClientRegister,
+} from "..";
+import { ClientRegisterActionCmd } from "./../../../components/forms/index";
 import { isGatewayError } from "@/app/api";
 import { checkForSessionCookie } from "@/components/checkCookies";
 

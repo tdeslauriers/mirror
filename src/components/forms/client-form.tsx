@@ -1,7 +1,7 @@
 "use client";
 
 import { useActionState } from "react";
-import { ServiceClient, ServiceClientActionCmd } from ".";
+import { ServiceClientActionCmd } from ".";
 import ErrorField from "../errors/error-field";
 import {
   SERVICENAME_MAX_LENGTH,
@@ -9,6 +9,7 @@ import {
 } from "@/validation/service_client_field";
 import { NAME_MAX_LENGTH, NAME_MIN_LENGTH } from "@/validation/user_fields";
 import FormSubmit from "./form-submit";
+import { ServiceClient } from "@/app/services";
 
 export default function ClientForm({
   csrf,

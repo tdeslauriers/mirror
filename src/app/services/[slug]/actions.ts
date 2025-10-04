@@ -1,11 +1,10 @@
 "use server";
 
-import { GeneratePatCmd } from "@/app/services";
+import { GeneratePatCmd, ServiceClient } from "@/app/services";
 import {
   ResetData,
   ResetPwActionCmd,
   EntityScopesActionCmd,
-  ServiceClient,
   ServiceClientActionCmd,
   validatePasswords,
 } from "@/components/forms";
