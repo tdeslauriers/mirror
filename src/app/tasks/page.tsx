@@ -7,12 +7,13 @@ import {
 } from "@/validation/url_query_params";
 import TaskCard from "./task_card";
 import GetCsrf from "@/components/csrf-token";
+import handlePageLoadFailure from "@/components/errors/handle-page-load-errors";
 
 export const metadata = {
   robots: "noindex, nofollow",
 };
 
-const pageError = "Failed to load /tasks page: ";
+const pageError = "Failed to load /tasks page";
 
 interface TasksPageProps {
   searchParams?: Record<string, string | string[] | undefined>;
@@ -42,10 +43,10 @@ export default async function TasksPage({
   // check if identity cookie has tasks_read permission
   // ie, gaurd pattern or access hint gating
   if (!cookies.identity || !cookies.identity.ux_render?.tasks?.tasks_read) {
-    console.log(pageError + "User does not have tasks_read permission.");
-    throw new Error(
-      pageError + "You do not have permission to view this page."
+    console.log(
+      `${pageError}: user ${cookies.identity?.username} does not have rights to view /tasks.`
     );
+    return handlePageLoadFailure(401, `you do not have rights to view /tasks.`);
   }
 
   // validate and prepare task params
@@ -58,22 +59,35 @@ export default async function TasksPage({
   const prepared = prepareQueryParams(sanitizedParams);
 
   // request task records from gateway
-  const tasks = await callGatewayData({
-    endpoint: "/tasks",
+  const tasksResult = await callGatewayData<Task[]>({
+    endpoint: `/tasks`,
     searchParams: prepared,
     session: cookies.session,
   });
+  if (!tasksResult.ok) {
+    console.log(
+      `${pageError} for user ${cookies.identity?.username}: ${tasksResult.error.message}`
+    );
+    return handlePageLoadFailure(
+      tasksResult.error.code,
+      tasksResult.error.message
+    );
+  }
+  const tasks = tasksResult.data;
 
   // get csrf token from gateway for updating task statuses
   // check if identity cookie has template_write permission
   let csrf: string | null = null;
   if (cookies.identity && cookies.identity.ux_render?.tasks?.tasks_write) {
     // get csrf token from gateway for template form
-    csrf = await GetCsrf(cookies.session ? cookies.session : "");
-    if (!csrf) {
-      console.log(`${pageError} CSRF token could not be retrieved for tasks.`);
-      throw new Error(
-        `${pageError} CSRF token could not be retrieved for template tasks.`
+    const csrfResult = await GetCsrf(cookies.session ? cookies.session : "");
+    if (!csrfResult.ok) {
+      console.log(
+        `${pageError} for user ${cookies.identity?.username}: ${csrfResult.error.message}`
+      );
+      return handlePageLoadFailure(
+        csrfResult.error.code,
+        csrfResult.error.message
       );
     }
   }

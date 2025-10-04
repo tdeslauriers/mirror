@@ -9,12 +9,14 @@ import { headers } from "next/headers";
 import ClipboardButton from "@/components/clipboard-button";
 import styles from "../album.module.css";
 import BackButton from "@/components/nav/back";
+import { imageComparator } from "@/app/images";
+import handlePageLoadFailure from "@/components/errors/handle-page-load-errors";
 
 export const metadata = {
   robots: "noindex, nofollow",
 };
 
-const pageError = "Failed to load /album/slug page: ";
+const pageError = "Failed to load /album/slug page";
 
 export default async function AlbumPage({
   params,
@@ -29,42 +31,58 @@ export default async function AlbumPage({
 
   // quick check if identity cookie has album_read access
   if (!cookies.identity || !cookies.identity.ux_render?.gallery?.album_read) {
-    console.log(pageError + "user does not have rights to view this album.");
-    throw new Error(pageError + "you do not have rights to view this album.");
+    console.log(
+      `${pageError}: user ${cookies.identity?.username} does not have rights to view this album.`
+    );
+    return handlePageLoadFailure(
+      401,
+      `you do not have rights to view /albums/${slug}`,
+      "/albums."
+    );
   }
 
   // get the header data to build up the copy link for sharing
-  const h = await headers();
-  const proto = h.get("x-forwarded-proto") ?? "http";
-  const host = h.get("x-forwarded-host") ?? h.get("host");
+  const hdrs = await headers();
+  const proto = hdrs.get("x-forwarded-proto") ?? "http";
+  const host = hdrs.get("x-forwarded-host") ?? hdrs.get("host");
   const baseUrl = `${proto}://${host}`;
 
   // get album data from gateway
-  const album: Album = await callGatewayData({
+  const result = await callGatewayData<Album>({
     endpoint: `/albums/${slug}`,
     session: cookies.session,
   });
-  if (!album) {
-    throw new Error("Album not found or you do not have access to it.");
+  if (!result.ok) {
+    console.log(
+      `${pageError} for user ${cookies.identity?.username}: ${result.error.message}`
+    );
+    return handlePageLoadFailure(
+      result.error.code,
+      result.error.message,
+      "/albums"
+    );
   }
 
+  const album = result.data;
+
+  // sort images by date and then by title
+  const sortedImages = [...(album.images ?? [])].sort(imageComparator);
+
   // check if identity cookie has album_write permission and get csrf if so for album form
-  const editAllowed = cookies.identity.ux_render?.gallery?.album_write;
+  const editAllowed = cookies.identity?.ux_render?.gallery?.album_write;
 
   // if edit is allowed, fetch the CSRF token for the form
   let csrf: string | null = null;
   if (editAllowed) {
     // get csrf token from gateway for album form
-    csrf = await GetCsrf(cookies.session ? cookies.session : "");
-
-    if (!csrf) {
+    const result = await GetCsrf(cookies.session ? cookies.session : "");
+    if (!result.ok) {
       console.log(
-        pageError + "CSRF token could not be retrieved for album form."
+        `${pageError} for user ${cookies.identity?.username}: ${result.error.message}`
       );
-      throw new Error(
-        pageError + "CSRF token could not be retrieved for album form."
-      );
+      return handlePageLoadFailure(500, result.error.message, "/albums");
     }
+    csrf = result.data.csrf_token;
   }
 
   return (
@@ -103,9 +121,9 @@ export default async function AlbumPage({
 
         {/* images: display the thumbnail images of an album in a grid */}
         <div className={styles.tiledisplay}>
-          {album.images &&
-            album.images.length > 0 &&
-            album.images.map((image) => (
+          {sortedImages &&
+            sortedImages.length > 0 &&
+            sortedImages.map((image) => (
               <>
                 {image.id ? (
                   <Tile

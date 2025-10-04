@@ -1,3 +1,4 @@
+import { Permission } from "../permissions";
 import { Scope } from "../scopes";
 
 export type User = {
@@ -16,6 +17,7 @@ export type User = {
   birth_day?: number;
   birth_year?: number;
   scopes?: Scope[];
+  permissions?: Permission[];
 };
 
 export type UserScopesCmd = {

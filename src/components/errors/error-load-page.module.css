@@ -1,4 +1,20 @@
-.center {
+.error {
+  font-size: 1rem;
+
+  display: block;
+  max-width: 50rem;
+  padding: 2rem;
+  margin: 2rem;
+  border-radius: 4px;
+  border-color: var(--highlight-error);
+  font-size: 1.25rem;
+  font-family: "Montserrat", sans-serif;
+  animation: glow-error 2s ease-in-out infinite alternate;
+  transform: translateZ(0); /* trigger GPU acceleration */
+  will-change: transform; /* inform the browser that this element will be animated */
+}
+
+.message {
   display: flex;
   justify-content: center;
   align-items: center;
@@ -14,22 +30,6 @@ span.highlightError {
   -webkit-text-fill-color: transparent;
 }
 
-.error {
-  font-size: 0.9rem;
-
-  display: block;
-  max-width: 50rem;
-  padding: 2rem;
-  margin: 1rem;
-  border-radius: 4px;
-  border-color: var(--highlight-error);
-  font-size: 1.25rem;
-  font-family: "Montserrat", sans-serif;
-  animation: glow-error 2s ease-in-out infinite alternate;
-  transform: translateZ(0); /* trigger GPU acceleration */
-  will-change: transform; /* inform the browser that this element will be animated */
-}
-
 .actionsError button {
   margin-top: 1rem;
   border: 0;
@@ -43,6 +43,7 @@ span.highlightError {
   );
   width: 100%;
   cursor: pointer;
+  color: var(--foreground-rgb);
   font: inherit;
   font-size: 1.25rem;
   text-transform: uppercase;

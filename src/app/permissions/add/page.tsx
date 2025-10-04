@@ -5,12 +5,13 @@ import Loading from "@/components/loading";
 import Link from "next/link";
 import { Suspense } from "react";
 import { handlePermissionAdd } from "./actions";
+import handlePageLoadFailure from "@/components/errors/handle-page-load-errors";
 
 export const metadata = {
   robots: "noindex, nofollow",
 };
 
-const pageError = "Failed to load add permission page: ";
+const pageError = "Failed to load add permission page";
 
 export default async function PermissionsAddPage() {
   // quick for redirect if auth'd cookies not present
@@ -19,21 +20,29 @@ export default async function PermissionsAddPage() {
   // check if identity cookie has scopes_write permission
   // ie, gaurd pattern or access hint gating
   if (!cookies.identity || !cookies.identity.ux_render?.users?.scope_write) {
-    console.log(pageError + "User does not have scopes_write permission.");
-    throw new Error(pageError + "You do not have permission to add scopes.");
+    console.log(
+      `${pageError}: user ${cookies.identity?.username} does not have rights to add permissions.`
+    );
+    return handlePageLoadFailure(
+      401,
+      `you do not have rights to add permissions.`,
+      "/permissions"
+    );
   }
 
   // get csrf token from gateway for profile form
-  const csrf = await GetCsrf(cookies.session ? cookies.session : "");
-
-  if (!csrf) {
+  const csrfResult = await GetCsrf(cookies.session ? cookies.session : "");
+  if (!csrfResult.ok) {
     console.log(
-      pageError + "CSRF token could not be retrieved for permission form."
+      `${pageError} for user ${cookies.identity?.username}: ${csrfResult.error.message}`
     );
-    throw new Error(
-      pageError + "CSRF token could not be retrieved for permission form."
+    return handlePageLoadFailure(
+      csrfResult.error.code,
+      csrfResult.error.message,
+      "/permissions"
     );
   }
+  const csrf = csrfResult.data.csrf_token;
 
   return (
     <>

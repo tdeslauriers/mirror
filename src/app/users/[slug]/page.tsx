@@ -13,12 +13,17 @@ import callGatewayData from "@/components/call-gateway-data";
 import ManageScopesForm from "@/components/forms/manage-scopes-form";
 import ManagePermissionsForm from "@/components/forms/manage-permissions-form";
 import { all } from "axios";
+import handlePageLoadFailure from "@/components/errors/handle-page-load-errors";
+import { Profile } from "@/app/profile";
+import { Scope } from "@/app/scopes";
+import { Permission } from "@/app/permissions";
+import { User } from "..";
 
 export const metadata = {
   robots: "noindex, nofollow",
 };
 
-const pageError = "Failed to load user page.";
+const pageError = "Failed to load user page";
 
 export default async function Page({
   params,
@@ -34,45 +39,88 @@ export default async function Page({
   // check if identity cookie has user_read permission
   // ie, gaurd pattern or access hint gating
   if (!cookies.identity || !cookies.identity.ux_render?.users?.user_read) {
-    console.log(pageError + "User does not have user_read permission.");
-    throw new Error(
-      pageError + "You do not have permission to view this page."
+    console.log(
+      `${pageError}: user ${cookies.identity?.username} does not have rights to view /users/${slug}.`
+    );
+    return handlePageLoadFailure(
+      401,
+      `you do not have rights to view /users/${slug}.`,
+      "/users"
     );
   }
 
   // check if identity cookie has user_write permission
   let csrf: string | null = null;
+  let user: User | null = null;
+  let allScopes: Scope[] = [];
+  let allPermissions: Permission[] = [];
   if (cookies.identity && cookies.identity.ux_render?.users?.user_write) {
-    // get csrf token from gateway for user form
-    csrf = await GetCsrf(cookies.session ? cookies.session : "");
+    // get csrf token, user data, scopes, and permissions from gateway for user form
+    const [csrfResult, userResult, scopesResult, permissionsResult] =
+      await Promise.all([
+        GetCsrf(cookies.session ? cookies.session : ""),
+        callGatewayData<any>({
+          endpoint: `/users/${slug}`,
+          session: cookies.session,
+        }),
+        callGatewayData<Scope[]>({
+          endpoint: `/scopes`,
+          session: cookies.session,
+        }),
+        callGatewayData<Permission[]>({
+          endpoint: `/permissions`,
+          session: cookies.session,
+        }),
+      ]);
 
-    if (!csrf) {
+    if (!csrfResult.ok) {
       console.log(
-        `${pageError} CSRF token could not be retrieved for user ${slug}.`
+        `${pageError} for user ${cookies.identity?.username}: ${csrfResult.error.message}`
       );
-      throw new Error(
-        `${pageError} CSRF token could not be retrieved for user ${slug}.`
+      return handlePageLoadFailure(
+        csrfResult.error.code,
+        csrfResult.error.message,
+        "/users"
       );
     }
+    csrf = csrfResult.data.csrf_token;
+
+    if (!userResult.ok) {
+      console.log(
+        `${pageError} for user ${cookies.identity?.username}: ${userResult.error.message}`
+      );
+      return handlePageLoadFailure(
+        userResult.error.code,
+        userResult.error.message,
+        "/users"
+      );
+    }
+    user = userResult.data;
+
+    if (!scopesResult.ok) {
+      console.log(
+        `${pageError} for user ${cookies.identity?.username}: ${scopesResult.error.message}`
+      );
+      return handlePageLoadFailure(
+        scopesResult.error.code,
+        scopesResult.error.message,
+        "/users"
+      );
+    }
+    allScopes = scopesResult.data;
+
+    if (!permissionsResult.ok) {
+      console.log(
+        `${pageError} for user ${cookies.identity?.username}: ${permissionsResult.error.message}`
+      );
+      return handlePageLoadFailure(
+        permissionsResult.error.code,
+        permissionsResult.error.message,
+        "/users"
+      );
+    }
+    allPermissions = permissionsResult.data;
   }
-
-  // get user record data from gateway
-  const user = await callGatewayData({
-    endpoint: `/users/${slug}`,
-    session: cookies.session,
-  });
-
-  // get scopess data from gateway for scopes dropdown
-  const allScopes = await callGatewayData({
-    endpoint: "/scopes",
-    session: cookies.session,
-  });
-
-  // get permissions data from the gateway for permissions dropdown
-  const allPermissions = await callGatewayData({
-    endpoint: "/permissions",
-    session: cookies.session,
-  });
 
   return (
     <>
@@ -141,7 +189,7 @@ export default async function Page({
               csrf={csrf}
               editAllowed={cookies.identity.ux_render?.users?.client_write}
               entitySlug={slug}
-              entityPermissions={user?.permissions}
+              entityPermissions={user?.permissions ? user.permissions : []}
               menuPermissions={allPermissions}
               updatePermissions={handlePermissionsUpdate}
             />
@@ -167,7 +215,7 @@ export default async function Page({
               csrf={csrf}
               editAllowed={cookies.identity?.ux_render?.users?.user_write}
               entitySlug={slug}
-              entityScopes={user?.scopes}
+              entityScopes={user?.scopes ? user.scopes : null}
               menuScopes={allScopes}
               updateScopes={handleScopesUpdate}
             />

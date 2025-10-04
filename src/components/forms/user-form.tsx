@@ -17,7 +17,7 @@ export default function UserForm({
   csrf: string | null;
   editAllowed?: boolean; // just cookie check => ui rendering logic only
   slug?: string;
-  profile: Profile | User;
+  profile: Profile | User | null;
   userEdit: (
     prevState: ProfileActionCmd,
     formData: FormData
@@ -31,7 +31,7 @@ export default function UserForm({
   });
 
   const age =
-    profile.birth_year && profile.birth_month && profile.birth_day
+    profile?.birth_year && profile.birth_month && profile.birth_day
       ? getAge(profile.birth_year, profile.birth_month, profile.birth_day)
       : null;
 

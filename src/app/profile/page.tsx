@@ -8,6 +8,7 @@ import { Suspense } from "react";
 import Loading from "@/components/loading";
 import { getAuthCookies } from "@/components/checkCookies";
 import callGatewayData from "@/components/call-gateway-data";
+import handlePageLoadFailure from "@/components/errors/handle-page-load-errors";
 
 export const metadata = {
   robots: "noindex, nofollow",
@@ -19,19 +20,38 @@ export default async function ProfilePage() {
   // quick for redirect if auth'd cookies not present
   const cookies = await getAuthCookies("/profile");
 
-  // get csrf token from gateway for profile form
-  const csrf = await GetCsrf(cookies.session ? cookies.session : "");
+  // get csrf token and profile data from gateway for profile form
+  const [csrfResult, profileResult] = await Promise.all([
+    GetCsrf(cookies.session ? cookies.session : ""),
+    callGatewayData<Profile>({
+      endpoint: "/profile",
+      session: cookies.session,
+    }),
+  ]);
 
-  if (!csrf) {
-    console.log(pageError + "CSRF token could not be retrieved.");
-    throw new Error(pageError + "CSRF token could not be retrieved.");
+  if (!csrfResult.ok) {
+    console.log(
+      `${pageError} for user ${cookies.identity?.username}: ${csrfResult.error.message}`
+    );
+    return handlePageLoadFailure(
+      csrfResult.error.code,
+      csrfResult.error.message,
+      "/"
+    );
   }
+  const csrf = csrfResult.data.csrf_token;
 
-  // get profile data from gateway
-  const profile: Profile = await callGatewayData({
-    endpoint: "/profile",
-    session: cookies.session,
-  });
+  if (!profileResult.ok) {
+    console.log(
+      `${pageError} for user ${cookies.identity?.username}: ${profileResult.error.message}`
+    );
+    return handlePageLoadFailure(
+      profileResult.error.code,
+      profileResult.error.message,
+      "/"
+    );
+  }
+  const profile = profileResult.data;
 
   return (
     <>

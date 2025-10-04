@@ -1,13 +1,15 @@
 "use client";
 
-import styles from "./error-form.module.css";
+import styles from "./error-load-page.module.css";
 
 export default function ErrorLoadPage({
+  errBanner,
   errMsg,
   redirectUrl,
 }: {
-  errMsg: string | null;
-  redirectUrl: string | null;
+  errBanner?: string | null;
+  errMsg?: string | null;
+  redirectUrl?: string | null;
 }) {
   if (!errMsg) {
     errMsg =
@@ -29,13 +31,14 @@ export default function ErrorLoadPage({
         <div className={styles.error}>
           <h2>
             <span className={styles.highlightError}>
-              Well, that didnt work...
+              {errBanner ? errBanner : "Well, that didn't work..."}
             </span>
           </h2>
 
-          <div className={styles.center}>
-            <p>{errMsg}</p>
+          <div className={styles.message}>
+            <p>{errMsg ? errMsg : "Something has gone terribly wrong."}</p>
           </div>
+
           <div className={styles.actionsError}>
             <button onClick={handleRedirect}>
               <strong>{buttonLable}</strong>

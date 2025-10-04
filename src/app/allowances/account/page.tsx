@@ -7,6 +7,7 @@ import { Suspense } from "react";
 import GetCsrf from "@/components/csrf-token";
 import { handleAccountEdit } from "./actions";
 import Link from "next/link";
+import handlePageLoadFailure from "@/components/errors/handle-page-load-errors";
 
 export const metadata = {
   robots: "noindex, nofollow",
@@ -27,26 +28,38 @@ export default async function Page() {
     );
   }
 
-  // get allowance account data from gateway
-  const allowance: Allowance = await callGatewayData({
-    endpoint: `/account`,
-    session: cookies.session,
-  });
+  // get allowance account data and csrf from gateway
+  const [result, csrfResult] = await Promise.all([
+    callGatewayData<Allowance>({
+      endpoint: `/account`,
+      session: cookies.session,
+    }),
+    GetCsrf(cookies.session ? cookies.session : ""),
+  ]);
 
-  let csrf: string | null = null;
-  if (cookies.identity && cookies.identity.ux_render?.tasks?.allowances_write) {
-    // get csrf token from gateway for allowance form updates
-    csrf = await GetCsrf(cookies.session ? cookies.session : "");
-
-    if (!csrf) {
-      console.log(
-        pageError + "CSRF token could not be retrieved for scope form."
-      );
-      throw new Error(
-        pageError + "CSRF token could not be retrieved for scope form."
-      );
-    }
+  if (!result.ok) {
+    console.log(
+      `${pageError} for user ${cookies.identity?.username}: ${result.error.message}`
+    );
+    return handlePageLoadFailure(
+      result.error.code,
+      result.error.message,
+      "/allowances"
+    );
   }
+  const allowance = result.data;
+
+  if (!csrfResult.ok) {
+    console.log(
+      `${pageError} for user ${cookies.identity?.username}: ${csrfResult.error.message}`
+    );
+    return handlePageLoadFailure(
+      csrfResult.error.code,
+      csrfResult.error.message,
+      "/allowances"
+    );
+  }
+  const csrf = csrfResult.data.csrf_token;
 
   return (
     <>
@@ -85,7 +98,7 @@ export default async function Page() {
                   className="locallink"
                   href={`/faq#how-is-allowance-calculated`}
                 >
-                  click here in the faq
+                  see faqs
                 </Link>
                 .
               </li>

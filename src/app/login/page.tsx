@@ -4,11 +4,10 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import GetCsrf from "@/components/csrf-token";
 import LoginForm from "./login-form";
-import { OauthExchange } from "../api";
+import { IdentityCookie, OauthExchange } from "../api";
 import GetOauthExchange from "@/components/oauth-exchange";
-import { pageError } from ".";
 import Loading from "@/components/loading";
-import Link from "next/link";
+import handlePageLoadFailure from "@/components/errors/handle-page-load-errors";
 
 export const metadata = {
   robots: "noindex, nofollow",
@@ -37,7 +36,13 @@ export default async function LoginPage({
     : null;
 
   if (hasIdentity) {
-    console.log("User has authenticated cookies. Redirecting to home.");
+    console.log(
+      `User ${
+        hasIdentity.value
+          ? (JSON.parse(hasIdentity.value) as IdentityCookie).username
+          : ""
+      } has authenticated cookies. Redirecting to home.`
+    );
     redirect("/");
   }
 
@@ -48,16 +53,15 @@ export default async function LoginPage({
 
   if (!hasSession) {
     console.log("Session cookie is missing");
-    throw new Error(pageError);
+    return handlePageLoadFailure(401, "Session cookie is missing.");
   }
 
-  const csrf = await GetCsrf(hasSession.value);
-  if (!csrf) {
-    console.log("CSRF token could not be retrieved.");
-    throw new Error(
-      "Failed to load login page: CSRF token could not be retrieved."
-    );
+  const result = await GetCsrf(hasSession.value);
+  if (!result.ok) {
+    console.log(`Failed to get csrf token for login: ${result.error.message}.`);
+    return handlePageLoadFailure(500, result.error.message);
   }
+  const csrf = result.data.csrf_token;
 
   // get oauth exchange params from gateway for login form
   const resolvedParams = await Promise.resolve(searchParams);

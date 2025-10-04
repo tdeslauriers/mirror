@@ -3,18 +3,7 @@
 import Table, { TableColumn } from "@/components/table";
 import Link from "next/link";
 import { useState } from "react";
-
-interface User {
-  id: string;
-  username: string;
-  firstname: string;
-  lastname: string;
-  slug: string;
-  created_at: string;
-  enabled: boolean;
-  account_expired: boolean;
-  account_locked: boolean;
-}
+import { User } from ".";
 
 interface UserTableProps {
   data: User[];
@@ -31,7 +20,7 @@ export default function UserTable({ data }: UserTableProps) {
       sortable: true,
       render: (value: User[keyof User], row: User) => (
         <Link className="locallink no-hover" href={`/users/${row.slug}`}>
-          {value}
+          {value as string}
         </Link>
       ),
     },

@@ -3,10 +3,14 @@ import { Suspense } from "react";
 import UserTable from "./user-table";
 import { getAuthCookies } from "@/components/checkCookies";
 import callGatewayData from "@/components/call-gateway-data";
+import { User } from ".";
+import handlePageLoadFailure from "@/components/errors/handle-page-load-errors";
 
 export const metadata = {
   robots: "noindex, nofollow",
 };
+
+const pageError = "Failed to load users page";
 
 export default async function UsersPage() {
   // quick for redirect if auth'd cookies not present
@@ -16,18 +20,23 @@ export default async function UsersPage() {
   // ie, gaurd pattern or access hint gating
   if (!cookies.identity || !cookies.identity.ux_render?.users?.user_read) {
     console.log(
-      "Failed to load users page. User does not have user_read permission."
+      `${pageError}: user ${cookies.identity?.username} does not have rights to view /users.`
     );
-    throw new Error(
-      "Failed to load users page. You do not have permission to view this page."
-    );
+    return handlePageLoadFailure(401, `you do not have rights to view /users.`);
   }
 
   // get user data from gateway
-  const users = await callGatewayData({
+  const result = await callGatewayData<User[]>({
     endpoint: "/users",
     session: cookies.session,
   });
+  if (!result.ok) {
+    console.log(
+      `${pageError} for user ${cookies.identity?.username}: ${result.error.message}`
+    );
+    return handlePageLoadFailure(result.error.code, result.error.message);
+  }
+  const users = result.data;
 
   return (
     <>

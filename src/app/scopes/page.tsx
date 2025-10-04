@@ -4,12 +4,14 @@ import ScopesTable from "./scopes_table";
 import Link from "next/link";
 import { getAuthCookies } from "@/components/checkCookies";
 import callGatewayData from "@/components/call-gateway-data";
+import handlePageLoadFailure from "@/components/errors/handle-page-load-errors";
+import { Scope } from ".";
 
 export const metadata = {
   robots: "noindex, nofollow",
 };
 
-const pageError = "Failed to load scopes page: ";
+const pageError = "Failed to load scopes page";
 
 export default async function ScopesPage() {
   // quick for redirect if auth'd cookies not present
@@ -18,15 +20,27 @@ export default async function ScopesPage() {
   // check if identity cookie has scopes_read access
   // ie, gaurd pattern or access hint gating
   if (!cookies.identity || !cookies.identity.ux_render?.users?.scope_read) {
-    console.log(pageError + "User does not have scopes_read permission.");
-    throw new Error(pageError + "You do not have permission to view scopes.");
+    console.log(
+      `${pageError}: user ${cookies.identity?.username} does not have rights to view /scopes.`
+    );
+    return handlePageLoadFailure(
+      401,
+      `you do not have rights to view /scopes.`
+    );
   }
 
   // get scoeps data from gateway
-  const scopes = await callGatewayData({
+  const result = await callGatewayData<Scope[]>({
     endpoint: "/scopes",
     session: cookies.session,
   });
+  if (!result.ok) {
+    console.log(
+      `${pageError} for user ${cookies.identity?.username}: ${result.error.message}`
+    );
+    return handlePageLoadFailure(result.error.code, result.error.message);
+  }
+  const scopes = result.data;
 
   return (
     <>

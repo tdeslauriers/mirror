@@ -5,12 +5,13 @@ import ClientRegistrationForm from "@/components/forms/client-registration-form"
 import handleClientRegister from "./actions";
 import Link from "next/link";
 import { getAuthCookies } from "@/components/checkCookies";
+import handlePageLoadFailure from "@/components/errors/handle-page-load-errors";
 
 export const metadata = {
   robots: "noindex, nofollow",
 };
 
-const pageError = "Failed to load /services/register page: ";
+const pageError = "Failed to load /services/register page";
 
 export default async function Page() {
   // quick for redirect if auth'd cookies not present
@@ -19,21 +20,29 @@ export default async function Page() {
   // check if identity cookie has scopes_write permission
   // ie, gaurd pattern or access hint gating
   if (!cookies.identity || !cookies.identity.ux_render?.users?.client_write) {
-    console.log(pageError + "User does not have client_write permission.");
-    throw new Error(pageError + "You do not have permission to add services.");
+    console.log(
+      `${pageError}: user ${cookies.identity?.username} does not have rights to register a service.`
+    );
+    return handlePageLoadFailure(
+      401,
+      `you do not have rights to register a service.`,
+      "/services"
+    );
   }
 
   // get csrf token from gateway for add/register service form
-  const csrf = await GetCsrf(cookies.session ? cookies.session : "");
-
-  if (!csrf) {
+  const csrfResult = await GetCsrf(cookies.session ? cookies.session : "");
+  if (!csrfResult.ok) {
     console.log(
-      pageError + "CSRF token could not be retrieved for scope form."
+      `${pageError} for user ${cookies.identity?.username}: ${csrfResult.error.message}`
     );
-    throw new Error(
-      pageError + "CSRF token could not be retrieved for scope form."
+    return handlePageLoadFailure(
+      csrfResult.error.code,
+      csrfResult.error.message,
+      "/services"
     );
   }
+  const csrf = csrfResult.data.csrf_token;
 
   return (
     <>

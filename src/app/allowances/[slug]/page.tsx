@@ -7,12 +7,13 @@ import { handleAllowanceEdit } from "./actions";
 import { getAuthCookies, UiCookies } from "@/components/checkCookies";
 import callGatewayData from "@/components/call-gateway-data";
 import { Allowance } from "@/components/forms";
+import handlePageLoadFailure from "@/components/errors/handle-page-load-errors";
 
 export const metadata = {
   robots: "noindex, nofollow",
 };
 
-const pageError = "Failed to load allowance record page: ";
+const pageError = "Failed to load allowance record page";
 
 export default async function Page({
   params,
@@ -31,31 +32,49 @@ export default async function Page({
     !cookies.identity ||
     !cookies.identity.ux_render?.tasks?.allowances_read
   ) {
-    console.log(pageError + "User does not have allowances_read permission.");
-    throw new Error(
-      pageError + "You do not have permission to view allowance records."
+    console.log(
+      `${pageError}: user ${cookies.identity?.username} does not have rights to view /allowances/${slug}.`
+    );
+    return handlePageLoadFailure(
+      401,
+      `you do not have rights to view /allowances/${slug}.`,
+      "/allowances"
     );
   }
 
   // get allowance account data from gateway
-  const allowance: Allowance = await callGatewayData({
+  const result = await callGatewayData<Allowance>({
     endpoint: `/allowances/${slug}`,
     session: cookies.session,
   });
+  if (!result.ok) {
+    console.log(
+      `${pageError} for user ${cookies.identity?.username}: ${result.error.message}`
+    );
+    return handlePageLoadFailure(
+      result.error.code,
+      result.error.message,
+      "/allowances"
+    );
+  }
+  const allowance = result.data;
 
   let csrf: string | null = null;
   if (cookies.identity && cookies.identity.ux_render?.tasks?.allowances_write) {
     // get csrf token from gateway for allowance form updates
-    csrf = await GetCsrf(cookies.session ? cookies.session : "");
+    const result = await GetCsrf(cookies.session ? cookies.session : "");
 
-    if (!csrf) {
+    if (!result.ok) {
       console.log(
-        pageError + "CSRF token could not be retrieved for scope form."
+        `${pageError} for user ${cookies.identity?.username}: ${result.error.message}`
       );
-      throw new Error(
-        pageError + "CSRF token could not be retrieved for scope form."
+      return handlePageLoadFailure(
+        result.error.code,
+        result.error.message,
+        "/allowances"
       );
     }
+    csrf = result.data.csrf_token;
   }
 
   return (

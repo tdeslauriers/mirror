@@ -6,12 +6,14 @@ import Loading from "@/components/loading";
 import Link from "next/link";
 import { getAuthCookies } from "@/components/checkCookies";
 import callGatewayData from "@/components/call-gateway-data";
+import handlePageLoadFailure from "@/components/errors/handle-page-load-errors";
+import { Scope } from "..";
 
 export const metadata = {
   robots: "noindex, nofollow",
 };
 
-const pageError = "Failed to load scope record page: ";
+const pageError = "Failed to load scope record page";
 
 export default async function Page({
   params,
@@ -27,31 +29,53 @@ export default async function Page({
   // check if identity cookie has scopes_read permission
   // ie, gaurd pattern or access hint gating
   if (!cookies.identity || !cookies.identity.ux_render?.users?.scope_read) {
-    console.log(pageError + "User does not have scopes_read permission.");
-    throw new Error(pageError + "You do not have permission to view scopes.");
+    console.log(
+      `${pageError}: user ${cookies.identity?.username} does not have rights to view /scopes/${slug}.`
+    );
+    return handlePageLoadFailure(
+      401,
+      `you do not have rights to view /scopes/${slug}.`,
+      "/scopes"
+    );
   }
 
   // check if identity cookie has scopes_write permission and get csrf is so for scope form
   let csrf: string | null = null;
+  let scope: Scope | null = null;
   if (cookies.identity && cookies.identity.ux_render?.users?.scope_write) {
-    // get csrf token from gateway for scope form
-    csrf = await GetCsrf(cookies.session ? cookies.session : "");
+    // get csrf token and scope from gateway for scope form
+    const [csrfResult, scopeResult] = await Promise.all([
+      GetCsrf(cookies.session ? cookies.session : ""),
+      callGatewayData<Scope>({
+        endpoint: `/scopes/${slug}`,
+        session: cookies.session,
+      }),
+    ]);
 
-    if (!csrf) {
+    if (!csrfResult.ok) {
       console.log(
-        pageError + "CSRF token could not be retrieved for scope form."
+        `${pageError} for user ${cookies.identity?.username}: ${csrfResult.error.message}`
       );
-      throw new Error(
-        pageError + "CSRF token could not be retrieved for scope form."
+      return handlePageLoadFailure(
+        csrfResult.error.code,
+        csrfResult.error.message,
+        "/scopes"
       );
     }
-  }
+    csrf = csrfResult.data.csrf_token;
 
-  // get scope record data from gateway
-  const scope = await callGatewayData({
-    endpoint: `/scopes/${slug}`,
-    session: cookies.session,
-  });
+    if (!scopeResult.ok) {
+      console.log(
+        `${pageError} for user ${cookies.identity?.username}: ${scopeResult.error.message}`
+      );
+      return handlePageLoadFailure(
+        scopeResult.error.code,
+        scopeResult.error.message,
+        "/scopes"
+      );
+    }
+    scope = scopeResult.data;
+  }
 
   return (
     <>

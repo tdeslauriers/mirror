@@ -89,7 +89,5 @@ export async function handleAlbumUpdate(
     throw new Error("Unhandled error while attempting to call the gateway.");
   }
 
-  console.log("Album update command: ", updated);
-  // redirect to the album page after successful update
   redirect(`/albums/${slug}`);
 }

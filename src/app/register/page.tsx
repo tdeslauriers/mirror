@@ -8,6 +8,7 @@ import { handleRegistration } from "./actions";
 import { Suspense } from "react";
 import Loading from "@/components/loading";
 import Link from "next/link";
+import handlePageLoadFailure from "@/components/errors/handle-page-load-errors";
 
 export const metadata = {
   robots: "noindex, nofollow",
@@ -34,15 +35,17 @@ export default async function Registration() {
 
   if (!hasSession) {
     console.log("Session cookie is missing");
-    throw new Error(pageError);
+    return handlePageLoadFailure(401, "Session cookie is missing.");
   }
 
-  const csrf = await GetCsrf(hasSession.value);
-
-  if (!csrf) {
-    console.log("CSRF token could not be retrieved.");
-    throw new Error(pageError);
+  const result = await GetCsrf(hasSession.value);
+  if (!result.ok) {
+    console.log(
+      `Failed to get csrf for registration form: ${result.error.message}`
+    );
+    return handlePageLoadFailure(401, result.error.message);
   }
+  const csrf = result.data.csrf_token;
 
   return (
     <>

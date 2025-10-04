@@ -4,12 +4,14 @@ import Loading from "@/components/loading";
 import AllowancesTable from "./allowances-table";
 import { getAuthCookies } from "@/components/checkCookies";
 import callGatewayData from "@/components/call-gateway-data";
+import handlePageLoadFailure from "@/components/errors/handle-page-load-errors";
+import { Allowance } from "@/components/forms";
 
 export const metadata = {
   robots: "noindex, nofollow",
 };
 
-const pageError = "Failed to load allowances page: ";
+const pageError = "Failed to load allowances page";
 
 export default async function AllowancesPage() {
   // quick for redirect if auth'd cookies not present
@@ -21,17 +23,27 @@ export default async function AllowancesPage() {
     !cookies.identity ||
     !cookies.identity.ux_render?.tasks?.allowances_read
   ) {
-    console.log(pageError + "User does not have allowances_read permission.");
-    throw new Error(
-      pageError + "You do not have permission to view allowances."
+    console.log(
+      `${pageError}: user ${cookies.identity?.username} does not have rights to view /allowances.`
+    );
+    return handlePageLoadFailure(
+      401,
+      `you do not have rights to view /allowances.`
     );
   }
 
   // get allowances data from gateway
-  const allowances = await callGatewayData({
+  const result = await callGatewayData<Allowance[]>({
     endpoint: "/allowances",
     session: cookies.session,
   });
+  if (!result.ok) {
+    console.log(
+      `${pageError} for user ${cookies.identity?.username}: ${result.error.message}`
+    );
+    return handlePageLoadFailure(result.error.code, result.error.message);
+  }
+  const allowances = result.data;
 
   return (
     <>

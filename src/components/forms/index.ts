@@ -1,4 +1,5 @@
-import { Scope } from "@/app/scopes";
+
+import { RegisterClient, ServiceClient } from "@/app/services";
 import { TaskTemplate } from "@/app/templates";
 import {
   checkPassword,
@@ -7,19 +8,7 @@ import {
   PASSWORD_MIN_LENGTH,
 } from "@/validation/user_fields";
 
-export type ServiceClient = {
-  csrf?: string;
 
-  id?: string;
-  name?: string;
-  owner?: string;
-  created_at?: string;
-  enabled?: boolean;
-  account_expired?: boolean;
-  account_locked?: boolean;
-  slug?: string;
-  scopes?: Scope[];
-};
 
 export type ServiceClientActionCmd = {
   csrf?: string | null;
@@ -138,17 +127,7 @@ export type ClientRegisterActionCmd = {
   errors: { [key: string]: string[] };
 };
 
-export type RegisterClient = {
-  csrf?: string;
 
-  id?: string;
-  name?: string;
-  owner?: string;
-  password?: string;
-  confirm_password?: string;
-  slug?: string;
-  enabled?: boolean;
-};
 
 export type AddAllowanceActionCmd = {
   csrf?: string;
@@ -157,7 +136,7 @@ export type AddAllowanceActionCmd = {
   username?: string;
   slug?: string;
   birth_date?: string;
-
+ 
   allowance_account?: string;
 
   errors: {

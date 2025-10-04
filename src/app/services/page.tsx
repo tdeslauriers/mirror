@@ -4,10 +4,14 @@ import ServicesTable from "./services_table";
 import Link from "next/link";
 import { getAuthCookies } from "@/components/checkCookies";
 import callGatewayData from "@/components/call-gateway-data";
+import handlePageLoadFailure from "@/components/errors/handle-page-load-errors";
+import { ServiceClient } from ".";
 
 export const metadata = {
   robots: "noindex, nofollow",
 };
+
+const pageError = "Failed to load services page";
 
 export default async function ServicesPage() {
   // quick for redirect if auth'd cookies not present
@@ -16,15 +20,27 @@ export default async function ServicesPage() {
   // check if identity cookie has services_read permission
   // ie, gaurd pattern or access hint gating
   if (!cookies.identity || !cookies.identity.ux_render?.users?.client_read) {
-    console.log("User does not have client_read permission.");
-    throw new Error("You do not have permission to view services.");
+    console.log(
+      `${pageError}: user ${cookies.identity?.username} does not have rights to view /services.`
+    );
+    return handlePageLoadFailure(
+      401,
+      `you do not have rights to view /services.`
+    );
   }
 
   // get services data from gateway
-  const clients = await callGatewayData({
+  const result = await callGatewayData<ServiceClient[]>({
     endpoint: "/clients",
     session: cookies.session,
   });
+  if (!result.ok) {
+    console.log(
+      `${pageError} for user ${cookies.identity?.username}: ${result.error.message}`
+    );
+    return handlePageLoadFailure(result.error.code, result.error.message);
+  }
+  const clients = result.data;
 
   return (
     <>

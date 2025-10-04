@@ -4,12 +4,14 @@ import Loading from "@/components/loading";
 import { Suspense } from "react";
 import PermissionsTable from "./permissions_table";
 import Link from "next/link";
+import handlePageLoadFailure from "@/components/errors/handle-page-load-errors";
+import { Permission } from ".";
 
 export const metadata = {
   robots: "noindex, nofollow",
 };
 
-const pageError = "Failed to load permissions page: ";
+const pageError = "Failed to load permissions page";
 
 export default async function PermissionsPage() {
   // quick for redirect if auth'd cookies not present
@@ -18,17 +20,27 @@ export default async function PermissionsPage() {
   // check if identity cookie has permissions_read permission
   // ie, gaurd pattern or access hint gating
   if (!cookies.identity || !cookies.identity.ux_render?.users?.user_read) {
-    console.log(pageError + "User does not have permissions_read permission.");
-    throw new Error(
-      pageError + "You do not have permission to view permissions."
+    console.log(
+      `${pageError}: user ${cookies.identity?.username} does not have rights to view /permissions.`
+    );
+    return handlePageLoadFailure(
+      401,
+      `you do not have rights to view /permissions.`
     );
   }
 
   // fetch permissions data from gateway
-  const permissions = await callGatewayData({
+  const result = await callGatewayData<Permission[]>({
     endpoint: "/permissions",
     session: cookies.session,
   });
+  if (!result.ok) {
+    console.log(
+      `${pageError} for user ${cookies.identity?.username}: ${result.error.message}`
+    );
+    return handlePageLoadFailure(result.error.code, result.error.message);
+  }
+  const permissions = result.data;
 
   return (
     <>

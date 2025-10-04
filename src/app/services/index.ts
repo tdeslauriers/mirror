@@ -3,8 +3,6 @@ import {
   ErrPasswordInvalid,
   ErrPasswordInvalidContains,
   ErrPasswordUsedPreviously,
-  RegisterClient,
-  ServiceClient,
 } from "@/components/forms";
 import { checkServiceName } from "@/validation/service_client_field";
 import {
@@ -14,6 +12,21 @@ import {
   FieldValidation,
 } from "@/validation/user_fields";
 import { GatewayError } from "../api";
+import { Scope } from "../scopes";
+
+export type ServiceClient = {
+  csrf?: string;
+
+  id?: string;
+  name?: string;
+  owner?: string;
+  created_at?: string;
+  enabled?: boolean;
+  account_expired?: boolean;
+  account_locked?: boolean;
+  slug?: string;
+  scopes?: Scope[];
+};
 
 // validate service client fields before sending to gateway
 export function validateServiceClient(serviceClient: ServiceClient) {
@@ -80,6 +93,18 @@ export type ClientScopesCmd = {
   csrf?: string | null;
   client_slug?: string | null;
   scope_slugs: string[];
+};
+
+export type RegisterClient = {
+  csrf?: string;
+
+  id?: string;
+  name?: string;
+  owner?: string;
+  password?: string;
+  confirm_password?: string;
+  slug?: string;
+  enabled?: boolean;
 };
 
 // validate the command before sending to the gateway service

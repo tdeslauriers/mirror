@@ -5,12 +5,14 @@ import { Suspense } from "react";
 import UploadForm from "./upload-form";
 import callGatewayData from "@/components/call-gateway-data";
 import { Album, albumComparator } from "@/app/albums";
+import handlePageLoadFailure from "@/components/errors/handle-page-load-errors";
+import { Permission } from "@/app/permissions";
 
 export const metadata = {
   robots: "noindex, nofollow",
 };
 
-const pageError = "Failed to load add-image page: ";
+const pageError = "Failed to load add-image page";
 
 export default async function AddImagePage() {
   // quick check for redirect if auth'd cookies not present
@@ -19,37 +21,63 @@ export default async function AddImagePage() {
   // check if identity cookie has images_write permission
   // ie, gaurd pattern or access hint gating
   if (!cookies.identity || !cookies.identity.ux_render?.gallery?.image_write) {
-    console.log(pageError + "User does not have images_write permission.");
-    throw new Error(pageError + "You do not have permission to add images.");
-  }
-
-  // get csrf token from gateway for profile form
-  const csrf = await GetCsrf(cookies.session ? cookies.session : "");
-
-  if (!csrf) {
     console.log(
-      pageError + "CSRF token could not be retrieved for add-image form."
+      `${pageError}: user ${cookies.identity?.username} does not have rights to add an image.`
     );
-    throw new Error(
-      pageError + "CSRF token could not be retrieved  add-image form."
+    return handlePageLoadFailure(
+      401,
+      "You do not have rights to add an image."
     );
   }
 
-  // get albums data from gateway
-  // this is used to render the albums dropdown in the form
-  const albums: Album[] = await callGatewayData({
-    endpoint: "/albums",
-    session: cookies.session,
-  });
+  // get csrf, albums, and image permissions data from gateway
+  const [csrfResult, albumsResult, permissionsResult] = await Promise.all([
+    GetCsrf(cookies.session ? cookies.session : ""),
+    callGatewayData<Album[]>({
+      endpoint: "/albums",
+      session: cookies.session,
+    }),
+    callGatewayData<Permission[]>({
+      endpoint: "/images/permissions",
+      session: cookies.session,
+    }),
+  ]);
 
-  const sortedAlbums = albums.sort(albumComparator);
+  if (!csrfResult.ok) {
+    console.log(
+      `${pageError} for user ${cookies.identity?.username}: ${csrfResult.error.message}`
+    );
+    return handlePageLoadFailure(
+      csrfResult.error.code,
+      csrfResult.error.message,
+      "/albums"
+    );
+  }
+  const csrf = csrfResult.data.csrf_token;
 
-  // get permissions menu items -> gallery permissions only
-  // this is used to render the permissions dropdown in the form
-  const galleryPermissions = await callGatewayData({
-    endpoint: "/images/permissions",
-    session: cookies.session,
-  });
+  if (!albumsResult.ok) {
+    console.log(
+      `${pageError} for user ${cookies.identity?.username}: ${albumsResult.error.message}`
+    );
+    return handlePageLoadFailure(
+      albumsResult.error.code,
+      albumsResult.error.message,
+      "/albums"
+    );
+  }
+  const sortedAlbums = [...(albumsResult.data ?? [])].sort(albumComparator);
+
+  if (!permissionsResult.ok) {
+    console.log(
+      `${pageError} for user ${cookies.identity?.username}: ${permissionsResult.error.message}`
+    );
+    return handlePageLoadFailure(
+      permissionsResult.error.code,
+      permissionsResult.error.message,
+      "/albums"
+    );
+  }
+  const galleryPermissions = permissionsResult.data ?? [];
 
   return (
     <>

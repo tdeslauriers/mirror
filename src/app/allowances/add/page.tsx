@@ -6,12 +6,15 @@ import AddAllowanceForm from "./add-allowance-form";
 import { handleAddAllowance } from "./actions";
 import { getAuthCookies, UiCookies } from "@/components/checkCookies";
 import callGatewayData from "@/components/call-gateway-data";
+import handlePageLoadFailure from "@/components/errors/handle-page-load-errors";
+import { User } from "@/app/users";
+import { UserProfile } from "..";
 
 export const metadata = {
   robots: "noindex, nofollow",
 };
 
-const pageError = "Failed to load allowance add page: ";
+const pageError = "Failed to load allowance add page";
 
 export default async function Page() {
   // quick for redirect if auth'd cookies not present
@@ -23,29 +26,48 @@ export default async function Page() {
     !cookies.identity ||
     !cookies.identity.ux_render?.tasks?.allowances_write
   ) {
-    console.log(pageError + "User does not have allowances_write permission.");
-    throw new Error(
-      pageError + "You do not have permission to add allowances."
-    );
-  }
-
-  // get csrf token from gateway for profile form
-  const csrf = await GetCsrf(cookies.session ? cookies.session : "");
-
-  if (!csrf) {
     console.log(
-      pageError + "CSRF token could not be retrieved for scope form."
+      `${pageError} User ${cookies.identity?.username} does not have allowances_write permission.`
     );
-    throw new Error(
-      pageError + "CSRF token could not be retrieved for scope form."
+    return handlePageLoadFailure(
+      401,
+      "You do not have rights to add an allowance account.",
+      "/allowances"
     );
   }
 
-  // get user data from gateway
-  const users = await callGatewayData({
-    endpoint: "/users",
-    session: cookies.session,
-  });
+  // get csrf token and users (for menu) from gateway for add allowance form
+  const [csrfResult, usersResult] = await Promise.all([
+    GetCsrf(cookies.session ? cookies.session : ""),
+    callGatewayData<UserProfile[]>({
+      endpoint: "/users",
+      session: cookies.session,
+    }),
+  ]);
+
+  if (!csrfResult.ok) {
+    console.log(
+      `Failed to fetch csrf from gateway for user ${cookies.identity?.username}: ${csrfResult.error.message}`
+    );
+    return handlePageLoadFailure(
+      csrfResult.error.code,
+      csrfResult.error.message,
+      "/allowances"
+    );
+  }
+  const csrf = csrfResult.data.csrf_token;
+
+  if (!usersResult.ok) {
+    console.log(
+      `Failed to fetch users for allowance users ${cookies.identity?.username}: ${usersResult.error.message}`
+    );
+    return handlePageLoadFailure(
+      usersResult.error.code,
+      usersResult.error.message,
+      "/allowances"
+    );
+  }
+  const users = usersResult.data;
 
   return (
     <>

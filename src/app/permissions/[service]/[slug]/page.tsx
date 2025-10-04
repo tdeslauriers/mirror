@@ -6,12 +6,14 @@ import Loading from "@/components/loading";
 import Link from "next/link";
 import { Suspense } from "react";
 import { handlePermissionEdit } from "./actions";
+import handlePageLoadFailure from "@/components/errors/handle-page-load-errors";
+import { Permission } from "../..";
 
 export const metadata = {
   robots: "noindex, nofollow",
 };
 
-const pageError = "Failed to load permission/service/slug page: ";
+const pageError = "Failed to load permission/service/slug page";
 
 export default async function PermissionEditPage({
   params,
@@ -27,33 +29,53 @@ export default async function PermissionEditPage({
   // check if identity cookie has permissions_read permission
   // ie, gaurd pattern or access hint gating
   if (!cookies.identity || !cookies.identity.ux_render?.users?.scope_read) {
-    console.log(pageError + "User does not have permissions_read permission.");
-    throw new Error(
-      pageError + "You do not have permission to view permissions."
+    console.log(
+      `${pageError}: user ${cookies.identity?.username} does not have rights to view /permissions/${service}/${slug}.`
+    );
+    return handlePageLoadFailure(
+      401,
+      `you do not have rights to view /permissions/${service}/${slug}.`,
+      "/permissions"
     );
   }
 
   // check if identity cookie has permissions_write permission and get csrf is so for permission form
   let csrf: string | null = null;
+  let permission: Permission | null = null;
   if (cookies.identity && cookies.identity.ux_render?.users?.scope_write) {
-    // get csrf token from gateway for permission form
-    csrf = await GetCsrf(cookies.session ? cookies.session : "");
+    // get csrf token and permissions from gateway for permission form
+    const [csrfResult, permissionResult] = await Promise.all([
+      GetCsrf(cookies.session ? cookies.session : ""),
+      callGatewayData<Permission>({
+        endpoint: `/permissions/${service}/${slug}`,
+        session: cookies.session,
+      }),
+    ]);
 
-    if (!csrf) {
+    if (!csrfResult.ok) {
       console.log(
-        pageError + "CSRF token could not be retrieved for permission form."
+        `${pageError} for user ${cookies.identity?.username}: ${csrfResult.error.message}`
       );
-      throw new Error(
-        pageError + "CSRF token could not be retrieved for permission form."
+      return handlePageLoadFailure(
+        csrfResult.error.code,
+        csrfResult.error.message,
+        "/permissions"
       );
     }
-  }
+    csrf = csrfResult.data.csrf_token;
 
-  // fetch permission data from gateway
-  const permission = await callGatewayData({
-    endpoint: `/permissions/${service}/${slug}`,
-    session: cookies.session,
-  });
+    if (!permissionResult.ok) {
+      console.log(
+        `${pageError} for user ${cookies.identity?.username}: ${permissionResult.error.message}`
+      );
+      return handlePageLoadFailure(
+        permissionResult.error.code,
+        permissionResult.error.message,
+        "/permissions"
+      );
+    }
+    permission = permissionResult.data;
+  }
 
   return (
     <>
@@ -69,7 +91,7 @@ export default async function PermissionEditPage({
             }}
           >
             <h1>
-              Permission: <span className="highlight">{permission.name}</span>
+              Permission: <span className="highlight">{permission?.name}</span>
             </h1>
             <Link
               href={`/permissions

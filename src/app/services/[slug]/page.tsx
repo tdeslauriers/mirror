@@ -14,12 +14,15 @@ import { getAuthCookies } from "@/components/checkCookies";
 import callGatewayData from "@/components/call-gateway-data";
 import ManageScopesForm from "@/components/forms/manage-scopes-form";
 import PatGenForm from "@/components/forms/pat-gen-form";
+import { ServiceClient } from "..";
+import handlePageLoadFailure from "@/components/errors/handle-page-load-errors";
+import { Scope } from "@/app/scopes";
 
 export const metadata = {
   robots: "noindex, nofollow",
 };
 
-const pageError = "Failed to load service client page.";
+const pageError = "Failed to load service client page";
 
 export default async function Page({
   params,
@@ -35,39 +38,70 @@ export default async function Page({
   // check if identity cookie has client_read permission
   // ie, gaurd pattern or access hint gating
   if (!cookies.identity || !cookies.identity.ux_render?.users?.client_read) {
-    console.log(pageError + "User does not have client_read permission.");
-    throw new Error(
-      pageError + "You do not have permission to view this page."
+    console.log(
+      `${pageError}: user ${cookies.identity?.username} does not have rights to view /services/${slug}.`
+    );
+    return handlePageLoadFailure(
+      401,
+      `you do not have rights to view /services/${slug}.`,
+      "/services"
     );
   }
 
   // check if identity cookie has client_write permission
   let csrf: string | null = null;
+  let client: ServiceClient | null = null;
+  let allScopes: Scope[] = [];
   if (cookies.identity && cookies.identity.ux_render?.users?.client_write) {
-    // get csrf token from gateway for service form
-    csrf = await GetCsrf(cookies.session ? cookies.session : "");
+    // get csrf token, client, and allScopes (menu) from gateway for client form
+    const [csrfResult, clientResult, scopesResult] = await Promise.all([
+      GetCsrf(cookies.session ? cookies.session : ""),
+      callGatewayData<ServiceClient>({
+        endpoint: `/clients/${slug}`,
+        session: cookies.session,
+      }),
+      callGatewayData<Scope[]>({
+        endpoint: `/scopes`,
+        session: cookies.session,
+      }),
+    ]);
 
-    if (!csrf) {
+    if (!csrfResult.ok) {
       console.log(
-        `${pageError} CSRF token could not be retrieved for service client ${slug}.`
+        `${pageError} for user ${cookies.identity?.username}: ${csrfResult.error.message}`
       );
-      throw new Error(
-        `${pageError} CSRF token could not be retrieved for service client ${slug}.`
+      return handlePageLoadFailure(
+        csrfResult.error.code,
+        csrfResult.error.message,
+        "/services"
       );
     }
+    csrf = csrfResult.data.csrf_token;
+
+    if (!clientResult.ok) {
+      console.log(
+        `${pageError} for user ${cookies.identity?.username}: ${clientResult.error.message}`
+      );
+      return handlePageLoadFailure(
+        clientResult.error.code,
+        clientResult.error.message,
+        "/services"
+      );
+    }
+    client = clientResult.data;
+
+    if (!scopesResult.ok) {
+      console.log(
+        `${pageError} for user ${cookies.identity?.username}: ${scopesResult.error.message}`
+      );
+      return handlePageLoadFailure(
+        scopesResult.error.code,
+        scopesResult.error.message,
+        "/services"
+      );
+    }
+    allScopes = scopesResult.data;
   }
-
-  // get client record data from gateway
-  const client = await callGatewayData({
-    endpoint: `/clients/${slug}`,
-    session: cookies.session,
-  });
-
-  // get scopess data from gateway for scopes dropdown
-  const allScopes = await callGatewayData({
-    endpoint: "/scopes",
-    session: cookies.session,
-  });
 
   return (
     <>
@@ -173,7 +207,7 @@ export default async function Page({
               csrf={csrf}
               editAllowed={cookies.identity.ux_render?.users?.client_write}
               entitySlug={slug}
-              entityScopes={client.scopes}
+              entityScopes={client?.scopes ? client.scopes : null}
               menuScopes={allScopes}
               updateScopes={handleScopesUpdate}
             />

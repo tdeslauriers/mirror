@@ -15,11 +15,6 @@ export async function handleAlbumAdd(
   // extract the CSRF token from the previous stat
   const csrf = previousScope.csrf;
 
-  // validate CSRF token
-  if (!csrf || csrf.trim().length < 16 || csrf.trim().length > 64) {
-    throw new Error("CSRF token is missing or not well formed.");
-  }
-
   // prepare the album data from formData
   let add: Album = {
     csrf: csrf,
@@ -28,6 +23,19 @@ export async function handleAlbumAdd(
     description: formData.get("description") as string,
     is_archived: formData.get("is_archived") === "on",
   };
+
+  // validate CSRF token
+  if (!csrf || csrf.trim().length < 16 || csrf.trim().length > 64) {
+    return {
+      csrf: csrf,
+      album: add,
+      errors: {
+        csrf: [
+          "CSRF token is required and must be between 16 and 64 characters long.",
+        ],
+      },
+    } as AlbumActionCmd;
+  }
 
   // validate the album data
   const errors = validateAlbum(add);

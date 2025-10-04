@@ -1,46 +1,41 @@
-import { GatewayError, isGatewayError } from "@/app/api";
-// import fetch from "../setupFetch";
+import callGatewayData, { GatewayResult } from "./call-gateway-data";
 
-const errMsg: string =
-  "Failed to retrieve CSRF token.  Please try again by either clicking 'Try Again' or refreshing the page. If the problem persists, please contact me.";
+export type CsrfToken = {
+  session_token: string;
+  csrf_token: string;
+  created_at: Date;
+  authenticated: boolean;
+};
 
-export default async function GetCsrf(session: string) {
+// gets a CSRF token from the gateway service for the provided session token
+export default async function GetCsrf(
+  session: string
+): Promise<GatewayResult<CsrfToken>> {
   // check for session (should never happen)
   if (!session || session.length <= 0) {
     console.log("No session token provided to get csrf fucntion.");
-    throw new Error("Session token required to get csrf token.");
+    return {
+      ok: false,
+      error: {
+        code: 401,
+        message: "No session token provided to get csrf function.",
+      },
+    };
   }
 
   if (isValidSessionId(session)) {
-    try {
-      const apiResponse = await fetch(
-        `${process.env.GATEWAY_SERVICE_URL}/session/csrf/${session}`,
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
-
-      if (apiResponse.ok) {
-        const success = await apiResponse.json();
-        return success.csrf_token as string;
-      } else {
-        const fail = await apiResponse.json();
-        if (isGatewayError(fail)) {
-          handleCsrfErrors(fail);
-          throw new Error(errMsg);
-        } else {
-          throw new Error(errMsg);
-        }
-      }
-    } catch (error: any) {
-      console.log(error.message);
-      throw new Error(error);
-    }
+    return await callGatewayData<CsrfToken>({
+      endpoint: `/session/csrf/${session}`,
+      session: session,
+    });
   } else {
-    throw new Error("Invalid session token.");
+    return {
+      ok: false,
+      error: {
+        code: 400,
+        message: "Invalid session token provided to get csrf function.",
+      },
+    };
   }
 }
 
@@ -50,11 +45,4 @@ export function isValidSessionId(session: string) {
     return false;
   }
   return true;
-}
-
-function handleCsrfErrors(gatewayError: GatewayError) {
-  console.log(
-    `A gateway error occurred calling csrf endpoint ( ${gatewayError.code}: ${gatewayError.message}`
-  );
-  throw new Error(errMsg);
 }

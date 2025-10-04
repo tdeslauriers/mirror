@@ -7,12 +7,13 @@ import { Suspense } from "react";
 import { getAuthCookies } from "@/components/checkCookies";
 import callGatewayData from "@/components/call-gateway-data";
 import { handleTemplateAdd } from "./actions";
+import handlePageLoadFailure from "@/components/errors/handle-page-load-errors";
 
 export const metadata = {
   robots: "noindex, nofollow",
 };
 
-const pageError = "Failed to load task template add page: ";
+const pageError = "Failed to load task template add page";
 
 export default async function AddPage() {
   // quick for redirect if auth'd cookies not present
@@ -24,29 +25,48 @@ export default async function AddPage() {
     !cookies.identity ||
     !cookies.identity.ux_render?.tasks?.templates_write
   ) {
-    console.log(pageError + "User does not have templates_write permission.");
-    throw new Error(
-      pageError + "You do not have permission to view this page."
+    console.log(
+      `${pageError}: user ${cookies.identity?.username} does not have rights to add a task.`
+    );
+    return handlePageLoadFailure(
+      401,
+      `you do not have rights to add a task.`,
+      "/templates"
     );
   }
 
   // get csrf token from gateway for template form submission
-  const csrf = await GetCsrf(cookies.session ? cookies.session : "");
+  const [csrfResult, assigneesResult] = await Promise.all([
+    GetCsrf(cookies.session ? cookies.session : ""),
+    callGatewayData<AllowanceUser[]>({
+      endpoint: `/allowances/users`,
+      session: cookies.session,
+    }),
+  ]);
 
-  if (!csrf) {
+  if (!csrfResult.ok) {
     console.log(
-      pageError + "CSRF token could not be retrieved for scope form."
+      `${pageError} for user ${cookies.identity?.username}: ${csrfResult.error.message}`
     );
-    throw new Error(
-      pageError + "CSRF token could not be retrieved for scope form."
+    return handlePageLoadFailure(
+      csrfResult.error.code,
+      csrfResult.error.message,
+      "/templates"
     );
   }
+  const csrf = csrfResult.data.csrf_token;
 
-  // get list of assignees for form dropdown
-  const assignees: AllowanceUser[] = await callGatewayData({
-    endpoint: "/templates/assignees",
-    session: cookies.session,
-  });
+  if (!assigneesResult.ok) {
+    console.log(
+      `${pageError} for user ${cookies.identity?.username}: ${assigneesResult.error.message}`
+    );
+    return handlePageLoadFailure(
+      assigneesResult.error.code,
+      assigneesResult.error.message,
+      "/templates"
+    );
+  }
+  const assignees = assigneesResult.data;
 
   return (
     <>

@@ -1,9 +1,9 @@
 "use client";
 
-import { ServiceClient } from "@/components/forms";
 import Table, { TableColumn } from "@/components/table";
 import Link from "next/link";
 import { Suspense, useState } from "react";
+import { ServiceClient } from ".";
 
 interface ServicesTableProps {
   data: ServiceClient[];

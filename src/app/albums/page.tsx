@@ -3,6 +3,8 @@ import { getAuthCookies } from "@/components/checkCookies";
 import Link from "next/link";
 import { Album, albumComparator } from ".";
 import Tile from "@/components/tile";
+import ErrorLoadPage from "@/components/errors/error-load-page";
+import handlePageLoadFailure from "@/components/errors/handle-page-load-errors";
 
 export const metadata = {
   robots: "noindex, nofollow",
@@ -16,21 +18,35 @@ export default async function AlbumsPage() {
 
   // quick check if identity cookie has album_read access
   if (!cookies.identity || !cookies.identity.ux_render?.gallery?.album_read) {
-    console.log(pageError + "user does not have rights to view albums.");
-    throw new Error(pageError + "you do not have rights to view albums.");
+    console.log(
+      pageError +
+        `user ${cookies.identity?.username} does not have rights to view albums.`
+    );
+    return handlePageLoadFailure(
+      401,
+      "you do not have rights to view /albums."
+    );
   }
 
   // get albums data from gateway
-  const albums: Album[] = await callGatewayData({
+  const result = await callGatewayData<Album[]>({
     endpoint: "/albums",
     session: cookies.session,
   });
+  if (!result.ok) {
+    console.log(
+      `Error returned from gateway for user ${cookies.identity?.username}: ${result.error.message}`
+    );
+    return handlePageLoadFailure(result.error.code, result.error.message);
+  }
+
+  const albums = result.data;
+
+  // log empty return -> permissions error
   if (!albums || albums.length === 0) {
-    // TODO: fix digest error here
-    // throw new Error(
-    //   "It appears you have not been granted access to any albums and/or photos yet."
-    // );
-    console.log(pageError + "no albums data returned from gateway.");
+    console.log(
+      `No albums data returned from gateway for user: ${cookies.identity?.username}`
+    );
   }
 
   // sort albums by title (alphabetically) then by year (descending)

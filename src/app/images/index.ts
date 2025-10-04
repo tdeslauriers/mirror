@@ -334,3 +334,30 @@ export function validateUpdateImageCmd(image: UpdateImageCmd): {
 
   return errors;
 }
+
+// sort images by date (descending) then by title (alphabetically)
+export const imageComparator = (a: ImageData, b: ImageData): number => {
+  const dateA = toEpoch(a.image_date);
+  const dateB = toEpoch(b.image_date);
+
+  if (dateA !== null && dateB !== null && dateA !== dateB) return dateB - dateA;
+  if (dateA === null && dateB !== null) return 1;
+  if (dateA !== null && dateB === null) return -1;
+
+  // tie-breaker: title (alphabetically)
+  const titleA = (a.title ?? "").trim();
+  const titleB = (b.title ?? "").trim();
+  return titleA.localeCompare(titleB, undefined, { sensitivity: "base" });
+};
+
+// toEpoch is used to convert a date to a timestamp for comparison
+const toEpoch = (v: unknown): number | null => {
+  if (!v) return null;
+  if (v instanceof Date) return v.getTime();
+  if (typeof v === "number" && Number.isFinite(v)) return v;
+  if (typeof v === "string") {
+    const parsed = Date.parse(v);
+    return Number.isNaN(parsed) ? null : parsed;
+  }
+  return null;
+};

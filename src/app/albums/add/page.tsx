@@ -4,12 +4,13 @@ import AlbumForm from "@/components/forms/album-form";
 import Loading from "@/components/loading";
 import { Suspense } from "react";
 import { handleAlbumAdd } from "./actions";
+import handlePageLoadFailure from "@/components/errors/handle-page-load-errors";
 
 export const metadata = {
   robots: "noindex, nofollow",
 };
 
-const pageError = "Failed to load album add page: ";
+const pageError = "Failed to load album add page ";
 
 export default async function AlbumAddPage() {
   // quick check for auth
@@ -17,20 +18,26 @@ export default async function AlbumAddPage() {
 
   // quick read of cookies
   if (!cookies.identity || !cookies.identity.ux_render?.gallery?.album_write) {
-    console.log(pageError + "user does not have rights to add an album.");
-    throw new Error(pageError + "you do not have rights to add an album");
+    console.log(
+      `${pageError} for user ${cookies.identity?.username} does not have rights to add an album.`
+    );
+    return handlePageLoadFailure(
+      401,
+      "You do not have rights to add an album."
+    );
   }
 
   // fetch csrf from gateway for add album form
-  const csrf = await GetCsrf(cookies.session ? cookies.session : "");
-  if (!csrf) {
+
+  // get csrf token from gateway for album form
+  const result = await GetCsrf(cookies.session ? cookies.session : "");
+  if (!result.ok) {
     console.log(
-      pageError + "CSRF token could not be retrieved for album form."
+      `${pageError} for user ${cookies.identity?.username}: ${result.error.message}`
     );
-    throw new Error(
-      pageError + "CSRF token could not be retrieved for album form."
-    );
+    return handlePageLoadFailure(500, result.error.message, "/albums");
   }
+  const csrf = result.data.csrf_token;
 
   return (
     <>
@@ -51,8 +58,6 @@ export default async function AlbumAddPage() {
           </div>
         </div>
         <hr className={`page-title`} />
-
-        {/* banner */}
 
         {/* banner */}
         <div className="banner">
