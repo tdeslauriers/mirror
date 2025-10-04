@@ -59,7 +59,7 @@ export default async function Page({
     const [csrfResult, userResult, scopesResult, permissionsResult] =
       await Promise.all([
         GetCsrf(cookies.session ? cookies.session : ""),
-        callGatewayData<any>({
+        callGatewayData<User>({
           endpoint: `/users/${slug}`,
           session: cookies.session,
         }),
