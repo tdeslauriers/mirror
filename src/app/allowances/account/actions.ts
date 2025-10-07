@@ -8,22 +8,13 @@ import {
   validateUpdateAllowanceCmd,
 } from "..";
 import { isGatewayError } from "@/app/api";
-import { checkForSessionCookie } from "@/components/checkCookies";
+import { getAuthCookies, getSessionCookie } from "@/components/checkCookies";
 export async function handleAccountEdit(
   previousState: AllowanceActionCmd,
   formData: FormData
 ) {
-  // get session token
-  const sessionCookie = await checkForSessionCookie();
-
-  // light-weight validation of csrf token
-  // true validation happpens in the gateway
+  // get form data and prepare update object
   const csrf = previousState.csrf;
-  if (!csrf || csrf.trim().length < 16 || csrf.trim().length > 64) {
-    throw new Error(
-      "CSRF token is missing or not well formed.  This value is required and cannot be tampered with."
-    );
-  }
 
   let updated: UpdateAllowanceCmd = {
     csrf: csrf,
@@ -35,9 +26,58 @@ export async function handleAccountEdit(
     is_calculated: formData.get("is_calculated") === "on" ? true : false,
   };
 
+  // get session cookie
+  const cookieResult = await getAuthCookies(`/account`);
+  if (!cookieResult.ok) {
+    console.log(
+      `failed to get auth cookies for user attempting to update their allowance account: ${
+        cookieResult.error ? cookieResult.error.message : "unknown error"
+      }`
+    );
+    return {
+      csrf: csrf,
+
+      credit: convertCentsToDollars(updated.credit),
+      debit: convertCentsToDollars(updated.debit),
+      allowance: previousState.allowance,
+      errors: {
+        server: [
+          `Failed to verify authentication cookies. Please login again and try to update your allowance account.`,
+        ],
+      },
+    } as AllowanceActionCmd;
+  }
+
+  // light-weight validation of csrf token
+  // true validation happpens in the gateway
+  if (!csrf || csrf.trim().length < 16 || csrf.trim().length > 64) {
+    console.log(
+      `user ${cookieResult.data.identity?.username} submitted CSRF token which is missing or not well formed.`
+    );
+    return {
+      csrf: csrf,
+
+      credit: convertCentsToDollars(updated.credit),
+      debit: convertCentsToDollars(updated.debit),
+      allowance: previousState.allowance,
+      errors: {
+        csrf: [
+          "CSRF token is missing or not well formed.  This value is required and cannot be tampered with.",
+        ],
+      },
+    } as AllowanceActionCmd;
+  }
+
   // field level validation including business logic validation.
   const errors = validateUpdateAllowanceCmd(updated);
   if (Object.keys(errors).length > 0) {
+    console.log(
+      `user ${
+        cookieResult.data.identity?.username
+      } submitted allowance account data which did not pass validation: ${JSON.stringify(
+        errors
+      )}`
+    );
     return {
       csrf: csrf,
 
@@ -55,7 +95,7 @@ export async function handleAccountEdit(
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `${sessionCookie.value}`,
+          Authorization: `${cookieResult.data.session}`,
         },
         body: JSON.stringify(updated),
       }
@@ -63,6 +103,9 @@ export async function handleAccountEdit(
 
     if (apiResponse.ok) {
       const success = await apiResponse.json();
+      console.log(
+        `user ${cookieResult.data.identity?.username} successfully updated their allowance account.`
+      );
       return {
         csrf: csrf,
         slug: null, // no slug to return because user's account only
@@ -83,15 +126,38 @@ export async function handleAccountEdit(
           errors: errors,
         } as AllowanceActionCmd;
       } else {
-        throw new Error(
-          "An unhandled gateway error occurred when trying to update allowance."
+        console.log(
+          `user ${cookieResult.data.identity?.username} received unexpected error while attempting to update their allowance account: ${apiResponse.status} ${apiResponse.statusText}`
         );
+        return {
+          csrf: csrf,
+          slug: null, // no slug to return because user's account only
+          credit: convertCentsToDollars(updated.credit),
+          debit: convertCentsToDollars(updated.debit),
+          allowance: previousState.allowance,
+          errors: {
+            server: [
+              `An unhandled gateway error occurred when attempting to update your allowance account.  Please try again. If the problem persists, please contact me.`,
+            ],
+          },
+        } as AllowanceActionCmd;
       }
     }
   } catch (error: any) {
-    console.log(error.message);
-    throw new Error(
-      `Unable to call gateway successfully to update allowance account`
+    console.log(
+      `user ${cookieResult.data.identity?.username} encountered an error when attempting to update their allowance account: ${error}`
     );
+    return {
+      csrf: csrf,
+      slug: null, // no slug to return because user's account only
+      credit: convertCentsToDollars(updated.credit),
+      debit: convertCentsToDollars(updated.debit),
+      allowance: previousState.allowance,
+      errors: {
+        server: [
+          `An error occurred when attempting to update your allowance account. Please try again. If the problem persists, please contact me.`,
+        ],
+      },
+    } as AllowanceActionCmd;
   }
 }

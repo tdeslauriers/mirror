@@ -34,12 +34,26 @@ export default async function Page({
 
   // quick check for redirect if auth'd cookies not present
   const cookies = await getAuthCookies(`/services/${slug}`);
+  if (!cookies.ok) {
+    console.log(
+      `${pageError}: failed auth cookie check: ${
+        cookies.error ? cookies.error.message : "unknown error"
+      }`
+    );
+    return handlePageLoadFailure(
+      401,
+      cookies.error
+        ? cookies.error.message
+        : "unknown error related to session cookies.",
+      "/login"
+    );
+  }
 
   // check if identity cookie has client_read permission
   // ie, gaurd pattern or access hint gating
-  if (!cookies.identity || !cookies.identity.ux_render?.users?.client_read) {
+  if (!cookies.data.identity?.ux_render?.users?.client_read) {
     console.log(
-      `${pageError}: user ${cookies.identity?.username} does not have rights to view /services/${slug}.`
+      `${pageError}: user ${cookies.data.identity?.username} does not have rights to view /services/${slug}.`
     );
     return handlePageLoadFailure(
       401,
@@ -52,23 +66,23 @@ export default async function Page({
   let csrf: string | null = null;
   let client: ServiceClient | null = null;
   let allScopes: Scope[] = [];
-  if (cookies.identity && cookies.identity.ux_render?.users?.client_write) {
+  if (cookies.data.identity.ux_render?.users?.client_write) {
     // get csrf token, client, and allScopes (menu) from gateway for client form
     const [csrfResult, clientResult, scopesResult] = await Promise.all([
-      GetCsrf(cookies.session ? cookies.session : ""),
+      GetCsrf(cookies.data.session ?? ""),
       callGatewayData<ServiceClient>({
         endpoint: `/clients/${slug}`,
-        session: cookies.session,
+        session: cookies.data.session,
       }),
       callGatewayData<Scope[]>({
         endpoint: `/scopes`,
-        session: cookies.session,
+        session: cookies.data.session,
       }),
     ]);
 
     if (!csrfResult.ok) {
       console.log(
-        `${pageError} for user ${cookies.identity?.username}: ${csrfResult.error.message}`
+        `${pageError} for user ${cookies.data.identity?.username}: ${csrfResult.error.message}`
       );
       return handlePageLoadFailure(
         csrfResult.error.code,
@@ -80,7 +94,7 @@ export default async function Page({
 
     if (!clientResult.ok) {
       console.log(
-        `${pageError} for user ${cookies.identity?.username}: ${clientResult.error.message}`
+        `${pageError} for user ${cookies.data.identity?.username}: ${clientResult.error.message}`
       );
       return handlePageLoadFailure(
         clientResult.error.code,
@@ -92,7 +106,7 @@ export default async function Page({
 
     if (!scopesResult.ok) {
       console.log(
-        `${pageError} for user ${cookies.identity?.username}: ${scopesResult.error.message}`
+        `${pageError} for user ${cookies.data.identity?.username}: ${scopesResult.error.message}`
       );
       return handlePageLoadFailure(
         scopesResult.error.code,
@@ -152,7 +166,7 @@ export default async function Page({
           <Suspense fallback={<Loading />}>
             <ClientForm
               csrf={csrf}
-              editAllowed={cookies.identity.ux_render?.users?.client_write}
+              editAllowed={cookies.data.identity.ux_render?.users?.client_write}
               slug={slug}
               client={client}
               clientFormUpdate={handleClientEdit}
@@ -160,7 +174,7 @@ export default async function Page({
           </Suspense>
         </div>
 
-        {cookies.identity.ux_render?.users?.client_write && (
+        {cookies.data.identity.ux_render?.users?.client_write && (
           <>
             <div className="card-title">
               <h2>
@@ -192,7 +206,7 @@ export default async function Page({
         <div className="card-title">
           <h2>
             Scopes:{" "}
-            {cookies.identity.ux_render?.users?.client_write && (
+            {cookies.data.identity.ux_render?.users?.client_write && (
               <sup>
                 <span className="highlight-info" style={{ fontSize: ".65em" }}>
                   * must click &lsquo;Update Scopes&lsquo; to save changes
@@ -205,7 +219,7 @@ export default async function Page({
           <div className="card">
             <ManageScopesForm
               csrf={csrf}
-              editAllowed={cookies.identity.ux_render?.users?.client_write}
+              editAllowed={cookies.data.identity.ux_render?.users?.client_write}
               entitySlug={slug}
               entityScopes={client?.scopes ? client.scopes : null}
               menuScopes={allScopes}
@@ -215,7 +229,7 @@ export default async function Page({
         </Suspense>
 
         {/* generate pat tokens form */}
-        {cookies.identity.ux_render?.users?.client_write && (
+        {cookies.data.identity.ux_render?.users?.client_write && (
           <>
             <div className="card-title">
               <h2>Generate PAT Token</h2>

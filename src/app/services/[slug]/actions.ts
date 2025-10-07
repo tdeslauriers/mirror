@@ -18,36 +18,19 @@ import {
 } from "..";
 
 import { isGatewayError } from "@/app/api";
-import { checkForSessionCookie } from "@/components/checkCookies";
+import { getAuthCookies, getSessionCookie } from "@/components/checkCookies";
+import { cookies } from "next/headers";
 
 export async function handleClientEdit(
   previousState: ServiceClientActionCmd,
   formData: FormData
 ) {
-  // get session token
-  const sessionCookie = await checkForSessionCookie();
-
-  // light-weight validation of csrf token
-  // true validation happpens in the gateway
   const csrf = previousState.csrf;
-  if (!csrf || csrf.trim().length < 16 || csrf.trim().length > 64) {
-    throw new Error(
-      "Service client details form CSRF token is missing or not well formed.  This value is required and cannot be tampered with."
-    );
-  }
-
-  // if this is tampered with, the gateway will simply error because
-  // the slug will not be found, or invalid, etc.
   const slug = previousState.slug;
-  if (!slug || slug.trim().length < 16 || slug.trim().length > 64) {
-    throw new Error(
-      "Service client slug is missing or not well formed.  This value is required and cannot be tampered with."
-    );
-  }
 
   // get form data
   let updated: ServiceClient = {
-    csrf: csrf,
+    csrf: csrf ?? "",
 
     name: formData.get("name") as string,
     owner: formData.get("owner") as string,
@@ -56,9 +39,72 @@ export async function handleClientEdit(
     account_locked: formData.get("account_locked") === "on" ? true : false,
   };
 
+  // get auth cookies
+  const cookies = await getAuthCookies(`/services/${slug}`);
+  if (!cookies.ok) {
+    console.log(
+      `Service client update failed because could not verify session cookies: ${
+        cookies.error ? cookies.error.message : "unknown error"
+      }`
+    );
+    return {
+      csrf: csrf,
+      slug: slug,
+      serviceClient: updated,
+      errors: {
+        server: [
+          cookies.error
+            ? cookies.error.message
+            : "unknown error related to session cookies.",
+        ],
+      },
+    } as ServiceClientActionCmd;
+  }
+
+  // light-weight validation of csrf token
+  // true validation happpens in the gateway
+  if (!csrf || csrf.trim().length < 16 || csrf.trim().length > 64) {
+    console.log(
+      `User ${cookies.data.identity?.username} submitted CSRF token which is missing or not well formed.`
+    );
+    return {
+      csrf: csrf,
+      slug: slug,
+      serviceClient: updated,
+      errors: {
+        csrf: [
+          "CSRF token is missing or not well formed.  This value is required and cannot be tampered with.",
+        ],
+      },
+    } as ServiceClientActionCmd;
+  }
+
+  // if this is tampered with, the gateway will simply error because
+  // the slug will not be found, or invalid, etc.
+  if (!slug || slug.trim().length < 16 || slug.trim().length > 64) {
+    console.log(
+      `User ${cookies.data.identity?.username} submitted service client slug which is missing or not well formed.`
+    );
+    return {
+      csrf: csrf,
+      slug: slug,
+      serviceClient: updated,
+      errors: {
+        slug: [
+          "Service client slug is missing or not well formed.  This value is required and cannot be tampered with.",
+        ],
+      },
+    } as ServiceClientActionCmd;
+  }
+
   // validate form data
   const errors = validateServiceClient(updated);
   if (errors && Object.keys(errors).length > 0) {
+    console.log(
+      `Service client update validation failed for user ${
+        cookies.data.identity?.username
+      }: ${JSON.stringify(errors)}`
+    );
     return {
       csrf: csrf,
       slug: slug,
@@ -74,7 +120,7 @@ export async function handleClientEdit(
       {
         method: "PUT",
         headers: {
-          Authorization: `${sessionCookie?.value}`,
+          Authorization: `${cookies.data.session}`,
           "Content-Type": "application/json",
         },
         body: JSON.stringify(updated),
@@ -83,7 +129,9 @@ export async function handleClientEdit(
 
     if (apiResponse.ok) {
       const success = await apiResponse.json();
-
+      console.log(
+        `Service client record ${slug} updated successfully by user ${cookies.data.identity?.username}.`
+      );
       return {
         csrf: csrf,
         slug: slug,
@@ -94,6 +142,11 @@ export async function handleClientEdit(
       const fail = await apiResponse.json();
       if (isGatewayError(fail)) {
         const errors = handleServiceClientErrors(fail);
+        console.log(
+          `Service client record ${slug} update failed for user ${
+            cookies.data.identity?.username
+          }: ${JSON.stringify(errors)}`
+        );
         return {
           csrf: csrf,
           slug: slug,
@@ -101,15 +154,39 @@ export async function handleClientEdit(
           errors: errors,
         } as ServiceClientActionCmd;
       } else {
-        throw new Error(
-          "Service client details form could not be updated due to unhandled gateway error.  Please try again."
+        console.error(
+          `Service client record ${slug} update failed for user ${cookies.data.identity?.username} due to unhandled gateway error: ${fail.message}`
         );
+        return {
+          csrf: csrf,
+          slug: slug,
+          serviceClient: updated,
+          errors: {
+            server: [
+              fail.message
+                ? fail.message
+                : "Service client update failed due to an unhandled gateway error.",
+            ],
+          },
+        } as ServiceClientActionCmd;
       }
     }
   } catch (error) {
-    throw new Error(
-      "Unable to call client service gateway.  Please try again."
+    console.error(
+      `Service client record ${slug} update failed for user ${
+        cookies.data.identity?.username
+      }: ${error ? error : "reason unknown"}`
     );
+    return {
+      csrf: csrf,
+      slug: slug,
+      serviceClient: updated,
+      errors: {
+        server: [
+          "Service client update failed due to an unhandled gateway error.",
+        ],
+      },
+    } as ServiceClientActionCmd;
   }
 }
 
@@ -117,28 +194,12 @@ export async function handleReset(
   previousState: ResetPwActionCmd,
   formData: FormData
 ) {
-  // lightweight validation of csrf token
+  // get forrm data
   const csrf = previousState.csrf;
-  if (!csrf || csrf.trim().length < 16 || csrf.trim().length > 64) {
-    throw new Error(
-      "CSRF token missing or not well formed.  This value is required and cannot be tampered with."
-    );
-  }
-
-  // lightweight validation of resource_id
   const resource_id = previousState.resource_id;
-  if (
-    !resource_id ||
-    resource_id.trim().length < 16 ||
-    resource_id.trim().length > 64
-  ) {
-    throw new Error(
-      "Resource ID missing or not well formed.  This value is required and cannot be tampered with."
-    );
-  }
 
   const reset: ResetData = {
-    csrf: csrf,
+    csrf: csrf ?? "",
     resource_id: resource_id,
 
     current_password: formData.get("current_password") as string,
@@ -146,9 +207,74 @@ export async function handleReset(
     confirm_password: formData.get("confirm_password") as string,
   };
 
+  // get auth cookies
+  const cookies = await getAuthCookies("/services");
+  if (!cookies.ok) {
+    console.log(
+      `Password reset failed because could not verify session cookies: ${
+        cookies.error ? cookies.error.message : "unknown error"
+      }`
+    );
+    return {
+      csrf: csrf,
+      resource_id: resource_id,
+      reset: reset,
+      errors: {
+        server: [
+          cookies.error
+            ? cookies.error.message
+            : "unknown error related to session cookies.",
+        ],
+      },
+    } as ResetPwActionCmd;
+  }
+
+  // lightweight validation of csrf token
+  if (!csrf || csrf.trim().length < 16 || csrf.trim().length > 64) {
+    console.log(
+      `User ${cookies.data.identity?.username} submitted CSRF token which is missing or not well formed.`
+    );
+    return {
+      csrf: csrf,
+      resource_id: resource_id,
+      reset: reset,
+      errors: {
+        csrf: [
+          "CSRF token is missing or not well formed.  This value is required and cannot be tampered with.",
+        ],
+      },
+    } as ResetPwActionCmd;
+  }
+
+  // lightweight validation of resource_id
+  if (
+    !resource_id ||
+    resource_id.trim().length < 16 ||
+    resource_id.trim().length > 64
+  ) {
+    console.log(
+      `User ${cookies.data.identity?.username} submitted resource_id which is missing or not well formed.`
+    );
+    return {
+      csrf: csrf,
+      resource_id: resource_id,
+      reset: reset,
+      errors: {
+        resource_id: [
+          "Resource ID is missing or not well formed.  This value is required and cannot be tampered with.",
+        ],
+      },
+    } as ResetPwActionCmd;
+  }
+
   // pw field validation
   const errors = validatePasswords(reset);
   if (errors && Object.keys(errors).length > 0) {
+    console.log(
+      `Password reset validation failed for user ${
+        cookies.data.identity?.username
+      }: ${JSON.stringify(errors)}`
+    );
     return {
       csrf: csrf,
       resource_id: resource_id,
@@ -157,17 +283,13 @@ export async function handleReset(
     } as ResetPwActionCmd;
   }
 
-  // get session token
-  // get session token
-  const sessionCookie = await checkForSessionCookie();
-
   try {
     const apiResponse = await fetch(
       `${process.env.GATEWAY_SERVICE_URL}/clients/reset`,
       {
         method: "POST",
         headers: {
-          Authorization: `${sessionCookie?.value}`,
+          Authorization: `${cookies.data.session}`,
           "Content-Type": "application/json",
         },
         body: JSON.stringify(reset),
@@ -175,6 +297,9 @@ export async function handleReset(
     );
 
     if (apiResponse.ok) {
+      console.log(
+        `Password reset successfully for user ${cookies.data.identity?.username}`
+      );
       return {
         csrf: csrf,
         resource_id: resource_id,
@@ -185,7 +310,11 @@ export async function handleReset(
       const fail = await apiResponse.json();
       if (isGatewayError(fail)) {
         const errors = handleServiceClientErrors(fail);
-        console.log("Gateway error: ", errors);
+        console.log(
+          `failed to reset user ${
+            cookies.data.identity?.username
+          }'s password: ${JSON.stringify(errors)}`
+        );
         return {
           csrf: csrf,
           resource_id: resource_id,
@@ -193,15 +322,35 @@ export async function handleReset(
           errors: errors,
         } as ResetPwActionCmd;
       } else {
-        throw new Error(
-          "Password reset form could not be submitted.  Please refresh and try again."
+        console.error(
+          `Password reset failed for user ${cookies.data.identity?.username} due to unhandled gateway error: ${fail.message}`
         );
+        return {
+          csrf: csrf,
+          resource_id: resource_id,
+          reset: reset,
+          errors: {
+            server: [
+              fail.message
+                ? fail.message
+                : "Password reset failed due to an unhandled gateway error.",
+            ],
+          },
+        } as ResetPwActionCmd;
       }
     }
   } catch (error) {
-    throw new Error(
-      "Attempt to call password reset gateway endpoint failed.  Please refresh and try again."
+    console.error(
+      `Password reset failed for user ${cookies.data.identity?.username}: ${error}`
     );
+    return {
+      csrf: csrf,
+      resource_id: resource_id,
+      reset: reset,
+      errors: {
+        server: ["Password reset failed due to an unknown error."],
+      },
+    } as ResetPwActionCmd;
   }
 }
 
@@ -209,28 +358,66 @@ export async function handleScopesUpdate(
   previousState: EntityScopesActionCmd,
   formData: FormData
 ) {
-  // get session token
-  const sessionCookie = await checkForSessionCookie();
+  // get form data
+  const csrf = previousState.csrf;
+  const slug = previousState.entitySlug;
+
+  // get auth cookies
+  const cookies = await getAuthCookies(`/services/${slug}`);
+  if (!cookies.ok) {
+    console.log(
+      `Service client scopes update failed because could not verify session cookies: ${
+        cookies.error ? cookies.error.message : "unknown error"
+      }`
+    );
+    return {
+      csrf: csrf,
+      entitySlug: slug,
+      errors: {
+        server: [
+          cookies.error
+            ? cookies.error.message
+            : "unknown error related to session cookies.",
+        ],
+      },
+    } as EntityScopesActionCmd;
+  }
 
   // lightweight validation of csrf token
   // true validation happens in the gateway
-  const csrf = previousState.csrf;
   if (!csrf || csrf.trim().length < 16 || csrf.trim().length > 64) {
-    throw new Error(
-      "Scopes form CSRF token is missing or not well formed.  This value is required and cannot be tampered with."
+    console.log(
+      `User ${cookies.data.identity?.username} submitted CSRF token which is missing or not well formed.`
     );
+    return {
+      csrf: csrf,
+      entitySlug: slug,
+      errors: {
+        csrf: [
+          "CSRF token is missing or not well formed.  This value is required and cannot be tampered with.",
+        ],
+      },
+    } as EntityScopesActionCmd;
   }
 
   // if this is tampered with, the gateway will error because
   // the slug will not be found, or invalid, etc.
-  const slug = previousState.entitySlug;
   if (!slug || slug.trim().length < 16 || slug.trim().length > 64) {
-    throw new Error(
-      "Service client slug is missing or not well formed.  This value is required and cannot be tampered with."
+    console.log(
+      `User ${cookies.data.identity?.username} submitted service client slug which is missing or not well formed.`
     );
+    return {
+      csrf: csrf,
+      entitySlug: slug,
+      errors: {
+        server: [
+          "Service client slug is missing or not well formed.  This value is required and cannot be tampered with.",
+        ],
+      },
+    } as EntityScopesActionCmd;
   }
 
-  // get form data
+  // get scopes slug data from form
   // Note: array of scope slugs
   const scopeSlugs = formData.getAll("scopes[]") as string[];
 
@@ -270,7 +457,7 @@ export async function handleScopesUpdate(
       {
         method: "PUT",
         headers: {
-          Authorization: `${sessionCookie?.value}`,
+          Authorization: `${cookies.data.session}`,
           "Content-Type": "application/json",
         },
         body: JSON.stringify(cmd),
@@ -278,6 +465,9 @@ export async function handleScopesUpdate(
     );
 
     if (apiResponse.ok) {
+      console.log(
+        `Service client scopes updated successfully by user ${cookies.data.identity?.username}.`
+      );
       return {
         csrf: csrf,
         entitySlug: slug,
@@ -287,21 +477,48 @@ export async function handleScopesUpdate(
       const fail = await apiResponse.json();
       if (isGatewayError(fail)) {
         const errors = handleServiceClientErrors(fail);
+        console.log(
+          `Service client scopes update failed for user ${
+            cookies.data.identity?.username
+          }: ${JSON.stringify(errors)}`
+        );
         return {
           csrf: csrf,
           entitySlug: slug,
           errors: errors,
         } as EntityScopesActionCmd;
       } else {
-        throw new Error(
-          "Service client scopes form could not be updated.  Please try again."
+        console.error(
+          `Service client scopes update failed for user ${cookies.data.identity?.username} due to unhandled gateway error: ${fail.message}`
         );
+        return {
+          csrf: csrf,
+          entitySlug: slug,
+          errors: {
+            server: [
+              fail.message
+                ? fail.message
+                : "Service client scopes update failed due to an unhandled gateway error.",
+            ],
+          },
+        } as EntityScopesActionCmd;
       }
     }
   } catch (error) {
-    throw new Error(
-      "Service client scopes form could not be updated.  Please try again."
+    console.error(
+      `Service client scopes update failed for user ${
+        cookies.data.identity?.username
+      }: ${error ? error : "reason unknown"}`
     );
+    return {
+      csrf: csrf,
+      entitySlug: slug,
+      errors: {
+        server: [
+          "Service client scopes update failed due to an unhandled gateway error.",
+        ],
+      },
+    } as EntityScopesActionCmd;
   }
 }
 
@@ -309,13 +526,35 @@ export async function genPatToken(
   previousState: PatActionCmd,
   formData: FormData
 ) {
-  // get session token
-  const sessionCookie = await checkForSessionCookie();
-
   // build generate PAT command
   const csrf = previousState.csrf;
   const slug = previousState.slug;
 
+  // get session token
+  const cookies = await getAuthCookies(`/services/${slug}`);
+  if (!cookies.ok) {
+    console.log(
+      `Personal Access Token generation failed because could not verify session cookies: ${
+        cookies.error ? cookies.error.message : "unknown error"
+      }`
+    );
+    return {
+      csrf: csrf,
+      slug: slug,
+      success: false,
+      pat: null,
+      errors: {
+        server: [
+          cookies.error
+            ? cookies.error.message
+            : "unknown error related to session cookies.",
+        ],
+      },
+    };
+  }
+
+  // build command
+  // only need csrf and slug to generate a PAT
   const cmd: GeneratePatCmd = {
     csrf: csrf,
     slug: slug,
@@ -324,6 +563,11 @@ export async function genPatToken(
   // validate command
   const errors = validateGeneratePatCmd(cmd);
   if (errors && Object.keys(errors).length > 0) {
+    console.log(
+      `Personal Access Token generation validation failed for user ${
+        cookies.data.identity?.username
+      }: ${JSON.stringify(errors)}`
+    );
     return {
       csrf: csrf,
       slug: slug,
@@ -340,7 +584,7 @@ export async function genPatToken(
       {
         method: "POST",
         headers: {
-          Authorization: `${sessionCookie?.value}`,
+          Authorization: `${cookies.data.session}`,
           "Content-Type": "application/json",
         },
         body: JSON.stringify(cmd),
@@ -369,14 +613,42 @@ export async function genPatToken(
           errors: errors,
         };
       } else {
-        throw new Error(
-          "Personal Access Token could not be generated due to unhandled gateway error.  Please try again."
+        console.error(
+          `Personal Access Token generation failed for user ${
+            cookies.data.identity?.username
+          } due to unhandled gateway error: ${JSON.stringify(fail)}`
         );
+        return {
+          csrf: csrf,
+          slug: slug,
+          success: false,
+          pat: null,
+          errors: {
+            server: [
+              fail
+                ? JSON.stringify(fail)
+                : "Personal Access Token generation failed due to an unhandled gateway error.",
+            ],
+          },
+        };
       }
     }
   } catch (error) {
-    throw new Error(
-      "Unable to call client service gateway.  Please try again."
+    console.error(
+      `Personal Access Token generation failed for user ${
+        cookies.data.identity?.username
+      }: ${error ? error : "reason unknown"}`
     );
+    return {
+      csrf: csrf,
+      slug: slug,
+      success: false,
+      pat: null,
+      errors: {
+        server: [
+          "Personal Access Token generation failed due to an unhandled gateway error.",
+        ],
+      },
+    };
   }
 }

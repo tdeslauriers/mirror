@@ -59,8 +59,9 @@ export default async function LoginPage({
   const result = await GetCsrf(hasSession.value);
   if (!result.ok) {
     console.log(`Failed to get csrf token for login: ${result.error.message}.`);
-    return handlePageLoadFailure(500, result.error.message);
+    return handlePageLoadFailure(result.error.code, result.error.message);
   }
+
   const csrf = result.data.csrf_token;
 
   // get oauth exchange params from gateway for login form

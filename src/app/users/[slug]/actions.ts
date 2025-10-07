@@ -7,7 +7,6 @@ import {
   UserPermissionsCmd as EntityPermissionsCmd,
   UserScopesCmd,
 } from "..";
-import { cookies } from "next/headers";
 import { ErrMsgGeneric, GatewayError, isGatewayError } from "@/app/api";
 import {
   EntityPermissionsActionCmd,
@@ -15,33 +14,18 @@ import {
 } from "@/components/forms";
 import { validateScopeSlugs } from "@/app/services";
 import { validatePermissionSlugs } from "@/app/permissions";
-import { checkForSessionCookie } from "@/components/checkCookies";
+import { getAuthCookies, getSessionCookie } from "@/components/checkCookies";
 
 export async function handleUserEdit(
   previousState: ProfileActionCmd,
   formData: FormData
 ) {
-  // get session token
-  const sessionCookie = await checkForSessionCookie();
-
-  // light-weight validation of csrf token
-  // true validation happpens in the gateway
+  // get form data
   const csrf = previousState.csrf;
-  if (!csrf || csrf.trim().length < 16 || csrf.trim().length > 64) {
-    throw new Error(
-      "User update CSRF token missing or not well formed.  This value is required and cannot be tampered with."
-    );
-  }
-
   const slug = previousState.slug;
-  if (!slug || slug.trim().length < 16 || slug.trim().length > 64) {
-    throw new Error(
-      "User slug is missing or not well formed.  This value is required and cannot be tampered with."
-    );
-  }
 
   let updated: User = {
-    csrf: csrf,
+    csrf: csrf ?? "",
 
     firstname: formData.get("firstname") as string,
     lastname: formData.get("lastname") as string,
@@ -53,9 +37,66 @@ export async function handleUserEdit(
     account_locked: formData.get("account_locked") === "on" ? true : false,
   };
 
+  // get session token
+  const cookies = await getAuthCookies("/users");
+  if (!cookies.ok) {
+    console.log(
+      `User update failed because could not verify session cookies: ${
+        cookies.error ? cookies.error.message : "unknown error"
+      }`
+    );
+    return {
+      csrf: csrf,
+      slug: slug,
+      profile: updated,
+      errors: {
+        server: [
+          cookies.error?.message || "unknown error related to session cookies.",
+        ],
+      },
+    } as ProfileActionCmd;
+  }
+
+  // light-weight validation of csrf token
+  // true validation happpens in the gateway
+  if (!csrf || csrf.trim().length < 16 || csrf.trim().length > 64) {
+    console.log(
+      `User ${cookies.data.identity?.username} submitted empty or invalid CSRF token.`
+    );
+    return {
+      csrf: null,
+      slug: slug,
+      profile: updated,
+      errors: {
+        server: ["CSRF token is required and cannot be tampered with."],
+      },
+    } as ProfileActionCmd;
+  }
+
+  // light-weight validation of user slug
+  // true validation happens in the gateway
+  if (!slug || slug.trim().length < 16 || slug.trim().length > 64) {
+    console.log(
+      `User ${cookies.data.identity?.username} submitted empty or invalid user slug.`
+    );
+    return {
+      csrf: csrf,
+      slug: undefined,
+      profile: updated,
+      errors: {
+        server: ["User slug is required and cannot be tampered with."],
+      },
+    } as ProfileActionCmd;
+  }
+
   // field validation
   const errors = validateUpdateProfile(updated);
   if (errors && Object.keys(errors).length > 0) {
+    console.log(
+      `User ${
+        cookies.data.identity?.username
+      } submitted invalid user profile update: ${JSON.stringify(errors)}`
+    );
     return { csrf: csrf, profile: updated, errors: errors } as ProfileActionCmd;
   }
 
@@ -66,7 +107,7 @@ export async function handleUserEdit(
         method: "PUT",
         headers: {
           Content_Type: "application/json",
-          Authorization: `${sessionCookie?.value}`,
+          Authorization: `${cookies.data.session}`,
         },
         body: JSON.stringify(updated),
       }
@@ -74,6 +115,9 @@ export async function handleUserEdit(
 
     if (apiResponse.ok) {
       const success = await apiResponse.json();
+      console.log(
+        `User ${cookies.data.identity?.username} successfully updated user ${updated.username}.`
+      );
       return {
         csrf: csrf,
         slug: slug,
@@ -84,24 +128,53 @@ export async function handleUserEdit(
       const fail = await apiResponse.json();
       if (isGatewayError(fail)) {
         const errors = handleUserUpdateErrors(fail);
+        console.log(
+          `User ${
+            cookies.data.identity?.username
+          } user update failed: ${JSON.stringify(errors)}`
+        );
         return {
           csrf: csrf,
           slug: slug,
           profile: updated,
           errors: errors,
         } as ProfileActionCmd;
+      } else {
+        console.log(
+          `User ${cookies.data.identity?.username} user update failed due to unhandled gateway error.`
+        );
+        return {
+          csrf: csrf,
+          slug: slug,
+          profile: updated,
+          errors: { server: ["Unhandled gateway error.  Please try again."] },
+        } as ProfileActionCmd;
       }
     }
   } catch (error) {
-    throw new Error(ErrMsgGeneric);
+    if ((error as Error).message) {
+      console.log(
+        `User ${cookies.data.identity?.username} user update failed: ${
+          (error as Error).message
+        }`
+      );
+      return {
+        csrf: csrf,
+        slug: slug,
+        profile: updated,
+        errors: { server: [(error as Error).message] },
+      } as ProfileActionCmd;
+    }
+    console.log(
+      `User ${cookies.data.identity?.username} user update failed due to unknown error.`
+    );
+    return {
+      csrf: csrf,
+      slug: slug,
+      profile: updated,
+      errors: { server: ["Unknown error.  Please try again."] },
+    } as ProfileActionCmd;
   }
-
-  return {
-    csrf: csrf,
-    slug: slug,
-    profile: updated,
-    errors: errors,
-  } as ProfileActionCmd;
 }
 
 // handles socpes update
@@ -109,28 +182,60 @@ export async function handleScopesUpdate(
   previousState: EntityScopesActionCmd,
   formData: FormData
 ) {
-  // get session token
-  const sessionCookie = await checkForSessionCookie();
+  // get form data
+  const csrf = previousState.csrf;
+  const slug = previousState.entitySlug;
+
+  // get auth cookies
+  const cookies = await getAuthCookies("/users");
+  if (!cookies.ok) {
+    console.log(
+      `User scopes update failed because could not verify session cookies: ${
+        cookies.error ? cookies.error.message : "unknown error"
+      }`
+    );
+    return {
+      csrf: csrf,
+      entitySlug: slug,
+      errors: {
+        server: [
+          cookies.error?.message || "unknown error related to session cookies.",
+        ],
+      },
+    } as EntityScopesActionCmd;
+  }
 
   // lightweight validation of csrf token
   // true validation happens in the gateway
-  const csrf = previousState.csrf;
   if (!csrf || csrf.trim().length < 16 || csrf.trim().length > 64) {
-    throw new Error(
-      "Scopes form CSRF token is missing or not well formed.  This value is required and cannot be tampered with."
+    console.log(
+      `User ${cookies.data.identity?.username} submitted empty or invalid CSRF token.`
     );
+    return {
+      csrf: null,
+      entitySlug: slug,
+      errors: {
+        csrf: ["CSRF token is required and cannot be tampered with."],
+      },
+    } as EntityScopesActionCmd;
   }
 
   // if this is tampered with, the gateway will error because
   // the slug will not be found, or invalid, etc.
-  const slug = previousState.entitySlug;
   if (!slug || slug.trim().length < 16 || slug.trim().length > 64) {
-    throw new Error(
-      "Service client slug is missing or not well formed.  This value is required and cannot be tampered with."
+    console.log(
+      `User ${cookies.data.identity?.username} submitted empty or invalid user slug.`
     );
+    return {
+      csrf: csrf,
+      entitySlug: null,
+      errors: {
+        server: ["User slug is required and cannot be tampered with."],
+      },
+    } as EntityScopesActionCmd;
   }
 
-  // get form data
+  // get slugs from form data
   // Note: array of scope slugs
   const scopeSlugs = formData.getAll("scopes[]") as string[];
 
@@ -145,6 +250,11 @@ export async function handleScopesUpdate(
   //  validate scope slugs are well formed uuids
   const errors = validateScopeSlugs(scopeSlugs);
   if (errors && Object.keys(errors).length > 0) {
+    console.log(
+      `User ${
+        cookies.data.identity?.username
+      } submitted invalid scope slugs: ${JSON.stringify(errors)}`
+    );
     return {
       csrf: csrf,
       entitySlug: slug,
@@ -168,7 +278,7 @@ export async function handleScopesUpdate(
       {
         method: "PUT",
         headers: {
-          Authorization: `${sessionCookie?.value}`,
+          Authorization: `${cookies.data.session}`,
           "Content-Type": "application/json",
         },
         body: JSON.stringify(cmd),
@@ -176,6 +286,9 @@ export async function handleScopesUpdate(
     );
 
     if (apiResponse.ok) {
+      console.log(
+        `User ${cookies.data.identity?.username} successfully updated scopes for user ${slug}.`
+      );
       return {
         csrf: csrf,
         entitySlug: slug,
@@ -185,21 +298,44 @@ export async function handleScopesUpdate(
       const fail = await apiResponse.json();
       if (isGatewayError(fail)) {
         const errors = handleUserUpdateErrors(fail);
+        console.log(
+          `User ${
+            cookies.data.identity?.username
+          } scopes update failed: ${JSON.stringify(errors)}`
+        );
         return {
           csrf: csrf,
           entitySlug: slug,
           errors: errors,
         } as EntityScopesActionCmd;
       } else {
-        throw new Error(
-          "An unhandled gateway error occured when attempting to update user scopes.  Please try again."
+        console.log(
+          `User ${cookies.data.identity?.username} scopes update failed due to unhandled gateway error.`
         );
+        return {
+          csrf: csrf,
+          entitySlug: slug,
+          errors: {
+            server: [
+              "Failed to update scopes due to unhandled gateway error.  Please try again.",
+            ],
+          },
+        } as EntityScopesActionCmd;
       }
     }
   } catch (error) {
-    throw new Error(
-      "User scopes form could not be updated.  Please try again."
+    console.log(
+      `User ${cookies.data.identity?.username} scopes update failed due to unknown error.`
     );
+    return {
+      csrf: csrf,
+      entitySlug: slug,
+      errors: {
+        server: [
+          "Failed to update scopes due to unknown error.  Please try again.",
+        ],
+      },
+    } as EntityScopesActionCmd;
   }
 }
 
@@ -208,34 +344,71 @@ export async function handlePermissionsUpdate(
   previousState: EntityPermissionsActionCmd,
   formData: FormData
 ) {
-  // get session token
-  const sessionCookie = await checkForSessionCookie();
-
-  // lightweight validation of csrf token
-  // true validation happens in the gateway
   const csrf = previousState.csrf;
-  if (!csrf || csrf.trim().length < 16 || csrf.trim().length > 64) {
-    throw new Error(
-      "Scopes form CSRF token is missing or not well formed.  This value is required and cannot be tampered with."
-    );
-  }
-
-  // if this is tampered with, the gateway will error because
-  // the slug will not be found, or invalid, etc.
   const slug = previousState.entitySlug;
-  if (!slug || slug.trim().length < 16 || slug.trim().length > 64) {
-    throw new Error(
-      "Service client slug is missing or not well formed.  This value is required and cannot be tampered with."
-    );
-  }
 
   // get form data
   // Note: array of permission slugs
   const permissionSlugs = formData.getAll("permissions[]") as string[];
+
+  // get auth cookies
+  const cookies = await getAuthCookies("/users");
+  if (!cookies.ok) {
+    console.log(
+      `User permissions update failed because could not verify session cookies: ${
+        cookies.error ? cookies.error.message : "unknown error"
+      }`
+    );
+    return {
+      csrf: csrf,
+      entitySlug: slug,
+      errors: {
+        server: [
+          cookies.error?.message || "unknown error related to session cookies.",
+        ],
+      },
+    } as EntityPermissionsActionCmd;
+  }
+
+  // lightweight validation of csrf token
+  // true validation happens in the gateway
+  if (!csrf || csrf.trim().length < 16 || csrf.trim().length > 64) {
+    console.log(
+      `User ${cookies.data.identity?.username} submitted empty or invalid CSRF token.`
+    );
+    return {
+      csrf: null,
+      entitySlug: slug,
+      errors: {
+        csrf: ["CSRF token is required and cannot be tampered with."],
+      },
+    } as EntityPermissionsActionCmd;
+  }
+
+  // if this is tampered with, the gateway will error because
+  // the slug will not be found, or invalid, etc.
+  if (!slug || slug.trim().length < 16 || slug.trim().length > 64) {
+    console.log(
+      `User ${cookies.data.identity?.username} submitted empty or invalid user slug.`
+    );
+    return {
+      csrf: csrf,
+      entitySlug: null,
+      errors: {
+        server: ["User slug is required and cannot be tampered with."],
+      },
+    } as EntityPermissionsActionCmd;
+  }
+
   // validate permission slugs are well formed uuids
   // Note: re-using the scopes slug validation function -> slugs are uuids for both
   const errors = validatePermissionSlugs(permissionSlugs);
   if (errors && Object.keys(errors).length > 0) {
+    console.log(
+      `User ${
+        cookies.data.identity?.username
+      } submitted invalid permission slugs: ${JSON.stringify(errors)}`
+    );
     return {
       csrf: csrf,
       entitySlug: slug,
@@ -272,7 +445,7 @@ export async function handlePermissionsUpdate(
       {
         method: "PUT",
         headers: {
-          Authorization: `${sessionCookie?.value}`,
+          Authorization: `${cookies.data.session}`,
           "Content-Type": "application/json",
         },
         body: JSON.stringify(cmd),
@@ -280,6 +453,9 @@ export async function handlePermissionsUpdate(
     );
 
     if (apiResponse.ok) {
+      console.log(
+        `User ${cookies.data.identity?.username} successfully updated permissions for user ${slug}.`
+      );
       return {
         csrf: csrf,
         entitySlug: slug,
@@ -289,21 +465,44 @@ export async function handlePermissionsUpdate(
       const fail = await apiResponse.json();
       if (isGatewayError(fail)) {
         const errors = handleUserUpdateErrors(fail);
+        console.log(
+          `User ${
+            cookies.data.identity?.username
+          } permissions update failed: ${JSON.stringify(errors)}`
+        );
         return {
           csrf: csrf,
           entitySlug: slug,
           errors: errors,
         } as EntityPermissionsActionCmd;
       } else {
-        throw new Error(
-          "A gateway error occured when attempting to update user permissions.  Please try again."
+        console.log(
+          `User ${cookies.data.identity?.username} permissions update failed due to unhandled gateway error.`
         );
+        return {
+          csrf: csrf,
+          entitySlug: slug,
+          errors: {
+            server: [
+              "Failed to update permissions due to unhandled gateway error.  Please try again.",
+            ],
+          },
+        } as EntityPermissionsActionCmd;
       }
     }
   } catch (error) {
-    throw new Error(
-      "Unhandled error occured when attempting to contact gateway.  Please try again."
+    console.log(
+      `User ${cookies.data.identity?.username} permissions update failed due to unknown error.`
     );
+    return {
+      csrf: csrf,
+      entitySlug: slug,
+      errors: {
+        server: [
+          "Failed to update permissions due to unknown error.  Please try again.",
+        ],
+      },
+    } as EntityPermissionsActionCmd;
   }
 }
 

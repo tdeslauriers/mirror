@@ -25,12 +25,26 @@ export default async function TemplatesPage({
 
   // quick check for redirect if auth'd cookies not present
   const cookies = await getAuthCookies(`/templates/${slug}`);
+  if (!cookies.ok) {
+    console.log(
+      `${pageError}: could not verify session cookies: ${
+        cookies.error ? cookies.error.message : "unknown error"
+      }`
+    );
+    return handlePageLoadFailure(
+      401,
+      cookies.error
+        ? cookies.error.message
+        : "unknown error related to session cookies.",
+      "/login"
+    );
+  }
 
   // check if identity cookie has template_read permission
   // ie, gaurd pattern or access hint gating
-  if (!cookies.identity || !cookies.identity.ux_render?.tasks?.templates_read) {
+  if (!cookies.data.identity?.ux_render?.tasks?.templates_read) {
     console.log(
-      `${pageError}: user ${cookies.identity?.username} does not have rights to view /templates/${slug}.`
+      `${pageError}: user ${cookies.data.identity?.username} does not have rights to view /templates/${slug}.`
     );
     return handlePageLoadFailure(
       401,
@@ -43,23 +57,23 @@ export default async function TemplatesPage({
   let csrf: string | null = null;
   let template: TaskTemplate | null = null;
   let assignees: AllowanceUser[] = [];
-  if (cookies.identity && cookies.identity.ux_render?.tasks?.templates_write) {
+  if (cookies.data.identity.ux_render?.tasks?.templates_write) {
     // get csrf, task template, and assignes (for menu) from gateway for template form
     const [csrfResult, templateResult, assigneesResult] = await Promise.all([
-      GetCsrf(cookies.session ? cookies.session : ""),
+      GetCsrf(cookies.data.session ?? ""),
       callGatewayData<TaskTemplate>({
         endpoint: `/templates/${slug}`,
-        session: cookies.session,
+        session: cookies.data.session,
       }),
       callGatewayData<AllowanceUser[]>({
         endpoint: `/templates/assignees`,
-        session: cookies.session,
+        session: cookies.data.session,
       }),
     ]);
 
     if (!csrfResult.ok) {
       console.log(
-        `Failed to get CSRF for user ${cookies.identity?.username}: ${csrfResult.error.message}`
+        `Failed to get CSRF for user ${cookies.data.identity?.username}: ${csrfResult.error.message}`
       );
       return handlePageLoadFailure(
         csrfResult.error.code,
@@ -71,7 +85,7 @@ export default async function TemplatesPage({
 
     if (!templateResult.ok) {
       console.log(
-        `Failed to get /template/${slug} for user ${cookies.identity?.username}: ${templateResult.error.message}`
+        `Failed to get /template/${slug} for user ${cookies.data.identity?.username}: ${templateResult.error.message}`
       );
       return handlePageLoadFailure(
         templateResult.error.code,
@@ -83,7 +97,7 @@ export default async function TemplatesPage({
 
     if (!assigneesResult.ok) {
       console.log(
-        `Failed to get assignees for template menu for user ${cookies.identity?.username}: ${assigneesResult.error.message}`
+        `Failed to get assignees for template menu for user ${cookies.data.identity?.username}: ${assigneesResult.error.message}`
       );
       return handlePageLoadFailure(
         assigneesResult.error.code,
@@ -142,10 +156,12 @@ export default async function TemplatesPage({
           <div className="card">
             <TemplateForm
               csrf={csrf}
-              username={cookies.identity?.username}
-              editAllowed={cookies.identity?.ux_render?.tasks?.templates_write}
+              username={cookies.data.identity?.username}
+              editAllowed={
+                cookies.data.identity?.ux_render?.tasks?.templates_write
+              }
               accountVisibility={
-                cookies.identity?.ux_render?.tasks?.allowances_write
+                cookies.data.identity?.ux_render?.tasks?.allowances_write
               }
               slug={slug}
               assignees={assignees}

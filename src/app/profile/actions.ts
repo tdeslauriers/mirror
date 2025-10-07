@@ -12,24 +12,19 @@ import {
   ResetPwActionCmd,
   validatePasswords,
 } from "@/components/forms";
+import { getAuthCookies } from "@/components/checkCookies";
 
 export async function handleUserEdit(
   previousState: ProfileActionCmd,
   formData: FormData
 ) {
-  // light-weight validation of csrf token
-  // true validation happpens in the gateway
+  // get form data
   const csrf = previousState.csrf;
-  if (!csrf || csrf.trim().length < 16 || csrf.trim().length > 64) {
-    throw new Error(
-      "CSRF token missing or not well formed.  This value is required and cannot be tampered with."
-    );
-  }
 
   // any fields that are not allowed to be changed by user will not be submitted
   // likewise, gateway/identity will dump any fields that are not allowed to be changed
   const updated: Profile = {
-    csrf: csrf,
+    csrf: csrf ?? "",
 
     firstname: formData.get("firstname") as string,
     lastname: formData.get("lastname") as string,
@@ -38,25 +33,45 @@ export async function handleUserEdit(
     birth_year: parseInt(formData.get("birthYear") as string),
   };
 
+  // get auth cookies
+  const cookies = await getAuthCookies("/profile");
+  if (!cookies.ok) {
+    console.log(`Failed to get auth cookies: ${cookies.error.message}`);
+    return {
+      csrf: csrf,
+      profile: updated,
+      errors: {
+        server: [cookies.error.message || ErrMsgGeneric],
+      },
+    } as ProfileActionCmd;
+  }
+
+  // light-weight validation of csrf token
+  // true validation happpens in the gateway
+  if (!csrf || csrf.trim().length < 16 || csrf.trim().length > 64) {
+    console.log(
+      `User ${cookies.data.identity?.username} submitted CSRF token which is missing or not well formed.`
+    );
+    const errors: { [key: string]: string[] } = {};
+    errors.csrf = [
+      "CSRF token missing or not well formed. This value is required and cannot be tampered with.",
+    ];
+    return {
+      csrf: csrf,
+      profile: updated,
+      errors: errors,
+    } as ProfileActionCmd;
+  }
+
   // field validation
   const errors = validateUpdateProfile(updated);
   if (errors && Object.keys(errors).length > 0) {
-    return { csrf: csrf, profile: updated, errors: errors } as ProfileActionCmd;
-  }
-
-  // get session token
-  const cookieStore = await cookies();
-  const hasSession = cookieStore.has("session_id")
-    ? cookieStore.get("session_id")
-    : null;
-  if (
-    !hasSession ||
-    hasSession.value.trim().length < 16 ||
-    hasSession.value.trim().length > 64
-  ) {
-    throw new Error(
-      "Session cookie is missing or not well formed.  This value is required and cannot be tampered with."
+    console.log(
+      `Profile update validation failed for user ${
+        cookies.data.identity?.username
+      }: ${JSON.stringify(errors)}`
     );
+    return { csrf: csrf, profile: updated, errors: errors } as ProfileActionCmd;
   }
 
   // call gateway profile endpoint
@@ -67,7 +82,7 @@ export async function handleUserEdit(
         method: "PUT",
         headers: {
           Content_Type: "application/json",
-          Authorization: `${hasSession?.value}`,
+          Authorization: `${cookies.data.session}`,
         },
         body: JSON.stringify(updated),
       }
@@ -75,6 +90,9 @@ export async function handleUserEdit(
 
     if (apiResponse.ok) {
       const success = await apiResponse.json();
+      console.log(
+        `Profile updated successfully for user ${cookies.data.identity?.username}`
+      );
       return {
         csrf: csrf,
         profile: success,
@@ -89,30 +107,46 @@ export async function handleUserEdit(
           profile: updated,
           errors: errors,
         } as ProfileActionCmd;
+      } else {
+        console.error(
+          `Profile update failed for user ${cookies.data.identity?.username} due to unhandled gateway error: ${apiResponse.status} ${apiResponse.statusText}`
+        );
+        return {
+          csrf: csrf,
+          profile: updated,
+          errors: {
+            server: [
+              "Profile update failed due to an unhandled gateway error.",
+            ],
+          },
+        } as ProfileActionCmd;
       }
     }
   } catch (error) {
-    throw new Error(ErrMsgGeneric);
+    console.error(
+      `Profile update failed for user ${cookies.data.identity?.username}: ${
+        error ? error : "reason unknown"
+      }`
+    );
+    return {
+      csrf: csrf,
+      profile: updated,
+      errors: {
+        server: ["Profile update failed due to an unhandled gateway error."],
+      },
+    } as ProfileActionCmd;
   }
-
-  return { csrf: csrf, profile: updated, errors: errors } as ProfileActionCmd;
 }
 
 export async function handleReset(
   previousState: ResetPwActionCmd,
   formData: FormData
 ) {
-  // light-weight validation of csrf token
-  // true validation happpens in the gateway
+  // get form data
   const csrf = previousState.csrf;
-  if (!csrf || csrf.trim().length < 16 || csrf.trim().length > 64) {
-    throw new Error(
-      "CSRF token missing or not well formed.  This value is required and cannot be tampered with."
-    );
-  }
 
   const resetCmd: ResetData = {
-    csrf: csrf,
+    csrf: csrf ?? "",
     // resource_id not used: identity will come from user's access token in gateway
 
     current_password: formData.get("current_password") as string,
@@ -120,25 +154,45 @@ export async function handleReset(
     confirm_password: formData.get("confirm_password") as string,
   };
 
+  // get auth cookies
+  const cookies = await getAuthCookies("/profile");
+  if (!cookies.ok) {
+    console.log(`Failed to get auth cookies: ${cookies.error.message}`);
+    return {
+      csrf: csrf,
+      reset: resetCmd,
+      errors: {
+        server: [cookies.error.message || ErrMsgGeneric],
+      },
+    } as ResetPwActionCmd;
+  }
+
+  // light-weight validation of csrf token
+  // true validation happpens in the gateway
+  if (!csrf || csrf.trim().length < 16 || csrf.trim().length > 64) {
+    console.log(
+      `User ${cookies.data.identity?.username} submitted CSRF token which is missing or not well formed.`
+    );
+    const errors: { [key: string]: string[] } = {};
+    errors.csrf = [
+      "CSRF token missing or not well formed. This value is required and cannot be tampered with.",
+    ];
+    return {
+      csrf: csrf,
+      reset: resetCmd,
+      errors: errors,
+    } as ResetPwActionCmd;
+  }
+
   // field validation
   const errors = validatePasswords(resetCmd);
   if (errors && Object.keys(errors).length > 0) {
-    return { csrf: csrf, reset: resetCmd, errors: errors } as ResetPwActionCmd;
-  }
-
-  // get session token
-  const cookieStore = await cookies();
-  const hasSession = cookieStore.has("session_id")
-    ? cookieStore.get("session_id")
-    : null;
-  if (
-    !hasSession ||
-    hasSession.value.trim().length < 16 ||
-    hasSession.value.trim().length > 64
-  ) {
-    throw new Error(
-      "Session cookie is missing or not well formed.  This value is required and cannot be tampered with."
+    console.log(
+      `Password reset validation failed for user ${
+        cookies.data.identity?.username
+      }: ${JSON.stringify(errors)}`
     );
+    return { csrf: csrf, reset: resetCmd, errors: errors } as ResetPwActionCmd;
   }
 
   // call gateway reset endpoint
@@ -149,14 +203,16 @@ export async function handleReset(
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `${hasSession?.value}`,
+          Authorization: `${cookies.data.session}`,
         },
         body: JSON.stringify(resetCmd),
       }
     );
 
     if (apiResponse.ok) {
-      console.log("Password reset successful.");
+      console.log(
+        `Password reset successfully for user ${cookies.data.identity?.username}`
+      );
       return {
         csrf: csrf,
         reset: {}, // cannot return password values, obviously
@@ -166,26 +222,42 @@ export async function handleReset(
       const fail = await apiResponse.json();
       if (isGatewayError(fail)) {
         const errors = handleProfileErrors(fail);
-        console.log("Gateway error: ", errors);
+        console.log(
+          `Password reset failed for user ${
+            cookies.data.identity?.username
+          }: ${JSON.stringify(errors)}`
+        );
         return {
           csrf: csrf,
           reset: resetCmd,
           errors: errors,
         } as ResetPwActionCmd;
       } else {
-        console.log(
-          "Unhandled error calling the gateway reset service: ",
-          fail
+        console.error(
+          `Password reset failed for user ${cookies.data.identity?.username} due to unhandled gateway error: ${apiResponse.status} ${apiResponse.statusText}`
         );
-        throw new Error(ErrMsgGeneric);
+        return {
+          csrf: csrf,
+          reset: resetCmd,
+          errors: {
+            server: [
+              "Password reset failed due to an unhandled gateway error.",
+            ],
+          },
+        } as ResetPwActionCmd;
       }
     }
-  } catch (error: any) {
-    console.log(
-      "Attempt to call password reset gateway endpoint failed.",
-      error
+  } catch (error) {
+    console.error(
+      `Password reset failed for user ${cookies.data.identity?.username}: ${error}`
     );
-    throw new Error(error.message || ErrMsgGeneric);
+    return {
+      csrf: csrf,
+      reset: resetCmd,
+      errors: {
+        server: ["Password reset failed due to an unhandled gateway error."],
+      },
+    } as ResetPwActionCmd;
   }
 }
 

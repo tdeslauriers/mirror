@@ -9,42 +9,15 @@ import {
   validateUpdateAllowanceCmd,
 } from "..";
 import { isGatewayError } from "@/app/api";
+import { getAuthCookies } from "@/components/checkCookies";
 export async function handleAllowanceEdit(
   previousState: AllowanceActionCmd,
   formData: FormData
 ) {
-  // get session token
-  const cookieStore = await cookies();
-  const hasSession = cookieStore.has("session_id")
-    ? cookieStore.get("session_id")
-    : null;
-  if (
-    !hasSession ||
-    hasSession.value.trim().length < 16 ||
-    hasSession.value.trim().length > 64
-  ) {
-    throw new Error(
-      "Session cookie is missing or not well formed.  This value is required and cannot be tampered with."
-    );
-  }
-
-  // light-weight validation of csrf token
-  // true validation happpens in the gateway
+  // get form data and prepare update object
   const csrf = previousState.csrf;
-  if (!csrf || csrf.trim().length < 16 || csrf.trim().length > 64) {
-    throw new Error(
-      "CSRF token is missing or not well formed.  This value is required and cannot be tampered with."
-    );
-  }
 
-  // if this is tampered with, the gateway will simply error because
-  // the slug will not be found, or invalid, etc.
   const slug = previousState.slug;
-  if (!slug || slug.trim().length < 16 || slug.trim().length > 64) {
-    throw new Error(
-      "Allowance slug is missing or not well formed.  This value is required and cannot be tampered with."
-    );
-  }
 
   let updated: UpdateAllowanceCmd = {
     csrf: csrf,
@@ -56,9 +29,78 @@ export async function handleAllowanceEdit(
     is_calculated: formData.get("is_calculated") === "on" ? true : false,
   };
 
+  // get auth cookies
+  const cookieResult = await getAuthCookies(`/allowances/${slug}`);
+  if (!cookieResult.ok) {
+    console.log(
+      `failed to get auth cookies for user attempting to update allowance ${slug}: ${
+        cookieResult.error ? cookieResult.error.message : "unknown error"
+      }`
+    );
+    return {
+      csrf: csrf,
+      slug: slug,
+      credit: convertCentsToDollars(updated.credit),
+      debit: convertCentsToDollars(updated.debit),
+      allowance: previousState.allowance,
+      errors: {
+        server: [
+          `Failed to verify authentication cookies. Please login again and try to update the allowance.`,
+        ],
+      },
+    } as AllowanceActionCmd;
+  }
+
+  // light-weight validation of csrf token
+  // true validation happpens in the gateway
+  if (!csrf || csrf.trim().length < 16 || csrf.trim().length > 64) {
+    console.log(
+      `user ${cookieResult.data.identity?.username} submitted CSRF token which is missing or not well formed.`
+    );
+    return {
+      csrf: csrf,
+      slug: slug,
+      credit: convertCentsToDollars(updated.credit),
+      debit: convertCentsToDollars(updated.debit),
+      allowance: previousState.allowance,
+      errors: {
+        csrf: [
+          "CSRF token is missing or not well formed.  This value is required and cannot be tampered with.",
+        ],
+      },
+    } as AllowanceActionCmd;
+  }
+
+  // if this is tampered with, the gateway will simply error because
+  // the slug will not be found, or invalid, etc.
+  if (!slug || slug.trim().length < 16 || slug.trim().length > 64) {
+    console.log(
+      `user ${cookieResult.data.identity?.username} submitted allowance slug which is missing or not well formed.`
+    );
+    return {
+      csrf: csrf,
+      slug: slug,
+      credit: convertCentsToDollars(updated.credit),
+      debit: convertCentsToDollars(updated.debit),
+      allowance: previousState.allowance,
+      errors: {
+        server: [
+          "Allowance slug is missing or not well formed.  This value is required and cannot be tampered with.",
+        ],
+      },
+    } as AllowanceActionCmd;
+  }
+
   // field level validation including business logic validation.
   const errors = validateUpdateAllowanceCmd(updated);
   if (Object.keys(errors).length > 0) {
+    console.log(
+      `user ${
+        cookieResult.data.identity?.username
+      } submitted allowance data which failed validation: ${JSON.stringify(
+        errors
+      )}`
+    );
     return {
       csrf: csrf,
       slug: slug,
@@ -76,7 +118,7 @@ export async function handleAllowanceEdit(
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `${hasSession?.value}`,
+          Authorization: `${cookieResult.data.session}`,
         },
         body: JSON.stringify(updated),
       }
@@ -84,6 +126,9 @@ export async function handleAllowanceEdit(
 
     if (apiResponse.ok) {
       const success = await apiResponse.json();
+      console.log(
+        `user ${cookieResult.data.identity?.username} updated allowance ${slug} successfully.`
+      );
       return {
         csrf: csrf,
         slug: slug,
@@ -104,15 +149,42 @@ export async function handleAllowanceEdit(
           errors: errors,
         } as AllowanceActionCmd;
       } else {
-        throw new Error(
-          "An unhandled gateway error occurred when trying to update allowance."
+        console.error(
+          `user ${
+            cookieResult.data.identity?.username
+          } received an unhandled error from the gateway when updating allowance ${slug}: ${JSON.stringify(
+            fail
+          )}`
         );
+        return {
+          csrf: csrf,
+          slug: slug,
+          credit: convertCentsToDollars(updated.credit),
+          debit: convertCentsToDollars(updated.debit),
+          allowance: previousState.allowance,
+          errors: {
+            server: [
+              "An unhandled gateway error occurred when attempting to update the allowance. Please try again. If the problem persists, please contact me.",
+            ],
+          },
+        } as AllowanceActionCmd;
       }
     }
   } catch (error: any) {
-    console.log(error.message);
-    throw new Error(
-      `Unable to call gateway successfully to update allowance account`
+    console.error(
+      `user ${cookieResult.data.identity?.username} encountered an error when attempting to update allowance ${slug}: ${error}`
     );
+    return {
+      csrf: csrf,
+      slug: slug,
+      credit: convertCentsToDollars(updated.credit),
+      debit: convertCentsToDollars(updated.debit),
+      allowance: previousState.allowance,
+      errors: {
+        server: [
+          `An error occurred when attempting to update the allowance: ${error}. Please try again. If the problem persists, please contact me.`,
+        ],
+      },
+    } as AllowanceActionCmd;
   }
 }

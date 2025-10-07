@@ -14,13 +14,28 @@ const pageError = "Failed to load /albums page: ";
 
 export default async function AlbumsPage() {
   // quick check for auth
-  const cookies = await getAuthCookies("/albums");
-
-  // quick check if identity cookie has album_read access
-  if (!cookies.identity || !cookies.identity.ux_render?.gallery?.album_read) {
+  const cookiesResult = await getAuthCookies("/albums");
+  if (!cookiesResult.ok) {
     console.log(
       pageError +
-        `user ${cookies.identity?.username} does not have rights to view albums.`
+        `failed auth cookie check: ${
+          cookiesResult.error ? cookiesResult.error.message : "unknown error"
+        }`
+    );
+    return handlePageLoadFailure(
+      401,
+      cookiesResult.error
+        ? cookiesResult.error.message
+        : "unknown error related to session cookies.",
+      "/login"
+    );
+  }
+
+  // quick check if identity cookie has album_read access
+  if (!cookiesResult.data.identity?.ux_render?.gallery?.album_read) {
+    console.log(
+      pageError +
+        `user ${cookiesResult.data.identity?.username} does not have rights to view albums.`
     );
     return handlePageLoadFailure(
       401,
@@ -31,11 +46,11 @@ export default async function AlbumsPage() {
   // get albums data from gateway
   const result = await callGatewayData<Album[]>({
     endpoint: "/albums",
-    session: cookies.session,
+    session: cookiesResult.data.session,
   });
   if (!result.ok) {
     console.log(
-      `Error returned from gateway for user ${cookies.identity?.username}: ${result.error.message}`
+      `Error returned from gateway for user ${cookiesResult.data.identity?.username}: ${result.error.message}`
     );
     return handlePageLoadFailure(result.error.code, result.error.message);
   }
@@ -45,7 +60,7 @@ export default async function AlbumsPage() {
   // log empty return -> permissions error
   if (!albums || albums.length === 0) {
     console.log(
-      `No albums data returned from gateway for user: ${cookies.identity?.username}`
+      `No albums data returned from gateway for user: ${cookiesResult.data.identity?.username}`
     );
   }
 
@@ -66,7 +81,7 @@ export default async function AlbumsPage() {
             }}
           >
             <h1>Albums</h1>
-            {cookies.identity?.ux_render?.gallery?.album_write && (
+            {cookiesResult.data.identity?.ux_render?.gallery?.album_write && (
               <Link href="/albums/add">
                 <button>Add Album</button>
               </Link>

@@ -16,12 +16,26 @@ const pageError = "Failed to load scopes page";
 export default async function ScopesPage() {
   // quick for redirect if auth'd cookies not present
   const cookies = await getAuthCookies("/scopes");
+  if (!cookies.ok) {
+    console.log(
+      `${pageError} due to failed auth cookie check: ${
+        cookies.error ? cookies.error.message : "unknown error"
+      }`
+    );
+    return handlePageLoadFailure(
+      401,
+      cookies.error
+        ? cookies.error.message
+        : "unknown error related to session cookies.",
+      "/login"
+    );
+  }
 
   // check if identity cookie has scopes_read access
   // ie, gaurd pattern or access hint gating
-  if (!cookies.identity || !cookies.identity.ux_render?.users?.scope_read) {
+  if (!cookies.data.identity?.ux_render?.users?.scope_read) {
     console.log(
-      `${pageError}: user ${cookies.identity?.username} does not have rights to view /scopes.`
+      `${pageError}: user ${cookies.data.identity?.username} does not have rights to view /scopes.`
     );
     return handlePageLoadFailure(
       401,
@@ -32,11 +46,11 @@ export default async function ScopesPage() {
   // get scoeps data from gateway
   const result = await callGatewayData<Scope[]>({
     endpoint: "/scopes",
-    session: cookies.session,
+    session: cookies.data.session,
   });
   if (!result.ok) {
     console.log(
-      `${pageError} for user ${cookies.identity?.username}: ${result.error.message}`
+      `${pageError} for user ${cookies.data.identity?.username}: ${result.error.message}`
     );
     return handlePageLoadFailure(result.error.code, result.error.message);
   }
@@ -56,7 +70,7 @@ export default async function ScopesPage() {
             }}
           >
             <h1>Scopes</h1>
-            {cookies.identity?.ux_render?.users?.scope_write && (
+            {cookies.data.identity?.ux_render?.users?.scope_write && (
               <Link href="/scopes/add">
                 <button>Add Scope</button>
               </Link>

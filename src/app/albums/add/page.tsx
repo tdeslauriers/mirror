@@ -15,25 +15,39 @@ const pageError = "Failed to load album add page ";
 export default async function AlbumAddPage() {
   // quick check for auth
   const cookies = await getAuthCookies("albums/add");
-
-  // quick read of cookies
-  if (!cookies.identity || !cookies.identity.ux_render?.gallery?.album_write) {
+  // return auth error page if cookies are not valid
+  if (!cookies.ok) {
     console.log(
-      `${pageError} for user ${cookies.identity?.username} does not have rights to add an album.`
+      `${pageError}: failed auth cookie check: ${
+        cookies.error ? cookies.error.message : "unknown error"
+      }`
     );
     return handlePageLoadFailure(
       401,
-      "You do not have rights to add an album."
+      cookies.error
+        ? cookies.error.message
+        : "unknown error related to session cookies.",
+      "/login"
     );
   }
 
-  // fetch csrf from gateway for add album form
+  // quick read of cookies
+  if (!cookies.data.identity?.ux_render?.gallery?.album_write) {
+    console.log(
+      `${pageError} for user ${cookies.data.identity?.username} does not have rights to add an album.`
+    );
+    return handlePageLoadFailure(
+      401,
+      "You do not have rights to add an album.",
+      "/albums"
+    );
+  }
 
   // get csrf token from gateway for album form
-  const result = await GetCsrf(cookies.session ? cookies.session : "");
+  const result = await GetCsrf(cookies.data.session ?? "");
   if (!result.ok) {
     console.log(
-      `${pageError} for user ${cookies.identity?.username}: ${result.error.message}`
+      `${pageError} for user ${cookies.data.identity?.username}: ${result.error.message}`
     );
     return handlePageLoadFailure(500, result.error.message, "/albums");
   }

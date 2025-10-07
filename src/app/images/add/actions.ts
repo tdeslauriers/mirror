@@ -1,13 +1,10 @@
 "use server";
 
-import { checkForSessionCookie } from "@/components/checkCookies";
+import { getSessionCookie } from "@/components/checkCookies";
 import { AddImageCmd, validateImageData } from "..";
 import { GatewayError, isGatewayError } from "@/app/api";
 
 export async function requestPresignedUrl(formdata: FormData) {
-  // get session token
-  const sessionCookie = await checkForSessionCookie();
-
   // collect form data
   const csrf = formdata.get("csrf") as string | null;
   const title = formdata.get("title") as string;
@@ -31,9 +28,30 @@ export async function requestPresignedUrl(formdata: FormData) {
     albums: cmdAlbums,
   } as AddImageCmd;
 
+  // get auth cookies
+  const cookies = await getSessionCookie();
+  if (!cookies.ok) {
+    console.log("Could not verify session cookies.");
+    return {
+      signedUrl: null,
+      errors: {
+        server: [
+          cookies.error
+            ? cookies.error.message
+            : "unknown error related to session cookies.",
+        ],
+      },
+    };
+  }
+
   // validate the command object
   const errors = validateImageData(addImageCmd);
   if (errors && Object.keys(errors).length > 0) {
+    console.log(
+      `image data added by user ${
+        cookies.data.identity?.username
+      } failed validation: ${JSON.stringify(errors)}`
+    );
     return {
       signedUrl: null,
       errors: errors,
@@ -48,7 +66,7 @@ export async function requestPresignedUrl(formdata: FormData) {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `${sessionCookie.value}`,
+          Authorization: `${cookies.data.session}`,
         },
         body: JSON.stringify(addImageCmd),
       }
@@ -64,16 +82,37 @@ export async function requestPresignedUrl(formdata: FormData) {
       const fail = await response.json();
       if (isGatewayError(fail)) {
         const errors = handleUploadError(fail);
-        console.error("Gateway error:", errors);
+        console.log(
+          `user ${
+            cookies.data.identity?.username
+          } failed to get presigned URL: ${JSON.stringify(errors)}`
+        );
         return {
           signedUrl: null,
           errors: errors,
         };
+      } else {
+        console.error(
+          `user ${cookies.data.identity?.username} failed to get presigned URL due to unhandled gateway error: ${response.status} ${response.statusText}`
+        );
+        return {
+          signedUrl: null,
+          errors: {
+            server: ["Image upload failed due to an unhandled gateway error."],
+          },
+        };
       }
     }
   } catch (error) {
-    console.error("Error requesting presigned URL:", error);
-    throw new Error("An error occurred while requesting the presigned URL.");
+    console.error(
+      `user ${cookies.data.identity?.username} failed to get presigned URL: ${error}`
+    );
+    return {
+      signedUrl: null,
+      errors: {
+        server: ["Image upload failed due to an unhandled gateway error."],
+      },
+    };
   }
 }
 

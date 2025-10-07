@@ -38,14 +38,16 @@ export default async function Registration() {
     return handlePageLoadFailure(401, "Session cookie is missing.");
   }
 
-  const result = await GetCsrf(hasSession.value);
-  if (!result.ok) {
-    console.log(
-      `Failed to get csrf for registration form: ${result.error.message}`
+  const csrfResult = await GetCsrf(hasSession.value);
+  if (!csrfResult.ok) {
+    console.log(`${pageError}: ${csrfResult.error.message}`);
+    return handlePageLoadFailure(
+      csrfResult.error.code,
+      csrfResult.error.message
     );
-    return handlePageLoadFailure(401, result.error.message);
   }
-  const csrf = result.data.csrf_token;
+
+  const csrf = csrfResult.data.csrf_token;
 
   return (
     <>

@@ -16,12 +16,26 @@ const pageError = "Failed to load scope add page";
 export default async function ScopesAddPage() {
   // quick for redirect if auth'd cookies not present
   const cookies = await getAuthCookies("/scopes/add");
+  if (!cookies.ok) {
+    console.log(
+      `${pageError}: failed auth cookie check: ${
+        cookies.error ? cookies.error.message : "unknown error"
+      }`
+    );
+    return handlePageLoadFailure(
+      401,
+      cookies.error
+        ? cookies.error.message
+        : "unknown error related to session cookies.",
+      "/login"
+    );
+  }
 
   // check if identity cookie has scopes_write permission
   // ie, gaurd pattern or access hint gating
-  if (!cookies.identity || !cookies.identity.ux_render?.users?.scope_write) {
+  if (!cookies.data.identity?.ux_render?.users?.scope_write) {
     console.log(
-      `${pageError}: user ${cookies.identity?.username} does not have rights to add a scope.`
+      `${pageError}: user ${cookies.data.identity?.username} does not have rights to add a scope.`
     );
     return handlePageLoadFailure(
       401,
@@ -31,10 +45,12 @@ export default async function ScopesAddPage() {
   }
 
   // get csrf token from gateway for profile form
-  const csrfResult = await GetCsrf(cookies.session ? cookies.session : "");
+  const csrfResult = await GetCsrf(
+    cookies.data.session ? cookies.data.session : ""
+  );
   if (!csrfResult.ok) {
     console.log(
-      `${pageError} for user ${cookies.identity?.username}: ${csrfResult.error.message}`
+      `${pageError} for user ${cookies.data.identity?.username}: ${csrfResult.error.message}`
     );
     return handlePageLoadFailure(
       csrfResult.error.code,
@@ -83,7 +99,7 @@ export default async function ScopesAddPage() {
           <div className="card">
             <ScopeForm
               csrf={csrf}
-              editAllowed={cookies.identity?.ux_render?.users?.scope_write}
+              editAllowed={cookies.data.identity?.ux_render?.users?.scope_write}
               slug={null}
               scope={null}
               scopeFormUpdate={handleScopeAdd}

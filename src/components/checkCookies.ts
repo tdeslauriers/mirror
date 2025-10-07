@@ -16,6 +16,16 @@ export type UiCookies = {
   session: string | null;
 };
 
+export type AuthCookieError = {
+  code: number;
+  message: string;
+  redirectTo?: string; // optional
+};
+
+export type AuthCookieResult<T> =
+  | { ok: true; data: T }
+  | { ok: false; error: AuthCookieError };
+
 // defining schemas for type checking the cookies
 const userAccessFlagsSchema = {
   user_read: "boolean",
@@ -68,13 +78,10 @@ const identityCookieSchema = {
 
 // checks for identity cookie and if does not exist, redirects to login,
 // and sets the state var to the current page.
-export async function getAuthCookies(page: string) {
+export async function getAuthCookies(
+  page: string
+): Promise<AuthCookieResult<UiCookies>> {
   const cookieStore = await cookies();
-
-  // identity cookie
-  const hasIdentity = cookieStore.has("identity")
-    ? cookieStore.get("identity")
-    : null;
 
   // session cookie
   const hasSession = cookieStore.has("session_id")
@@ -83,18 +90,39 @@ export async function getAuthCookies(page: string) {
 
   // check session cookie exists
   if (!hasSession) {
-    console.log(`Failed to load ${page} page: session cookie is missing`);
-    throw new Error(`Failed to load ${page} page: session cookie is missing`);
+    console.log(`Session cookie is missing`);
+    return {
+      ok: false,
+      error: {
+        code: 401,
+        message: "Session cookie is missing.",
+        redirectTo: `/login?redirect_url=${encodeURIComponent(page)}`,
+      },
+    };
   }
 
   // check session cookie is well formed
   const checkSession = checkUuid(hasSession?.value);
   if (!checkSession.isValid) {
-    throw new Error(`Failed to load ${page} page: session cookie is invalid`);
+    console.log(`session cookie is invalid`);
+    return {
+      ok: false,
+      error: {
+        code: 401,
+        message: "Session cookie is invalid.",
+        redirectTo: `/login?redirect_url=${encodeURIComponent(page)}`,
+      },
+    };
   }
+
+  // identity cookie
+  const hasIdentity = cookieStore.has("identity")
+    ? cookieStore.get("identity")
+    : null;
 
   // if identity cookie is missing, redirect to login page
   if (!hasIdentity) {
+    console.log(`Identity cookie is missing; redirecting to login.`);
     const oauth = await GetOauthExchange(hasSession?.value, page);
     if (oauth) {
       redirect(
@@ -114,81 +142,145 @@ export async function getAuthCookies(page: string) {
     if (validateStrict(identityParsed, identityCookieSchema)) {
       identity = identityParsed;
     } else {
-      console.log("Identity cookie is invalid.");
-      throw new Error(
-        "Identity cookie is invalid.  This value is required and cannot be tampered with."
-      );
+      console.log(`identity cookie is invalid.`);
+      return {
+        ok: false,
+        error: {
+          code: 401,
+          message:
+            "Identity cookie is invalid.  This value is reuired and may not be tampered with.",
+          redirectTo: `/login?redirect_url=${encodeURIComponent(page)}`,
+        },
+      };
     }
   }
 
   // check that identity cookie values are well formed
   if (!identity) {
-    console.log("Identity cookie is missing.");
-    throw new Error(
-      "Identity cookie is missing.  This value is required and cannot be tampered with."
-    );
+    console.log(`identity cookie is missing.`);
+    return {
+      ok: false,
+      error: {
+        code: 401,
+        message:
+          "Identity cookie is missing.  This value is required and cannot be tampered with.",
+        redirectTo: `/login?redirect_url=${encodeURIComponent(page)}`,
+      },
+    };
   }
 
   if (!identity.username) {
-    console.log("Identity cookie username is missing.");
-    throw new Error(
-      "Identity cookie username is missing.  This value is required and cannot be tampered with."
-    );
+    console.log(`identity cookie username is missing.`);
+    return {
+      ok: false,
+      error: {
+        code: 401,
+        message:
+          "Identity cookie username is missing.  This value is required and cannot be tampered with.",
+        redirectTo: `/login?redirect_url=${encodeURIComponent(page)}`,
+      },
+    };
   } else {
     const check = checkEmail(identity.username);
     if (!check.isValid) {
       const err =
         "Identity cookie username is invalid: " + check.messages.join("; ");
-      console.log(err);
-      throw new Error(err);
+      console.log(`${err}`);
+      return {
+        ok: false,
+        error: {
+          code: 401,
+          message: err,
+          redirectTo: `/login?redirect_url=${encodeURIComponent(page)}`,
+        },
+      };
     }
   }
 
   // check fullname is well formed
   if (!identity.fullname) {
-    console.log("Identity cookie fullname is missing.");
-    throw new Error(
-      "Identity cookie fullname is missing.  This value is required and cannot be tampered with."
-    );
+    console.log(`identity cookie fullname is missing.`);
+    return {
+      ok: false,
+      error: {
+        code: 401,
+        message:
+          "Identity cookie fullname is missing.  This value is required and cannot be tampered with.",
+        redirectTo: `/login?redirect_url=${encodeURIComponent(page)}`,
+      },
+    };
   } else {
     const check = checkName(identity.fullname);
     if (!check.isValid) {
       const err =
         "Identity cookie fullname is invalid." + check.messages.join("; ");
-      console.log(err);
-      throw new Error(err);
+      console.log(`${err}`);
+      return {
+        ok: false,
+        error: {
+          code: 401,
+          message: err,
+          redirectTo: `/login?redirect_url=${encodeURIComponent(page)}`,
+        },
+      };
     }
   }
 
   // check given_name is well formed
   if (!identity.given_name) {
-    console.log("Identity cookie given_name is missing.");
-    throw new Error(
-      "Identity cookie given_name is missing.  This value is required and cannot be tampered with."
-    );
+    console.log(`identity cookie given_name is missing.`);
+    return {
+      ok: false,
+      error: {
+        code: 401,
+        message:
+          "Identity cookie given_name is missing.  This value is required and cannot be tampered with.",
+        redirectTo: `/login?redirect_url=${encodeURIComponent(page)}`,
+      },
+    };
   } else {
     const check = checkName(identity.given_name);
     if (!check.isValid) {
       const err =
         "Identity cookie given_name is invalid." + check.messages.join("; ");
-      console.log(err);
-      throw new Error(err);
+      console.log(`${err}`);
+      return {
+        ok: false,
+        error: {
+          code: 401,
+          message: err,
+          redirectTo: `/login?redirect_url=${encodeURIComponent(page)}`,
+        },
+      };
     }
   }
 
   // check family_name is well formed
   if (!identity.family_name) {
-    console.log("Identity cookie family_name is missing.");
-    throw new Error(
-      "Identity cookie family_name is missing.  This value is required and cannot be tampered with."
-    );
+    console.log(`identity cookie family_name is missing.`);
+    return {
+      ok: false,
+      error: {
+        code: 401,
+        message:
+          "Identity cookie family_name is missing.  This value is required and cannot be tampered with.",
+        redirectTo: `/login?redirect_url=${encodeURIComponent(page)}`,
+      },
+    };
   } else {
     const check = checkName(identity.family_name);
     if (!check.isValid) {
       const err =
         "Identity cookie family_name is invalid: " + check.messages.join("; ");
       console.log(err);
-      throw new Error(err);
+      return {
+        ok: false,
+        error: {
+          code: 401,
+          message: err,
+          redirectTo: `/login?redirect_url=${encodeURIComponent(page)}`,
+        },
+      };
     }
   }
 
@@ -205,14 +297,22 @@ export async function getAuthCookies(page: string) {
       const err =
         "Identity cookie birthdate is invalid: " + check.messages.join("; ");
       console.log(err);
-      throw new Error(err);
+      return {
+        ok: false,
+        error: {
+          code: 401,
+          message: err,
+          redirectTo: `/login?redirect_url=${encodeURIComponent(page)}`,
+        },
+      };
     }
   }
 
-  return { identity: identity, session: hasSession?.value } as UiCookies;
+  return { ok: true, data: { identity: identity, session: hasSession.value } };
 }
 
-export async function checkForSessionCookie() {
+//
+export async function getSessionCookie(): Promise<AuthCookieResult<UiCookies>> {
   const cookieStore = await cookies();
 
   const hasSession = cookieStore.has("session_id")
@@ -220,19 +320,29 @@ export async function checkForSessionCookie() {
     : null;
 
   if (!hasSession) {
-    throw new Error(
-      "Session cookie is missing.  This value is required and cannot be tampered with."
-    );
+    console.log("Session cookie is missing");
+    return {
+      ok: false,
+      error: {
+        code: 401,
+        message: "Session cookie is missing.  This value is required.",
+      },
+    };
   }
 
   const checkSession = checkUuid(hasSession?.value);
   if (!checkSession.isValid) {
-    throw new Error(
-      "Session cookie is invalid.  This value is required and cannot be tampered with."
-    );
+    console.log("Session cookie is invalid");
+    return {
+      ok: false,
+      error: {
+        code: 401,
+        message: "Session cookie is invalid.  This value is required.",
+      },
+    };
   }
 
-  return hasSession;
+  return { ok: true, data: { identity: null, session: hasSession.value } };
 }
 
 // perform type checks on values of schemas

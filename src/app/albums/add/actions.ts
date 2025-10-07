@@ -1,6 +1,6 @@
 "use server";
 
-import { checkForSessionCookie } from "@/components/checkCookies";
+import { getSessionCookie, getAuthCookies } from "@/components/checkCookies";
 import { Album, AlbumActionCmd, handleAlbumErrors, validateAlbum } from "..";
 import { isGatewayError } from "@/app/api";
 import { redirect } from "next/navigation";
@@ -9,8 +9,7 @@ export async function handleAlbumAdd(
   previousScope: AlbumActionCmd,
   formData: FormData
 ) {
-  // get session token
-  const sessionCookie = await checkForSessionCookie();
+
 
   // extract the CSRF token from the previous stat
   const csrf = previousScope.csrf;
@@ -24,8 +23,30 @@ export async function handleAlbumAdd(
     is_archived: formData.get("is_archived") === "on",
   };
 
+    // get auth cookies
+  const cookies = await getAuthCookies("/albums/add");
+  if (!cookies.ok) {
+    console.error(
+      `failed to get auth cookies for user attempting to add an album: ${
+        cookies.error ? cookies.error.message : "unknown error"
+      }`
+    );
+    return {
+      csrf: csrf,
+      album: add,
+      errors: {
+        server: [
+          `Failed to verify authentication cookies. Please login again and try to add the album.`,
+        ],
+      },
+    } as AlbumActionCmd;
+  }
+
   // validate CSRF token
   if (!csrf || csrf.trim().length < 16 || csrf.trim().length > 64) {
+    console.error(
+      `user ${cookies.data.identity?.username} submitted CSRF token which is missing or not well formed.`
+    );
     return {
       csrf: csrf,
       album: add,
@@ -40,6 +61,13 @@ export async function handleAlbumAdd(
   // validate the album data
   const errors = validateAlbum(add);
   if (errors && Object.keys(errors).length > 0) {
+    console.error(
+      `user ${
+        cookies.data.identity?.username
+      } submitted album data which did not pass validation: ${JSON.stringify(
+        errors
+      )}`
+    );
     return {
       csrf: csrf,
       album: add,
@@ -53,14 +81,16 @@ export async function handleAlbumAdd(
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `${sessionCookie.value}`,
+        Authorization: `${cookies.data.session}`,
       },
       body: JSON.stringify(add),
     });
 
     if (response.ok) {
       add = await response.json();
-      console.log("Album added successfully:", add);
+      console.log(
+        `user ${cookies.data.identity?.username} added album ${add.title} successfully.`
+      );
     } else {
       const fail = await response.json();
       if (isGatewayError(fail)) {
@@ -71,12 +101,37 @@ export async function handleAlbumAdd(
           errors: errors,
         } as AlbumActionCmd;
       } else {
-        throw new Error("Failed to add album due to unhandled gateway error.");
+        console.error(
+          `user ${
+            cookies.data.identity?.username
+          } received an unhandled error from the gateway when adding an album: ${JSON.stringify(
+            fail
+          )}`
+        );
+        return {
+          csrf: csrf,
+          album: add,
+          errors: {
+            server: [
+              `Failed to add album due to an internal server error. Please try again.`,
+            ],
+          },
+        } as AlbumActionCmd;
       }
     }
   } catch (error) {
-    console.error("Failed to add album:", error);
-    throw new Error("Unhandled error while attempting to call the gateway.");
+    console.error(
+      `user ${cookies.data.identity?.username} encountered an error when attempting to add an album: ${error}`
+    );
+    return {
+      csrf: csrf,
+      album: add,
+      errors: {
+        server: [
+          `Failed to add album due to an internal server error. Please try again.`,
+        ],
+      },
+    } as AlbumActionCmd;
   }
 
   redirect("/albums");

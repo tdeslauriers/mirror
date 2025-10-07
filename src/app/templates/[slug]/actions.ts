@@ -1,6 +1,6 @@
 "use server";
 
-import { checkForSessionCookie } from "@/components/checkCookies";
+import { getAuthCookies, getSessionCookie } from "@/components/checkCookies";
 import { TemplateActionCmd } from "@/components/forms";
 import {
   handleTemplateErrors,
@@ -10,30 +10,15 @@ import {
   validateTaskTemplate,
 } from "..";
 import { isGatewayError } from "@/app/api";
+import { Server } from "node:tls";
 
 export async function handleTemplateEdit(
   previousState: TemplateActionCmd,
   formData: FormData
 ) {
-  // get session token
-  const sessionCookie = await checkForSessionCookie();
-
+  // get form data
   const csrf = previousState.csrf;
-  if (!csrf || csrf.trim().length < 16 || csrf.trim().length > 64) {
-    console.log("CSRF token is mission or not well formed");
-    throw new Error(
-      "CSRF token is missing or not well formed.  This value is required and cannot be tampered with."
-    );
-  }
-
-  // slug may not exist if adding a new template
   const slug = previousState.slug;
-  if (!slug || slug.trim().length < 16 || slug.trim().length > 64) {
-    console.log("Template slug is missing or not well formed");
-    throw new Error(
-      "Template slug is missing or not well formed.  This value is required and cannot be tampered with."
-    );
-  }
 
   const updated: TaskTemplate = {
     // id omitted
@@ -47,9 +32,67 @@ export async function handleTemplateEdit(
     is_archived: formData.get("is_archived") === "on" ? true : false,
   };
 
+  // get session token
+  const cookies = await getAuthCookies("/templates");
+  if (!cookies.ok) {
+    console.log(
+      `Task template edit failed because could not verify session cookies: ${
+        cookies.error ? cookies.error.message : "unknown error"
+      }`
+    );
+    return {
+      csrf: csrf,
+      slug: slug,
+      template: updated,
+      errors: {
+        server: [
+          cookies.error?.message || "unknown error related to session cookies.",
+        ],
+      },
+    } as TemplateActionCmd;
+  }
+
+  if (!csrf || csrf.trim().length < 16 || csrf.trim().length > 64) {
+    console.log(
+      `User ${cookies.data.identity?.username} submitted empty or invalid CSRF token.`
+    );
+    return {
+      csrf: null,
+      slug: slug,
+      template: updated,
+      errors: {
+        csrf: [
+          "CSRF token is required and must be well formed. May not be tampered with.",
+        ],
+      },
+    } as TemplateActionCmd;
+  }
+
+  // slug may not exist if adding a new template
+  if (!slug || slug.trim().length < 16 || slug.trim().length > 64) {
+    console.log(
+      `User ${cookies.data.identity?.username} submitted empty or invalid template slug.`
+    );
+    return {
+      csrf: csrf,
+      slug: null,
+      template: updated,
+      errors: {
+        slug: [
+          "Template slug is required and must be well formed. May not be tampered with.",
+        ],
+      },
+    } as TemplateActionCmd;
+  }
+
   // check task template fields
   const errors = validateTaskTemplate(updated);
   if (errors && Object.keys(errors).length > 0) {
+    console.log(
+      `User ${
+        cookies.data.identity?.username
+      } submitted invalid task template data: ${JSON.stringify(errors)}`
+    );
     return {
       csrf: csrf,
       slug: slug,
@@ -62,6 +105,13 @@ export async function handleTemplateEdit(
   const usernames = formData.getAll("assignees[]") as string[];
   const assigneesErrors = validateAssigneesUsernames(usernames);
   if (assigneesErrors && Object.keys(assigneesErrors).length > 0) {
+    console.log(
+      `User ${
+        cookies.data.identity?.username
+      } submitted invalid assignees usernames: ${JSON.stringify(
+        assigneesErrors
+      )}`
+    );
     return {
       csrf: csrf,
       slug: slug,
@@ -90,13 +140,16 @@ export async function handleTemplateEdit(
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `${sessionCookie.value}`,
+          Authorization: `${cookies.data.session}`,
         },
         body: JSON.stringify(cmd),
       }
     );
     if (apiResponse.ok) {
       const success = await apiResponse.json();
+      console.log(
+        `User ${cookies.data.identity?.username} successfully edited task template ${success.slug}.`
+      );
       return {
         csrf: csrf,
         slug: success.slug,
@@ -107,6 +160,11 @@ export async function handleTemplateEdit(
       const fail = await apiResponse.json();
       if (isGatewayError(fail)) {
         const errors = handleTemplateErrors(fail);
+        console.log(
+          `User ${
+            cookies.data.identity?.username
+          } failed to edit task template: ${JSON.stringify(errors)}`
+        );
         return {
           csrf: csrf,
 
@@ -114,13 +172,40 @@ export async function handleTemplateEdit(
           errors: errors,
         } as TemplateActionCmd;
       } else {
-        throw new Error(
-          "unhandled error resulted from call to gateway failed to edit task template",
-          fail
+        console.log(
+          `User ${cookies.data.identity?.username} failed to edit task template due to unhandled gateway error.`
         );
+        return {
+          csrf: csrf,
+          slug: slug,
+          template: updated,
+          errors: {
+            server: [
+              "Failed to edit task template due to unhandled gateway error.  Please try again.",
+            ],
+          },
+        } as TemplateActionCmd;
       }
     }
   } catch (error) {
-    throw new Error("Failed to call gateway to edit task template");
+    console.log(
+      `User ${
+        cookies.data.identity?.username
+      } failed to edit task template due to unknown error: ${
+        (error as Error).message
+      }`
+    );
+    return {
+      csrf: csrf,
+      slug: slug,
+      template: updated,
+      errors: {
+        server: [
+          `Failed to edit task template due to unknown error: ${
+            (error as Error).message
+          }`,
+        ],
+      },
+    } as TemplateActionCmd;
   }
 }

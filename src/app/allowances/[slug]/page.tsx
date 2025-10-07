@@ -24,16 +24,27 @@ export default async function Page({
   const slug = (await params).slug;
 
   // quick for redirect if auth'd cookies not present
-  const cookies: UiCookies = await getAuthCookies(`/allowances/${slug}`);
+  const cookiesResult = await getAuthCookies(`/allowances/${slug}`);
+  if (!cookiesResult.ok) {
+    console.log(
+      `${pageError}: failed auth cookie check: ${
+        cookiesResult.error ? cookiesResult.error.message : "unknown error"
+      }`
+    );
+    return handlePageLoadFailure(
+      401,
+      cookiesResult.error
+        ? cookiesResult.error.message
+        : "unknown error related to session cookies.",
+      "/login"
+    );
+  }
 
   // check if identity cookie has allowances_read permission
   // ie, gaurd pattern or access hint gating
-  if (
-    !cookies.identity ||
-    !cookies.identity.ux_render?.tasks?.allowances_read
-  ) {
+  if (!cookiesResult.data.identity?.ux_render?.tasks?.allowances_read) {
     console.log(
-      `${pageError}: user ${cookies.identity?.username} does not have rights to view /allowances/${slug}.`
+      `${pageError}: user ${cookiesResult.data.identity?.username} does not have rights to view /allowances/${slug}.`
     );
     return handlePageLoadFailure(
       401,
@@ -45,11 +56,11 @@ export default async function Page({
   // get allowance account data from gateway
   const result = await callGatewayData<Allowance>({
     endpoint: `/allowances/${slug}`,
-    session: cookies.session,
+    session: cookiesResult.data.session,
   });
   if (!result.ok) {
     console.log(
-      `${pageError} for user ${cookies.identity?.username}: ${result.error.message}`
+      `${pageError} for user ${cookiesResult.data.identity?.username}: ${result.error.message}`
     );
     return handlePageLoadFailure(
       result.error.code,
@@ -60,13 +71,16 @@ export default async function Page({
   const allowance = result.data;
 
   let csrf: string | null = null;
-  if (cookies.identity && cookies.identity.ux_render?.tasks?.allowances_write) {
+  if (
+    cookiesResult.data.identity &&
+    cookiesResult.data.identity.ux_render?.tasks?.allowances_write
+  ) {
     // get csrf token from gateway for allowance form updates
-    const result = await GetCsrf(cookies.session ? cookies.session : "");
+    const result = await GetCsrf(cookiesResult.data.session ?? "");
 
     if (!result.ok) {
       console.log(
-        `${pageError} for user ${cookies.identity?.username}: ${result.error.message}`
+        `${pageError} for user ${cookiesResult.data.identity?.username}: ${result.error.message}`
       );
       return handlePageLoadFailure(
         result.error.code,
@@ -95,8 +109,9 @@ export default async function Page({
               <span className="highlight">{allowance?.username}</span>
             </h1>
 
-            {cookies.identity &&
-              cookies.identity.ux_render?.tasks?.allowances_write && (
+            {cookiesResult.data.identity &&
+              cookiesResult.data.identity.ux_render?.tasks
+                ?.allowances_write && (
                 <Link href={`/allowances`}>
                   <button>Allowances Table</button>
                 </Link>
@@ -141,7 +156,9 @@ export default async function Page({
           <div className="card">
             <AllowanceForm
               csrf={csrf}
-              editAllowed={cookies.identity?.ux_render?.tasks?.allowances_write}
+              editAllowed={
+                cookiesResult.data.identity?.ux_render?.tasks?.allowances_write
+              }
               slug={slug}
               allowance={allowance}
               allowanceFormUpdate={handleAllowanceEdit}

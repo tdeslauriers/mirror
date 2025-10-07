@@ -18,15 +18,26 @@ const pageError = "Failed to load task template add page";
 export default async function AddPage() {
   // quick for redirect if auth'd cookies not present
   const cookies = await getAuthCookies("/templates/add");
+  if (!cookies.ok) {
+    console.log(
+      `${pageError}: could not verify session cookies: ${
+        cookies.error ? cookies.error.message : "unknown error"
+      }`
+    );
+    return handlePageLoadFailure(
+      401,
+      cookies.error
+        ? cookies.error.message
+        : "unknown error related to session cookies.",
+      "/login"
+    );
+  }
 
   // check if identity cookie has template_write permission
   // ie, gaurd pattern or access hint gating
-  if (
-    !cookies.identity ||
-    !cookies.identity.ux_render?.tasks?.templates_write
-  ) {
+  if (!cookies.data.identity?.ux_render?.tasks?.templates_write) {
     console.log(
-      `${pageError}: user ${cookies.identity?.username} does not have rights to add a task.`
+      `${pageError}: user ${cookies.data.identity?.username} does not have rights to add a task.`
     );
     return handlePageLoadFailure(
       401,
@@ -37,16 +48,16 @@ export default async function AddPage() {
 
   // get csrf token from gateway for template form submission
   const [csrfResult, assigneesResult] = await Promise.all([
-    GetCsrf(cookies.session ? cookies.session : ""),
+    GetCsrf(cookies.data.session ?? ""),
     callGatewayData<AllowanceUser[]>({
       endpoint: `/allowances/users`,
-      session: cookies.session,
+      session: cookies.data.session,
     }),
   ]);
 
   if (!csrfResult.ok) {
     console.log(
-      `${pageError} for user ${cookies.identity?.username}: ${csrfResult.error.message}`
+      `${pageError} for user ${cookies.data.identity?.username}: ${csrfResult.error.message}`
     );
     return handlePageLoadFailure(
       csrfResult.error.code,
@@ -58,7 +69,7 @@ export default async function AddPage() {
 
   if (!assigneesResult.ok) {
     console.log(
-      `${pageError} for user ${cookies.identity?.username}: ${assigneesResult.error.message}`
+      `${pageError} for user ${cookies.data.identity?.username}: ${assigneesResult.error.message}`
     );
     return handlePageLoadFailure(
       assigneesResult.error.code,
@@ -101,10 +112,12 @@ export default async function AddPage() {
           <div className="card">
             <TemplateForm
               csrf={csrf}
-              username={cookies.identity.username}
-              editAllowed={cookies.identity?.ux_render?.tasks?.templates_write}
+              username={cookies.data.identity.username}
+              editAllowed={
+                cookies.data.identity?.ux_render?.tasks?.templates_write
+              }
               accountVisibility={
-                cookies.identity?.ux_render?.tasks?.allowances_write
+                cookies.data.identity?.ux_render?.tasks?.allowances_write
               }
               slug={null}
               assignees={assignees}

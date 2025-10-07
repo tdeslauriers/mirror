@@ -3,35 +3,18 @@
 import { Scope, ScopeActionCmd, validateScope } from "..";
 import { GatewayError, isGatewayError } from "@/app/api";
 
-import { checkForSessionCookie } from "@/components/checkCookies";
+import { getAuthCookies, getSessionCookie } from "@/components/checkCookies";
 
 export async function handleScopeEdit(
   previousState: ScopeActionCmd,
   formData: FormData
 ) {
-  // get session token
-  const sessionCookie = await checkForSessionCookie();
-
-  // light-weight validation of csrf token
-  // true validation happpens in the gateway
+  // get form data
   const csrf = previousState.csrf;
-  if (!csrf || csrf.trim().length < 16 || csrf.trim().length > 64) {
-    throw new Error(
-      "CSRF token is missing or not well formed.  This value is required and cannot be tampered with."
-    );
-  }
-
-  // if this is tampered with, the gateway will simply error because
-  // the slug will not be found, or invalid, etc.
   const slug = previousState.slug;
-  if (!slug || slug.trim().length < 16 || slug.trim().length > 64) {
-    throw new Error(
-      "Scope slug is missing or not well formed.  This value is required and cannot be tampered with."
-    );
-  }
 
   let updated: Scope = {
-    csrf: csrf,
+    csrf: csrf ?? "",
 
     // TODO: update service name to be dropdown
     service_name: formData.get("service_name") as string,
@@ -40,6 +23,64 @@ export async function handleScopeEdit(
     description: formData.get("description") as string,
     active: formData.get("active") === "on" ? true : false,
   };
+
+  // get auth cookies
+  const cookies = await getAuthCookies(`/scopes/${slug}`);
+  if (!cookies.ok) {
+    console.log(
+      `Scope update failed because could not verify session cookies: ${
+        cookies.error ? cookies.error.message : "unknown error"
+      }`
+    );
+    return {
+      csrf: csrf,
+      slug: slug,
+      scope: updated,
+      errors: {
+        server: [
+          cookies.error
+            ? cookies.error.message
+            : "unknown error related to session cookies.",
+        ],
+      },
+    } as ScopeActionCmd;
+  }
+
+  // light-weight validation of csrf token
+  // true validation happpens in the gateway
+  if (!csrf || csrf.trim().length < 16 || csrf.trim().length > 64) {
+    console.log(
+      `User ${cookies.data.identity?.username} submitted CSRF token which is missing or not well formed.`
+    );
+    return {
+      csrf: csrf,
+      slug: slug,
+      scope: updated,
+      errors: {
+        csrf: [
+          "CSRF token missing or not well formed. This value is required and cannot be tampered with.",
+        ],
+      },
+    } as ScopeActionCmd;
+  }
+
+  // if this is tampered with, the gateway will simply error because
+  // the slug will not be found, or invalid, etc.
+  if (!slug || slug.trim().length < 16 || slug.trim().length > 64) {
+    console.log(
+      `User ${cookies.data.identity?.username} submitted a scope slug which is missing or not well formed.`
+    );
+    return {
+      csrf: csrf,
+      slug: slug,
+      scope: updated,
+      errors: {
+        server: [
+          "Scope slug is missing or not well formed. This value is required and cannot be tampered with.",
+        ],
+      },
+    } as ScopeActionCmd;
+  }
 
   // validate form data
   const errors = validateScope(updated);
@@ -59,7 +100,7 @@ export async function handleScopeEdit(
       {
         method: "PUT",
         headers: {
-          Authorization: `${sessionCookie.value}`,
+          Authorization: `${cookies.data.session}`,
           Content_Type: "application/json",
         },
         body: JSON.stringify(updated),
@@ -68,6 +109,9 @@ export async function handleScopeEdit(
 
     if (apiResponse.ok) {
       const success = await apiResponse.json();
+      console.log(
+        `Scope record ${slug} updated successfully by user ${cookies.data.identity?.username}.`
+      );
       return {
         csrf: csrf,
         slug: slug,
@@ -78,6 +122,12 @@ export async function handleScopeEdit(
       const fail = await apiResponse.json();
       if (isGatewayError(fail)) {
         const errors = handleScopeErrors(fail);
+
+        console.log(
+          `Scope record ${slug} update failed for user ${
+            cookies.data.identity?.username
+          }: ${JSON.stringify(errors)}`
+        );
         return {
           csrf: csrf,
           slug: slug,
@@ -85,13 +135,35 @@ export async function handleScopeEdit(
           errors: errors,
         } as ScopeActionCmd;
       } else {
-        throw new Error(
-          "Scope record could not be updated due to unhandled gateway error."
+        console.error(
+          `Scope record ${slug} update failed for user ${cookies.data.identity?.username} due to unhandled gateway error: ${fail.message}`
         );
+        return {
+          csrf: csrf,
+          slug,
+          scope: updated,
+          errors: {
+            server: [
+              fail.message
+                ? fail.message
+                : "Scope update failed due to an unhandled gateway error.",
+            ],
+          },
+        } as ScopeActionCmd;
       }
     }
   } catch (error) {
-    throw new Error("Failed to update scope record due to unhandled error.");
+    console.error(
+      `Scope record ${slug} update failed for user ${cookies.data.identity?.username}: ${error}`
+    );
+    return {
+      csrf: csrf,
+      slug: slug,
+      scope: updated,
+      errors: {
+        server: ["Scope update failed due to an unhandled gateway error."],
+      },
+    } as ScopeActionCmd;
   }
 }
 

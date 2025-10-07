@@ -17,12 +17,26 @@ const pageError = "Failed to load add-image page";
 export default async function AddImagePage() {
   // quick check for redirect if auth'd cookies not present
   const cookies = await getAuthCookies("/images/add");
+  if (!cookies.ok) {
+    console.log(
+      `${pageError} due to failed auth cookie check: ${
+        cookies.error ? cookies.error.message : "unknown error"
+      }`
+    );
+    return handlePageLoadFailure(
+      401,
+      cookies.error
+        ? cookies.error.message
+        : "unknown error related to session cookies.",
+      "/login"
+    );
+  }
 
   // check if identity cookie has images_write permission
   // ie, gaurd pattern or access hint gating
-  if (!cookies.identity || !cookies.identity.ux_render?.gallery?.image_write) {
+  if (!cookies.data.identity?.ux_render?.gallery?.image_write) {
     console.log(
-      `${pageError}: user ${cookies.identity?.username} does not have rights to add an image.`
+      `${pageError}: user ${cookies.data.identity?.username} does not have rights to add an image.`
     );
     return handlePageLoadFailure(
       401,
@@ -32,20 +46,20 @@ export default async function AddImagePage() {
 
   // get csrf, albums, and image permissions data from gateway
   const [csrfResult, albumsResult, permissionsResult] = await Promise.all([
-    GetCsrf(cookies.session ? cookies.session : ""),
+    GetCsrf(cookies.data.session ?? ""),
     callGatewayData<Album[]>({
       endpoint: "/albums",
-      session: cookies.session,
+      session: cookies.data.session,
     }),
     callGatewayData<Permission[]>({
       endpoint: "/images/permissions",
-      session: cookies.session,
+      session: cookies.data.session,
     }),
   ]);
 
   if (!csrfResult.ok) {
     console.log(
-      `${pageError} for user ${cookies.identity?.username}: ${csrfResult.error.message}`
+      `${pageError} for user ${cookies.data.identity?.username}: ${csrfResult.error.message}`
     );
     return handlePageLoadFailure(
       csrfResult.error.code,
@@ -57,7 +71,7 @@ export default async function AddImagePage() {
 
   if (!albumsResult.ok) {
     console.log(
-      `${pageError} for user ${cookies.identity?.username}: ${albumsResult.error.message}`
+      `${pageError} for user ${cookies.data.identity?.username}: ${albumsResult.error.message}`
     );
     return handlePageLoadFailure(
       albumsResult.error.code,
@@ -69,7 +83,7 @@ export default async function AddImagePage() {
 
   if (!permissionsResult.ok) {
     console.log(
-      `${pageError} for user ${cookies.identity?.username}: ${permissionsResult.error.message}`
+      `${pageError} for user ${cookies.data.identity?.username}: ${permissionsResult.error.message}`
     );
     return handlePageLoadFailure(
       permissionsResult.error.code,

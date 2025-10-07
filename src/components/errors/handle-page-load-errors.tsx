@@ -23,7 +23,7 @@ export default function handlePageLoadFailure(
     case 401:
       return (
         <ErrorLoadPage
-          errBanner="401 | That's a no from me dawg..."
+          errBanner="401 | That's a no from me, dawg."
           errMsg={errorMessage ? errorMessage : "No ticket."}
           redirectUrl={redirectUrl ? redirectUrl : ""}
         />
@@ -43,7 +43,7 @@ export default function handlePageLoadFailure(
     case 404:
       return (
         <ErrorLoadPage
-          errBanner="404 | You're off the map..."
+          errBanner="404 | You're off the map."
           errMsg={errorMessage ? errorMessage : "Here there be monsters."}
           redirectUrl={redirectUrl ? redirectUrl : ""}
         />
@@ -51,7 +51,7 @@ export default function handlePageLoadFailure(
     case 405:
       return (
         <ErrorLoadPage
-          errBanner="405 | You cant even do that..."
+          errBanner="405 | You cant even do that."
           errMsg={
             errorMessage
               ? errorMessage
@@ -63,7 +63,7 @@ export default function handlePageLoadFailure(
     case 410:
       return (
         <ErrorLoadPage
-          errBanner="410 | Gone, but not forgotten..."
+          errBanner="410 | Gone, but not forgotten."
           errMsg={
             errorMessage
               ? errorMessage
@@ -85,7 +85,7 @@ export default function handlePageLoadFailure(
     case 503:
       return (
         <ErrorLoadPage
-          errBanner="503 | Sorry, we're closed..."
+          errBanner="503 | Sorry, we're closed."
           errMsg={errorMessage ? errorMessage : "Stuff is down, it's a mess."}
           redirectUrl={redirectUrl ? redirectUrl : ""}
         />

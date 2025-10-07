@@ -3,14 +3,14 @@
 import { Scope, ScopeActionCmd, validateScope } from "..";
 import { redirect } from "next/navigation";
 import { GatewayError, isGatewayError } from "@/app/api";
-import { checkForSessionCookie } from "@/components/checkCookies";
+import { getSessionCookie } from "@/components/checkCookies";
 
 export async function handleScopeAdd(
   previousState: ScopeActionCmd,
   formData: FormData
 ) {
   // get session token
-  const sessionCookie = await checkForSessionCookie();
+  const sessionCookie = await getSessionCookie();
 
   // light-weight validation of csrf token
   // true validation happpens in the gateway

@@ -27,12 +27,24 @@ export default async function AlbumPage({
   const slug = (await params).slug;
 
   // quick check for auth
-  const cookies = await getAuthCookies(`/albums/${slug}`);
+  const cookiesResult = await getAuthCookies(`/albums/${slug}`);
 
-  // quick check if identity cookie has album_read access
-  if (!cookies.identity || !cookies.identity.ux_render?.gallery?.album_read) {
+  // quick check if identity cookie exists
+  if (!cookiesResult.ok) {
     console.log(
-      `${pageError}: user ${cookies.identity?.username} does not have rights to view this album.`
+      `${pageError}: failed auth cookie check: ${
+        cookiesResult.error ? cookiesResult.error.message : "unknown error"
+      }`
+    );
+    return handlePageLoadFailure(401, cookiesResult.error.message, "/login");
+  }
+
+  // check if user has album read rights
+  if (!cookiesResult.data.identity?.ux_render?.gallery?.album_read) {
+    console.log(
+      `${pageError}: user ${
+        cookiesResult.ok ? cookiesResult.data.identity?.username : null
+      } does not have rights to view this album.`
     );
     return handlePageLoadFailure(
       401,
@@ -50,11 +62,11 @@ export default async function AlbumPage({
   // get album data from gateway
   const result = await callGatewayData<Album>({
     endpoint: `/albums/${slug}`,
-    session: cookies.session,
+    session: cookiesResult.data.session,
   });
   if (!result.ok) {
     console.log(
-      `${pageError} for user ${cookies.identity?.username}: ${result.error.message}`
+      `${pageError} for user ${cookiesResult.data.identity?.username}: ${result.error.message}`
     );
     return handlePageLoadFailure(
       result.error.code,
@@ -69,19 +81,22 @@ export default async function AlbumPage({
   const sortedImages = [...(album.images ?? [])].sort(imageComparator);
 
   // check if identity cookie has album_write permission and get csrf if so for album form
-  const editAllowed = cookies.identity?.ux_render?.gallery?.album_write;
+  const editAllowed =
+    cookiesResult.data.identity?.ux_render?.gallery?.album_write;
 
   // if edit is allowed, fetch the CSRF token for the form
   let csrf: string | null = null;
   if (editAllowed) {
     // get csrf token from gateway for album form
-    const result = await GetCsrf(cookies.session ? cookies.session : "");
+    const result = await GetCsrf(cookiesResult.data.session ?? "");
     if (!result.ok) {
       console.log(
-        `${pageError} for user ${cookies.identity?.username}: ${result.error.message}`
+        `${pageError} for user ${cookiesResult.data.identity?.username}: ${result.error.message}`
       );
       return handlePageLoadFailure(500, result.error.message, "/albums");
     }
+
+    // set the csrf token for the album form
     csrf = result.data.csrf_token;
   }
 

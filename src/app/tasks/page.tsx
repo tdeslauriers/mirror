@@ -38,13 +38,29 @@ export default async function TasksPage({
     sanitizedParams as Record<string, string>
   ).toString();
   const fullpath = `/tasks${query ? `?${query}` : ""}`;
+
+  // get auth cookies
   const cookies = await getAuthCookies(fullpath);
+  if (!cookies.ok) {
+    console.log(
+      `${pageError}: failed auth cookie check: ${
+        cookies.error ? cookies.error.message : "unknown error"
+      }`
+    );
+    return handlePageLoadFailure(
+      401,
+      cookies.error
+        ? cookies.error.message
+        : "unknown error related to session cookies.",
+      "/login"
+    );
+  }
 
   // check if identity cookie has tasks_read permission
   // ie, gaurd pattern or access hint gating
-  if (!cookies.identity || !cookies.identity.ux_render?.tasks?.tasks_read) {
+  if (!cookies.data.identity?.ux_render?.tasks?.tasks_read) {
     console.log(
-      `${pageError}: user ${cookies.identity?.username} does not have rights to view /tasks.`
+      `${pageError}: user ${cookies.data.identity?.username} does not have rights to view /tasks.`
     );
     return handlePageLoadFailure(401, `you do not have rights to view /tasks.`);
   }
@@ -62,11 +78,11 @@ export default async function TasksPage({
   const tasksResult = await callGatewayData<Task[]>({
     endpoint: `/tasks`,
     searchParams: prepared,
-    session: cookies.session,
+    session: cookies.data.session,
   });
   if (!tasksResult.ok) {
     console.log(
-      `${pageError} for user ${cookies.identity?.username}: ${tasksResult.error.message}`
+      `${pageError} for user ${cookies.data.identity?.username}: ${tasksResult.error.message}`
     );
     return handlePageLoadFailure(
       tasksResult.error.code,
@@ -78,12 +94,12 @@ export default async function TasksPage({
   // get csrf token from gateway for updating task statuses
   // check if identity cookie has template_write permission
   let csrf: string | null = null;
-  if (cookies.identity && cookies.identity.ux_render?.tasks?.tasks_write) {
+  if (cookies.data.identity.ux_render?.tasks?.tasks_write) {
     // get csrf token from gateway for template form
-    const csrfResult = await GetCsrf(cookies.session ? cookies.session : "");
+    const csrfResult = await GetCsrf(cookies.data.session ?? "");
     if (!csrfResult.ok) {
       console.log(
-        `${pageError} for user ${cookies.identity?.username}: ${csrfResult.error.message}`
+        `${pageError} for user ${cookies.data.identity?.username}: ${csrfResult.error.message}`
       );
       return handlePageLoadFailure(
         csrfResult.error.code,
@@ -126,7 +142,7 @@ export default async function TasksPage({
                 task={task}
                 csrf={csrf}
                 reviewAllowed={
-                  cookies.identity?.ux_render?.tasks?.allowances_write
+                  cookies.data.identity?.ux_render?.tasks?.allowances_write
                 }
               />
             </>

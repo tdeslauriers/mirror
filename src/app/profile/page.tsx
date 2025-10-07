@@ -19,19 +19,33 @@ const pageError: string = "Failed to load profile page: ";
 export default async function ProfilePage() {
   // quick for redirect if auth'd cookies not present
   const cookies = await getAuthCookies("/profile");
+  if (!cookies.ok) {
+    console.log(
+      `${pageError}: failed auth cookie check: ${
+        cookies.error ? cookies.error.message : "unknown error related to session cookies."
+      }`
+    );
+    return handlePageLoadFailure(
+      401,
+      cookies.error
+        ? cookies.error.message
+        : "unknown error related to session cookies.",
+      "/login"
+    );
+  }
 
   // get csrf token and profile data from gateway for profile form
   const [csrfResult, profileResult] = await Promise.all([
-    GetCsrf(cookies.session ? cookies.session : ""),
+    GetCsrf(cookies.data.session ?? ""),
     callGatewayData<Profile>({
       endpoint: "/profile",
-      session: cookies.session,
+      session: cookies.data.session,
     }),
   ]);
 
   if (!csrfResult.ok) {
     console.log(
-      `${pageError} for user ${cookies.identity?.username}: ${csrfResult.error.message}`
+      `${pageError} for user ${cookies.data.identity?.username}: ${csrfResult.error.message}`
     );
     return handlePageLoadFailure(
       csrfResult.error.code,
@@ -43,7 +57,7 @@ export default async function ProfilePage() {
 
   if (!profileResult.ok) {
     console.log(
-      `${pageError} for user ${cookies.identity?.username}: ${profileResult.error.message}`
+      `${pageError} for user ${cookies.data.identity?.username}: ${profileResult.error.message}`
     );
     return handlePageLoadFailure(
       profileResult.error.code,
@@ -83,7 +97,7 @@ export default async function ProfilePage() {
               csrf={csrf}
               profile={profile}
               userEdit={handleUserEdit}
-              editAllowed={profile?.username === cookies.identity?.username}
+              editAllowed={profile?.username === cookies.data.identity?.username}
             />
           </Suspense>
         </div>

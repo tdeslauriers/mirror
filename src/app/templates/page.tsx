@@ -1,9 +1,7 @@
 import callGatewayData from "@/components/call-gateway-data";
-
 import Link from "next/link";
 import TemplatesTable from "./templates-table";
-import { getAuthCookies, UiCookies } from "@/components/checkCookies";
-import { AllowanceUser } from "@/components/forms";
+import { getAuthCookies } from "@/components/checkCookies";
 import { TaskTemplate } from ".";
 import handlePageLoadFailure from "@/components/errors/handle-page-load-errors";
 
@@ -15,13 +13,27 @@ const pageError = "Failed to load templates page";
 
 export default async function TemplatesPage() {
   // quick for redirect if auth'd cookies not present
-  const cookies: UiCookies = await getAuthCookies("/templates");
+  const cookies = await getAuthCookies("/templates");
+  if (!cookies.ok) {
+    console.log(
+      `${pageError}: could not verify session cookies: ${
+        cookies.error ? cookies.error.message : "unknown error"
+      }`
+    );
+    return handlePageLoadFailure(
+      401,
+      cookies.error
+        ? cookies.error.message
+        : "unknown error related to session cookies.",
+      "/login"
+    );
+  }
 
   // check if identity cookie has template_read permission
   // ie, gaurd pattern or access hint gating
-  if (!cookies.identity || !cookies.identity.ux_render?.tasks?.templates_read) {
+  if (!cookies.data.identity?.ux_render?.tasks?.templates_read) {
     console.log(
-      `${pageError}: user ${cookies.identity?.username} does not have rights to view /templates.`
+      `${pageError}: user ${cookies.data.identity?.username} does not have rights to view /templates.`
     );
     return handlePageLoadFailure(
       401,
@@ -32,11 +44,11 @@ export default async function TemplatesPage() {
   // get template data from gateway
   const result = await callGatewayData<TaskTemplate[]>({
     endpoint: "/templates",
-    session: cookies.session,
+    session: cookies.data.session,
   });
   if (!result.ok) {
     console.log(
-      `${pageError} for user ${cookies.identity?.username}: ${result.error.message}`
+      `${pageError} for user ${cookies.data.identity?.username}: ${result.error.message}`
     );
     return handlePageLoadFailure(result.error.code, result.error.message);
   }
@@ -56,8 +68,8 @@ export default async function TemplatesPage() {
             }}
           >
             <h1>Task Templates and Assignments</h1>
-            {cookies.identity &&
-              cookies.identity.ux_render?.tasks?.templates_write && (
+            {cookies.data.identity &&
+              cookies.data.identity.ux_render?.tasks?.templates_write && (
                 <Link href="/templates/add">
                   <button>Add Task/Template</button>
                 </Link>
@@ -84,8 +96,10 @@ export default async function TemplatesPage() {
 
         <TemplatesTable
           data={templates}
-          username={cookies.identity.username}
-          accountVisibility={cookies.identity.ux_render.tasks.allowances_write}
+          username={cookies.data.identity.username}
+          accountVisibility={
+            cookies.data.identity.ux_render.tasks.allowances_write
+          }
         />
       </main>
     </>

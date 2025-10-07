@@ -25,12 +25,26 @@ export default async function Page({
 
   // quick for redirect if auth'd cookies not present
   const cookies = await getAuthCookies(`/scopes/${slug}`);
+  if (!cookies.ok) {
+    console.log(
+      `${pageError}: failed auth cookie check: ${
+        cookies.error ? cookies.error.message : "unknown error"
+      }`
+    );
+    return handlePageLoadFailure(
+      401,
+      cookies.error
+        ? cookies.error.message
+        : "unknown error related to session cookies.",
+      "/login"
+    );
+  }
 
   // check if identity cookie has scopes_read permission
   // ie, gaurd pattern or access hint gating
-  if (!cookies.identity || !cookies.identity.ux_render?.users?.scope_read) {
+  if (!cookies.data.identity?.ux_render?.users?.scope_read) {
     console.log(
-      `${pageError}: user ${cookies.identity?.username} does not have rights to view /scopes/${slug}.`
+      `${pageError}: user ${cookies.data.identity?.username} does not have rights to view /scopes/${slug}.`
     );
     return handlePageLoadFailure(
       401,
@@ -42,19 +56,19 @@ export default async function Page({
   // check if identity cookie has scopes_write permission and get csrf is so for scope form
   let csrf: string | null = null;
   let scope: Scope | null = null;
-  if (cookies.identity && cookies.identity.ux_render?.users?.scope_write) {
+  if (cookies.data.identity?.ux_render?.users?.scope_write) {
     // get csrf token and scope from gateway for scope form
     const [csrfResult, scopeResult] = await Promise.all([
-      GetCsrf(cookies.session ? cookies.session : ""),
+      GetCsrf(cookies.data.session ?? ""),
       callGatewayData<Scope>({
         endpoint: `/scopes/${slug}`,
-        session: cookies.session,
+        session: cookies.data.session,
       }),
     ]);
 
     if (!csrfResult.ok) {
       console.log(
-        `${pageError} for user ${cookies.identity?.username}: ${csrfResult.error.message}`
+        `${pageError} for user ${cookies.data.identity?.username}: ${csrfResult.error.message}`
       );
       return handlePageLoadFailure(
         csrfResult.error.code,
@@ -66,7 +80,7 @@ export default async function Page({
 
     if (!scopeResult.ok) {
       console.log(
-        `${pageError} for user ${cookies.identity?.username}: ${scopeResult.error.message}`
+        `${pageError} for user ${cookies.data.identity?.username}: ${scopeResult.error.message}`
       );
       return handlePageLoadFailure(
         scopeResult.error.code,
@@ -129,7 +143,7 @@ export default async function Page({
           <div className="card">
             <ScopeForm
               csrf={csrf}
-              editAllowed={cookies.identity?.ux_render?.users?.scope_write}
+              editAllowed={cookies.data.identity?.ux_render?.users?.scope_write}
               slug={slug}
               scope={scope}
               scopeFormUpdate={handleScopeEdit}

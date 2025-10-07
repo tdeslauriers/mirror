@@ -1,7 +1,7 @@
 "use server";
 
 import { GatewayError, isGatewayError } from "@/app/api";
-import { checkForSessionCookie } from "@/components/checkCookies";
+import { getAuthCookies, getSessionCookie } from "@/components/checkCookies";
 import {
   isAllowedService,
   Permission,
@@ -14,20 +14,12 @@ export async function handlePermissionAdd(
   previousState: PermissionActionCmd,
   formData: FormData
 ) {
-  // get session token
-  const sessionCookie = await checkForSessionCookie();
-
-  // light-weight validation of csrf token
-  // true validation happpens in the gateway
+  // get form data
   const csrf = previousState.csrf;
-  if (!csrf || csrf.trim().length < 16 || csrf.trim().length > 64) {
-    throw new Error(
-      "CSRF token is missing or not well formed.  This value is required and cannot be tampered with."
-    );
-  }
+
   // slug unnecessary, will be dropped even if submitted (which would indicate tampering from this page)
   let add: Permission = {
-    csrf: csrf,
+    csrf: csrf ?? "",
 
     // TODO: update service name to be dropdown
     service_name: formData.get("service_name") as string, // needs to be added here because field disabled in form ==> null
@@ -37,10 +29,50 @@ export async function handlePermissionAdd(
     active: formData.get("active") === "on" ? true : false,
   };
 
+  // get auth cookie data
+  const cookies = await getAuthCookies(`/permissions/add`);
+  if (!cookies.ok) {
+    console.log(
+      `Could not verify session cookies for user attempting to add permission in service ${
+        add.service_name
+      }: ${cookies.error ? cookies.error.message : "unknown error"}`
+    );
+    return {
+      csrf: csrf,
+      permission: add,
+      errors: {
+        server: [
+          `Failed to verify authentication cookies. Please login again and try to add the permission.`,
+        ],
+      },
+    } as PermissionActionCmd;
+  }
+
+  // light-weight validation of csrf token
+  // true validation happpens in the gateway
+  if (!csrf || csrf.trim().length < 16 || csrf.trim().length > 64) {
+    console.log(
+      `User ${cookies.data.identity?.username} submitted CSRF token which is missing or not well formed.`
+    );
+    const errors: { [key: string]: string[] } = {};
+    errors.csrf = [
+      "CSRF token missing or not well formed. This value is required and cannot be tampered with.",
+    ];
+    return {
+      csrf: csrf,
+      permission: add,
+      errors: errors,
+    } as PermissionActionCmd;
+  }
+
   // check if service is allowed
   if (!add.service_name || !isAllowedService(add.service_name)) {
     const errors: { [key: string]: string[] } = {};
     errors.service = ["Service name is not allowed."];
+
+    console.log(
+      `User ${cookies.data.identity?.username} submitted service name which is not allowed: ${add.service_name}`
+    );
     return {
       csrf: csrf,
       permission: add,
@@ -51,6 +83,11 @@ export async function handlePermissionAdd(
   // validate form data
   const errors = validatePermission(add);
   if (errors && Object.keys(errors).length > 0) {
+    console.log(
+      `Permission data added by user ${
+        cookies.data.identity?.username
+      } failed validation: ${JSON.stringify(errors)}`
+    );
     return {
       csrf: csrf,
       permission: add,
@@ -66,7 +103,7 @@ export async function handlePermissionAdd(
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `${sessionCookie.value}`,
+          Authorization: `${cookies.data.session}`,
         },
         body: JSON.stringify(add),
       }
@@ -74,24 +111,54 @@ export async function handlePermissionAdd(
 
     if (response.ok) {
       const added = await response.json();
-      console.log("Permission added successfully:", added);
+      console.log(
+        `permission record ${added.name} in service ${added.service_name} added successfully by user ${cookies.data.identity?.username}.`
+      );
     } else {
       const errorResponse = await response.json();
       if (isGatewayError(errorResponse)) {
         const gatewayError: GatewayError = errorResponse;
         const errors = handlePermissionErrors(gatewayError);
+        console.log(
+          `user ${
+            cookies.data.identity?.username
+          } failed to add permission record: ${JSON.stringify(errors)}`
+        );
         return {
           csrf: csrf,
           permission: add,
           errors: errors,
         } as PermissionActionCmd;
       } else {
-        throw new Error("Unhandled error calling the gateway service.");
+        console.error(
+          `permission record add failed for user ${cookies.data.identity?.username} due to unhandled gateway error: ${errorResponse.message}`
+        );
+        return {
+          csrf: csrf,
+          permission: add,
+          errors: {
+            server: [
+              errorResponse.message
+                ? errorResponse.message
+                : "Permission record add failed due to an unhandled gateway error.",
+            ],
+          },
+        } as PermissionActionCmd;
       }
     }
   } catch (error) {
-    console.error("Error adding permission:", error);
-    throw new Error("Failed to add permission record.");
+    console.error(
+      `user ${cookies.data.identity?.username} failed to add permission record: ${error}`
+    );
+    return {
+      csrf: csrf,
+      permission: add,
+      errors: {
+        server: [
+          "Permission record add failed due to an unhandled gateway error.",
+        ],
+      },
+    } as PermissionActionCmd;
   }
 
   redirect("/permissions");

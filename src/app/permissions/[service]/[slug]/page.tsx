@@ -25,12 +25,26 @@ export default async function PermissionEditPage({
 
   // quick for redirect if auth'd cookies not present
   const cookies = await getAuthCookies(`/permissions/${service}/${slug}`);
+  if (!cookies.ok) {
+    console.log(
+      `${pageError}: failed auth cookie check: ${
+        cookies.error ? cookies.error.message : "unknown error"
+      }`
+    );
+    return handlePageLoadFailure(
+      401,
+      cookies.error
+        ? cookies.error.message
+        : "unknown error related to session cookies.",
+      "/login"
+    );
+  }
 
   // check if identity cookie has permissions_read permission
   // ie, gaurd pattern or access hint gating
-  if (!cookies.identity || !cookies.identity.ux_render?.users?.scope_read) {
+  if (!cookies.data.identity?.ux_render?.users?.scope_read) {
     console.log(
-      `${pageError}: user ${cookies.identity?.username} does not have rights to view /permissions/${service}/${slug}.`
+      `${pageError}: user ${cookies.data.identity?.username} does not have rights to view /permissions/${service}/${slug}.`
     );
     return handlePageLoadFailure(
       401,
@@ -42,19 +56,19 @@ export default async function PermissionEditPage({
   // check if identity cookie has permissions_write permission and get csrf is so for permission form
   let csrf: string | null = null;
   let permission: Permission | null = null;
-  if (cookies.identity && cookies.identity.ux_render?.users?.scope_write) {
+  if (cookies.data.identity?.ux_render?.users?.scope_write) {
     // get csrf token and permissions from gateway for permission form
     const [csrfResult, permissionResult] = await Promise.all([
-      GetCsrf(cookies.session ? cookies.session : ""),
+      GetCsrf(cookies.data.session ?? ""),
       callGatewayData<Permission>({
         endpoint: `/permissions/${service}/${slug}`,
-        session: cookies.session,
+        session: cookies.data.session,
       }),
     ]);
 
     if (!csrfResult.ok) {
       console.log(
-        `${pageError} for user ${cookies.identity?.username}: ${csrfResult.error.message}`
+        `${pageError} for user ${cookies.data.identity?.username}: ${csrfResult.error.message}`
       );
       return handlePageLoadFailure(
         csrfResult.error.code,
@@ -66,7 +80,7 @@ export default async function PermissionEditPage({
 
     if (!permissionResult.ok) {
       console.log(
-        `${pageError} for user ${cookies.identity?.username}: ${permissionResult.error.message}`
+        `${pageError} for user ${cookies.data.identity?.username}: ${permissionResult.error.message}`
       );
       return handlePageLoadFailure(
         permissionResult.error.code,
@@ -130,7 +144,7 @@ export default async function PermissionEditPage({
           <div className="card">
             <PermissionForm
               csrf={csrf}
-              editAllowed={cookies.identity?.ux_render?.users?.scope_write}
+              editAllowed={cookies.data.identity?.ux_render?.users?.scope_write}
               slug={slug}
               service={service}
               permission={permission}

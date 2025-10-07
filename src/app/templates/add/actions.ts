@@ -1,6 +1,6 @@
 "use server";
 
-import { checkForSessionCookie } from "@/components/checkCookies";
+import { getAuthCookies, getSessionCookie } from "@/components/checkCookies";
 import { TemplateActionCmd } from "@/components/forms";
 import {
   handleTemplateErrors,
@@ -16,16 +16,8 @@ export async function handleTemplateAdd(
   previousState: TemplateActionCmd,
   formData: FormData
 ) {
-  // get session token
-  const sessionCookie = await checkForSessionCookie();
-
+  // get form data
   const csrf = previousState.csrf;
-  if (!csrf || csrf.trim().length < 16 || csrf.trim().length > 64) {
-    console.log("CSRF token is mission or not well formed");
-    throw new Error(
-      "CSRF token is missing or not well formed.  This value is required and cannot be tampered with."
-    );
-  }
 
   let add: TaskTemplate = {
     // id omitted
@@ -39,9 +31,48 @@ export async function handleTemplateAdd(
     is_archived: formData.get("is_archived") === "on" ? true : false,
   };
 
+  // get auth token
+  const cookies = await getAuthCookies("/templates");
+  if (!cookies.ok) {
+    console.log(
+      `Task template add failed because could not verify session cookies: ${
+        cookies.error ? cookies.error.message : "unknown error"
+      }`
+    );
+    return {
+      csrf: csrf,
+      // slug omitted because doesn't exist yet
+      template: add,
+      errors: {
+        server: [
+          cookies.error?.message || "unknown error related to session cookies.",
+        ],
+      },
+    } as TemplateActionCmd;
+  }
+
+  if (!csrf || csrf.trim().length < 16 || csrf.trim().length > 64) {
+    console.log(
+      `User ${cookies.data.identity?.username} submitted empty or invalid CSRF token.`
+    );
+    return {
+      csrf: null,
+      // slug omitted because doesn't exist yet
+      template: add,
+      errors: {
+        csrf: ["invalid CSRF token, please refresh the page and try again."],
+      },
+    } as TemplateActionCmd;
+  }
+
   // check task template fields
   const errors = validateTaskTemplate(add);
   if (errors && Object.keys(errors).length > 0) {
+    console.log(
+      `User ${
+        cookies.data.identity?.username
+      } submitted invalid task template: ${JSON.stringify(errors)}`
+    );
     return {
       csrf: csrf,
       // slug omitted because doesn't exist yet
@@ -54,6 +85,13 @@ export async function handleTemplateAdd(
   const usernames = formData.getAll("assignees[]") as string[];
   const assigneesErrors = validateAssigneesUsernames(usernames);
   if (assigneesErrors && Object.keys(assigneesErrors).length > 0) {
+    console.log(
+      `User ${
+        cookies.data.identity?.username
+      } submitted invalid assignees usernames: ${JSON.stringify(
+        assigneesErrors
+      )}`
+    );
     return {
       csrf: csrf,
       // slug omitted because doesn't exist yet
@@ -82,27 +120,76 @@ export async function handleTemplateAdd(
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `${sessionCookie.value}`,
+          Authorization: `${cookies.data.session}`,
         },
         body: JSON.stringify(cmd),
       }
     );
     if (apiResponse.ok) {
       add = await apiResponse.json();
+      console.log(
+        `User ${cookies.data.identity?.username} created new task template ${add.name}.`
+      );
     } else {
       const fail = await apiResponse.json();
       if (isGatewayError(fail)) {
         const errors = handleTemplateErrors(fail);
+        console.log(
+          `User ${
+            cookies.data.identity?.username
+          } task template creation failed: ${JSON.stringify(errors)}`
+        );
         return {
           csrf: csrf,
 
           template: add,
           errors: errors,
         } as TemplateActionCmd;
+      } else {
+        console.log(
+          `User ${cookies.data.identity?.username} task template creation failed due to unhandled gateway error.`
+        );
+        return {
+          csrf: csrf,
+          // slug omitted because doesn't exist yet
+          template: add,
+          errors: {
+            server: [
+              "Failed to create task template due to unhandled gateway error.  Please try again.",
+            ],
+          },
+        } as TemplateActionCmd;
       }
     }
   } catch (error) {
-    throw new Error("Failed to call gateway to create a new task template");
+    if ((error as Error).message) {
+      console.log(
+        `User ${
+          cookies.data.identity?.username
+        } task template creation failed: ${(error as Error).message}`
+      );
+      return {
+        csrf: csrf,
+        // slug omitted because doesn't exist yet
+        template: add,
+        errors: {
+          server: [(error as Error).message],
+        },
+      } as TemplateActionCmd;
+    }
+    console.log(
+      `User ${cookies.data.identity?.username} task template creation failed due to unknown error.`
+    );
+    return {
+      csrf: csrf,
+      // slug omitted because doesn't exist yet
+      template: add,
+      errors: {
+        server: [
+          "Failed to create task template due to unknown error.  Please try again.",
+        ],
+      },
+    } as TemplateActionCmd;
   }
 
   redirect(`/templates`);

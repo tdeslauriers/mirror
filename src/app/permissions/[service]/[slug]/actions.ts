@@ -1,6 +1,6 @@
 "use server";
 
-import { checkForSessionCookie } from "@/components/checkCookies";
+import { getAuthCookies, getSessionCookie } from "@/components/checkCookies";
 import {
   isAllowedService,
   Permission,
@@ -13,32 +13,14 @@ export async function handlePermissionEdit(
   previousState: PermissionActionCmd,
   formData: FormData
 ) {
-  // get session token
-  const sessionCookie = await checkForSessionCookie();
-
-  // light-weight validation of csrf token
-  // true validation happpens in the gateway
+  // get form data
   const csrf = previousState.csrf;
-  if (!csrf || csrf.trim().length < 16 || csrf.trim().length > 64) {
-    throw new Error(
-      "CSRF token is missing or not well formed. This value is required and cannot be tampered with."
-    );
-  }
-
-  // if this is tampered with, the gateway will simply error because
-  // the slug will not be found, or invalid, etc.
   const slug = previousState.slug;
-  if (!slug || slug.trim().length < 16 || slug.trim().length > 64) {
-    throw new Error(
-      "Scope slug is missing or not well formed. This value is required and cannot be tampered with."
-    );
-  }
-
   const service = previousState.service;
 
   // build updated permission object
   let updated: Permission = {
-    csrf: csrf,
+    csrf: csrf ?? "",
 
     // service is dropped upstream
     // need to create a new permission in the applicable service, they cannot be moved from one to the other.
@@ -49,8 +31,70 @@ export async function handlePermissionEdit(
     active: formData.get("active") === "on" ? true : false,
   };
 
+  // get auth cookies
+  const cookies = await getAuthCookies(`/permissions/${service}/${slug}`);
+  if (!cookies.ok) {
+    console.log(
+      `Could not verify session cookies for user attempting to update permission ${slug} in service ${service}: ${
+        cookies.error ? cookies.error.message : "unknown error"
+      }`
+    );
+    return {
+      csrf: csrf,
+      slug: slug,
+      service: service,
+      permission: updated,
+      errors: {
+        server: [
+          `Failed to verify authentication cookies. Please login again and try to update the permission.`,
+        ],
+      },
+    } as PermissionActionCmd;
+  }
+
+  // light-weight validation of csrf token
+  // true validation happpens in the gateway
+  if (!csrf || csrf.trim().length < 16 || csrf.trim().length > 64) {
+    console.log(
+      `User ${cookies.data.identity?.username} submitted CSRF token which is missing or not well formed.`
+    );
+    return {
+      csrf: csrf,
+      slug: slug,
+      service: service,
+      permission: updated,
+      errors: {
+        csrf: [
+          "CSRF token is missing or not well formed.  This value is required and cannot be tampered with.",
+        ],
+      },
+    } as PermissionActionCmd;
+  }
+
+  // if this is tampered with, the gateway will simply error because
+  // the slug will not be found, or invalid, etc.
+  if (!slug || slug.trim().length < 16 || slug.trim().length > 64) {
+    console.log(
+      `User ${cookies.data.identity?.username} submitted permission slug which is missing or not well formed.`
+    );
+    return {
+      csrf: csrf,
+      slug: slug,
+      service: service,
+      permission: updated,
+      errors: {
+        server: [
+          "Permission slug is missing or not well formed.  This value is required and cannot be tampered with.",
+        ],
+      },
+    } as PermissionActionCmd;
+  }
+
   // validate service name --> change would indicate tampering
   if (!service || !isAllowedService(service)) {
+    console.log(
+      `User ${cookies.data.identity?.username} submitted permission service name which is not allowed: ${service}`
+    );
     const errors: { [key: string]: string[] } = {};
     errors.service = ["Service name is not allowed."];
     return {
@@ -65,6 +109,13 @@ export async function handlePermissionEdit(
   // validate form data
   const errors = validatePermission(updated);
   if (errors && Object.keys(errors).length > 0) {
+    console.log(
+      `User ${
+        cookies.data.identity?.username
+      } submitted permission data which failed validation: ${JSON.stringify(
+        errors
+      )}`
+    );
     return {
       csrf: csrf,
       slug: slug,
@@ -83,7 +134,7 @@ export async function handlePermissionEdit(
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `${sessionCookie.value}`,
+          Authorization: `${cookies.data.session}`,
         },
         body: JSON.stringify(updated),
       }
@@ -91,6 +142,9 @@ export async function handlePermissionEdit(
 
     if (apiResponse.ok) {
       const success = await apiResponse.json();
+      console.log(
+        `permission record ${slug} in service ${service} updated successfully by user ${cookies.data.identity?.username}.`
+      );
       return {
         csrf: csrf,
         slug: slug,
@@ -102,6 +156,11 @@ export async function handlePermissionEdit(
       const fail = await apiResponse.json();
       if (isGatewayError(fail)) {
         const errors = handlePermissionErrors(fail);
+        console.log(
+          `permission record ${slug} in service ${service} update failed for user ${
+            cookies.data.identity?.username
+          }: ${JSON.stringify(errors)}`
+        );
         return {
           csrf: csrf,
           slug: slug,
@@ -110,15 +169,37 @@ export async function handlePermissionEdit(
           errors: errors,
         } as PermissionActionCmd;
       } else {
-        throw new Error(
-          "Failed to update permission record due to unhandled gateway error."
+        console.error(
+          `permission record ${slug} in service ${service} update failed for user ${cookies.data.identity?.username} due to unhandled gateway error: ${fail.message}`
         );
+        return {
+          csrf: csrf,
+          slug,
+          service,
+          permission: updated,
+          errors: {
+            server: [
+              fail.message
+                ? fail.message
+                : "Permission update failed due to an unhandled gateway error.",
+            ],
+          },
+        } as PermissionActionCmd;
       }
     }
   } catch (error) {
-    throw new Error(
-      "Failed to update permission record due to unhandled error."
+    console.error(
+      `permission record ${slug} in service ${service} update failed for user ${cookies.data.identity?.username}: ${error}`
     );
+    return {
+      csrf: csrf,
+      slug: slug,
+      service: service,
+      permission: updated,
+      errors: {
+        server: ["Permission update failed due to an unexpected error."],
+      },
+    } as PermissionActionCmd;
   }
 }
 

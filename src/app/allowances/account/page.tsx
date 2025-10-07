@@ -17,14 +17,28 @@ const pageError = "Failed to load allowance account page: ";
 
 export default async function Page() {
   // quick for redirect if auth'd cookies not present
-  const cookies: UiCookies = await getAuthCookies(`/account`);
+  const cookiesResult = await getAuthCookies(`/account`);
+  if (!cookiesResult.ok) {
+    console.log(
+      `${pageError}: failed auth cookie check: ${
+        cookiesResult.error ? cookiesResult.error.message : "unknown error"
+      }`
+    );
+    return handlePageLoadFailure(
+      401,
+      cookiesResult.error
+        ? cookiesResult.error.message
+        : "unknown error related to session cookies.",
+      "/login"
+    );
+  }
 
   // check if identity cookie has allowances_read permission
   // ie, gaurd pattern or access hint gating
-  if (!cookies.identity || !cookies.identity.ux_render?.tasks?.account_read) {
+  if (!cookiesResult.data.identity?.ux_render?.tasks?.account_read) {
     console.log(pageError + "User does not have account_read permission.");
     throw new Error(
-      pageError + "You do not have permission to view your allowance account."
+      pageError + "you do not have permission to view your allowance account."
     );
   }
 
@@ -32,14 +46,14 @@ export default async function Page() {
   const [result, csrfResult] = await Promise.all([
     callGatewayData<Allowance>({
       endpoint: `/account`,
-      session: cookies.session,
+      session: cookiesResult.data.session,
     }),
-    GetCsrf(cookies.session ? cookies.session : ""),
+    GetCsrf(cookiesResult.data.session ?? ""),
   ]);
 
   if (!result.ok) {
     console.log(
-      `${pageError} for user ${cookies.identity?.username}: ${result.error.message}`
+      `${pageError} for user ${cookiesResult.data.identity?.username}: ${result.error.message}`
     );
     return handlePageLoadFailure(
       result.error.code,
@@ -51,7 +65,7 @@ export default async function Page() {
 
   if (!csrfResult.ok) {
     console.log(
-      `${pageError} for user ${cookies.identity?.username}: ${csrfResult.error.message}`
+      `${pageError} for user ${cookiesResult.data.identity?.username}: ${csrfResult.error.message}`
     );
     return handlePageLoadFailure(
       csrfResult.error.code,
@@ -119,8 +133,9 @@ export default async function Page() {
             <AllowanceForm
               csrf={csrf}
               editAllowed={
-                cookies.identity?.ux_render?.tasks?.allowances_write ||
-                cookies.identity?.ux_render?.tasks?.account_write
+                cookiesResult.data.identity?.ux_render?.tasks
+                  ?.allowances_write ||
+                cookiesResult.data.identity?.ux_render?.tasks?.account_write
               }
               slug={null}
               allowance={allowance}

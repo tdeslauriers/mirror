@@ -1,6 +1,6 @@
 "use server";
 
-import { checkForSessionCookie } from "@/components/checkCookies";
+import { getAuthCookies, getSessionCookie } from "@/components/checkCookies";
 import { ImageActionCmd, UpdateImageCmd, validateUpdateImageCmd } from "..";
 import { GatewayError, isGatewayError } from "@/app/api";
 import { redirect } from "next/navigation";
@@ -9,24 +9,9 @@ export async function imageFormUpdate(
   previousState: ImageActionCmd,
   formData: FormData
 ) {
-  // get session token
-  const sessionCookie = await checkForSessionCookie();
-
-  // light-weight validation of csrf token
-  // true validation happpens in the gateway
+  // load form data
   const csrf = previousState.csrf;
-  if (!csrf || csrf.trim().length < 16 || csrf.trim().length > 64) {
-    throw new Error(
-      "Image update CSRF token missing or not well formed.  This value is required and cannot be tampered with."
-    );
-  }
-
   const slug = previousState.slug;
-  if (!slug || slug.trim().length < 16 || slug.trim().length > 64) {
-    throw new Error(
-      "Image slug is missing or not well formed.  This value is required and cannot be tampered with."
-    );
-  }
 
   // get form date
   let updated: UpdateImageCmd = {
@@ -44,6 +29,44 @@ export async function imageFormUpdate(
     permission_slugs: formData.getAll("permissions[]") as string[],
   };
 
+  // get session cookie for auth
+  const cookies = await getAuthCookies(`/images/${slug}`);
+  if (!cookies.ok) {
+    console.log(
+      `Image update failed because could not verify session cookies: ${
+        cookies.error ? cookies.error.message : "unknown error"
+      }`
+    );
+    return {
+      csrf: csrf,
+      slug: slug,
+      updateCmd: updated,
+      errors: {
+        server: [
+          cookies.error
+            ? cookies.error.message
+            : "unknown error related to session cookies.",
+        ],
+      },
+    } as ImageActionCmd;
+  }
+
+  // light-weight validation of csrf token
+  // true validation happpens in the gateway
+  if (!csrf || csrf.trim().length < 16 || csrf.trim().length > 64) {
+    throw new Error(
+      "Image update CSRF token missing or not well formed.  This value is required and cannot be tampered with."
+    );
+  }
+
+  // light-weight validation of csrf token
+  // true validation happpens in the gateway
+  if (!slug || slug.trim().length < 16 || slug.trim().length > 64) {
+    throw new Error(
+      "Image slug is missing or not well formed.  This value is required and cannot be tampered with."
+    );
+  }
+
   // validate the updated image data
   const errors = validateUpdateImageCmd(updated);
   if (Object.keys(errors).length > 0) {
@@ -51,17 +74,7 @@ export async function imageFormUpdate(
     return {
       csrf: csrf,
       slug: slug,
-      updateCmd: {
-        csrf: csrf,
-        slug: slug,
-        title: updated.title,
-        description: updated.description,
-        image_date_month: updated.image_date_month,
-        image_date_day: updated.image_date_day,
-        image_date_year: updated.image_date_year,
-        is_published: updated.is_published,
-        is_archived: updated.is_archived,
-      } as UpdateImageCmd,
+      updateCmd: updated,
       errors: errors,
     } as ImageActionCmd;
   }
@@ -74,7 +87,7 @@ export async function imageFormUpdate(
         method: "PUT",
         headers: {
           Content_Type: "application/json",
-          Authorization: `${sessionCookie?.value}`,
+          Authorization: `${cookies.data.session}`,
         },
         body: JSON.stringify(updated),
       }
@@ -82,10 +95,14 @@ export async function imageFormUpdate(
 
     if (apiResponse.ok) {
       //   const success = await apiResponse.json();
-      console.log("Image meta data updated successfully:", updated);
+      console.log(
+        `image metadata updated successfully by user ${cookies.data.identity?.username}.`
+      );
     } else {
       const fail = await apiResponse.json();
-      console.error("Failed to update image meta data:", fail);
+      console.log(
+        `image metadata update failed for user ${cookies.data.identity?.username}: ${fail.message}`
+      );
       if (isGatewayError(fail)) {
         const errors = handleImageUpdateErrors(fail);
         return {
@@ -95,17 +112,43 @@ export async function imageFormUpdate(
           errors: errors,
         } as ImageActionCmd;
       } else {
-        throw new Error(
-          "Unhandled error returned from gateway when attempting to update image metadata."
+        console.error(
+          `image ${slug} updated failed for user ${cookies.data.identity?.username} due to unhandled gateway error: ${fail.message}`
         );
+        return {
+          csrf: csrf,
+          slug,
+          updateCmd: updated,
+          errors: {
+            server: [
+              fail.message
+                ? fail.message
+                : "Image update failed due to an unhandled gateway error.",
+            ],
+          },
+        } as ImageActionCmd;
       }
     }
   } catch (error) {
-    throw new Error(
-      error instanceof Error
-        ? error.message
-        : "An unknown error occurred while updating image metadata."
+    console.error(
+      `image ${slug} update failed for user ${
+        cookies.data.identity?.username
+      } due to unhandled error: ${
+        error instanceof Error ? error.message : "unknown error"
+      }`
     );
+    return {
+      csrf: csrf,
+      slug,
+      updateCmd: updated,
+      errors: {
+        server: [
+          error instanceof Error
+            ? error.message
+            : "Image update failed due to an unhandled error.",
+        ],
+      },
+    } as ImageActionCmd;
   }
 
   redirect(`/images/${slug}`);

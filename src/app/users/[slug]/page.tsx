@@ -35,12 +35,26 @@ export default async function Page({
 
   // quick for redirect if auth'd cookies not present
   const cookies = await getAuthCookies(`/users/${slug}`);
+  if (!cookies.ok) {
+    console.log(
+      `${pageError}: could not verify session cookies: ${
+        cookies.error ? cookies.error.message : "unknown error"
+      }`
+    );
+    return handlePageLoadFailure(
+      401,
+      cookies.error
+        ? cookies.error.message
+        : "unknown error related to session cookies.",
+      "/login"
+    );
+  }
 
   // check if identity cookie has user_read permission
   // ie, gaurd pattern or access hint gating
-  if (!cookies.identity || !cookies.identity.ux_render?.users?.user_read) {
+  if (!cookies.data.identity?.ux_render?.users?.user_read) {
     console.log(
-      `${pageError}: user ${cookies.identity?.username} does not have rights to view /users/${slug}.`
+      `${pageError}: user ${cookies.data.identity?.username} does not have rights to view /users/${slug}.`
     );
     return handlePageLoadFailure(
       401,
@@ -54,28 +68,28 @@ export default async function Page({
   let user: User | null = null;
   let allScopes: Scope[] = [];
   let allPermissions: Permission[] = [];
-  if (cookies.identity && cookies.identity.ux_render?.users?.user_write) {
+  if (cookies.data.identity.ux_render?.users?.user_write) {
     // get csrf token, user data, scopes, and permissions from gateway for user form
     const [csrfResult, userResult, scopesResult, permissionsResult] =
       await Promise.all([
-        GetCsrf(cookies.session ? cookies.session : ""),
+        GetCsrf(cookies.data.session ?? ""),
         callGatewayData<User>({
           endpoint: `/users/${slug}`,
-          session: cookies.session,
+          session: cookies.data.session,
         }),
         callGatewayData<Scope[]>({
           endpoint: `/scopes`,
-          session: cookies.session,
+          session: cookies.data.session,
         }),
         callGatewayData<Permission[]>({
           endpoint: `/permissions`,
-          session: cookies.session,
+          session: cookies.data.session,
         }),
       ]);
 
     if (!csrfResult.ok) {
       console.log(
-        `${pageError} for user ${cookies.identity?.username}: ${csrfResult.error.message}`
+        `${pageError} for user ${cookies.data.identity?.username}: ${csrfResult.error.message}`
       );
       return handlePageLoadFailure(
         csrfResult.error.code,
@@ -87,7 +101,7 @@ export default async function Page({
 
     if (!userResult.ok) {
       console.log(
-        `${pageError} for user ${cookies.identity?.username}: ${userResult.error.message}`
+        `${pageError} for user ${cookies.data.identity?.username}: ${userResult.error.message}`
       );
       return handlePageLoadFailure(
         userResult.error.code,
@@ -99,7 +113,7 @@ export default async function Page({
 
     if (!scopesResult.ok) {
       console.log(
-        `${pageError} for user ${cookies.identity?.username}: ${scopesResult.error.message}`
+        `${pageError} for user ${cookies.data.identity?.username}: ${scopesResult.error.message}`
       );
       return handlePageLoadFailure(
         scopesResult.error.code,
@@ -111,7 +125,7 @@ export default async function Page({
 
     if (!permissionsResult.ok) {
       console.log(
-        `${pageError} for user ${cookies.identity?.username}: ${permissionsResult.error.message}`
+        `${pageError} for user ${cookies.data.identity?.username}: ${permissionsResult.error.message}`
       );
       return handlePageLoadFailure(
         permissionsResult.error.code,
@@ -162,7 +176,7 @@ export default async function Page({
           <div className={`card`}>
             <UserForm
               csrf={csrf}
-              editAllowed={cookies.identity?.ux_render?.users?.user_write}
+              editAllowed={cookies.data.identity?.ux_render?.users?.user_write}
               slug={slug}
               profile={user}
               userEdit={handleUserEdit}
@@ -174,7 +188,7 @@ export default async function Page({
         <div className="card-title">
           <h2>
             Permissions:{" "}
-            {cookies.identity.ux_render?.users?.client_write && (
+            {cookies.data.identity.ux_render?.users?.client_write && (
               <sup>
                 <span className="highlight-info" style={{ fontSize: ".65em" }}>
                   * must click &lsquo;Update Permissions&lsquo; to save changes
@@ -187,7 +201,7 @@ export default async function Page({
           <div className="card">
             <ManagePermissionsForm
               csrf={csrf}
-              editAllowed={cookies.identity.ux_render?.users?.client_write}
+              editAllowed={cookies.data.identity.ux_render?.users?.client_write}
               entitySlug={slug}
               entityPermissions={user?.permissions ? user.permissions : []}
               menuPermissions={allPermissions}
@@ -200,7 +214,7 @@ export default async function Page({
         <div className="card-title">
           <h2>
             Scopes:{" "}
-            {cookies.identity.ux_render?.users?.user_write && (
+            {cookies.data.identity.ux_render?.users?.user_write && (
               <sup>
                 <span className="highlight-info" style={{ fontSize: ".65em" }}>
                   * must click &lsquo;Update Scopes&lsquo; to save changes
@@ -213,7 +227,7 @@ export default async function Page({
           <div className="card">
             <ManageScopesForm
               csrf={csrf}
-              editAllowed={cookies.identity?.ux_render?.users?.user_write}
+              editAllowed={cookies.data.identity?.ux_render?.users?.user_write}
               entitySlug={slug}
               entityScopes={user?.scopes ? user.scopes : null}
               menuScopes={allScopes}

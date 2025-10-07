@@ -58,9 +58,10 @@ export async function logout() {
           );
           return errors;
         } else {
-          throw new Error(
-            "An error occurred. Please try again. If the problem persists, please contact me."
-          );
+          console.error("Failed to logout due to unhandled gateway error.");
+          return {
+            server: ["Failed to logout due to unhandled gateway error."],
+          };
         }
       }
     } catch (error: any) {

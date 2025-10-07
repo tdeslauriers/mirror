@@ -16,12 +16,26 @@ const pageError = "Failed to load permissions page";
 export default async function PermissionsPage() {
   // quick for redirect if auth'd cookies not present
   const cookies = await getAuthCookies("/permissions");
+  if (!cookies.ok) {
+    console.log(
+      `${pageError} due to failed auth cookie check: ${
+        cookies.error ? cookies.error.message : "unknown error"
+      }`
+    );
+    return handlePageLoadFailure(
+      401,
+      cookies.error
+        ? cookies.error.message
+        : "unknown error related to session cookies.",
+      "/login"
+    );
+  }
 
   // check if identity cookie has permissions_read permission
   // ie, gaurd pattern or access hint gating
-  if (!cookies.identity || !cookies.identity.ux_render?.users?.user_read) {
+  if (!cookies.data.identity?.ux_render?.users?.user_read) {
     console.log(
-      `${pageError}: user ${cookies.identity?.username} does not have rights to view /permissions.`
+      `${pageError}: user ${cookies.data.identity?.username} does not have rights to view /permissions.`
     );
     return handlePageLoadFailure(
       401,
@@ -32,11 +46,11 @@ export default async function PermissionsPage() {
   // fetch permissions data from gateway
   const result = await callGatewayData<Permission[]>({
     endpoint: "/permissions",
-    session: cookies.session,
+    session: cookies.data.session,
   });
   if (!result.ok) {
     console.log(
-      `${pageError} for user ${cookies.identity?.username}: ${result.error.message}`
+      `${pageError} for user ${cookies.data.identity?.username}: ${result.error.message}`
     );
     return handlePageLoadFailure(result.error.code, result.error.message);
   }
@@ -56,7 +70,7 @@ export default async function PermissionsPage() {
             }}
           >
             <h1>Permissions</h1>
-            {cookies.identity?.ux_render?.users?.scope_write && (
+            {cookies.data.identity?.ux_render?.users?.scope_write && (
               <Link href="/permissions/add">
                 <button>Add Permission</button>
               </Link>

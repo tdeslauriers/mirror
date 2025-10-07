@@ -16,33 +16,46 @@ const pageError = "Failed to load allowances page";
 export default async function AllowancesPage() {
   // quick for redirect if auth'd cookies not present
   const cookies = await getAuthCookies("/allowances");
-
-  // check if identity cookie has allowances_read permission
-  // ie, gaurd pattern or access hint gating
-  if (
-    !cookies.identity ||
-    !cookies.identity.ux_render?.tasks?.allowances_read
-  ) {
+  if (!cookies.ok) {
     console.log(
-      `${pageError}: user ${cookies.identity?.username} does not have rights to view /allowances.`
+      `${pageError} due to failed auth cookie check: ${
+        cookies.error ? cookies.error.message : "unknown error"
+      }`
     );
     return handlePageLoadFailure(
       401,
-      `you do not have rights to view /allowances.`
+      cookies.error
+        ? cookies.error.message
+        : "unknown error related to session cookies.",
+      "/login"
+    );
+  }
+
+  // check if identity cookie has allowances_read permission
+  // ie, gaurd pattern or access hint gating
+  if (!cookies.data.identity?.ux_render?.tasks?.allowances_read) {
+    console.log(
+      `${pageError}: user ${cookies.data.identity?.username} does not have rights to view /allowances.`
+    );
+    return handlePageLoadFailure(
+      401,
+      `you do not have rights to view /allowances.`,
     );
   }
 
   // get allowances data from gateway
   const result = await callGatewayData<Allowance[]>({
     endpoint: "/allowances",
-    session: cookies.session,
+    session: cookies.data.session,
   });
   if (!result.ok) {
     console.log(
-      `${pageError} for user ${cookies.identity?.username}: ${result.error.message}`
+      `${pageError} for user ${cookies.data.identity?.username}: ${result.error.message}`
     );
     return handlePageLoadFailure(result.error.code, result.error.message);
   }
+
+  // TODO: sort allowances by remitee name
   const allowances = result.data;
 
   return (
@@ -59,12 +72,11 @@ export default async function AllowancesPage() {
             }}
           >
             <h1>Allowances</h1>
-            {cookies.identity &&
-              cookies.identity.ux_render?.tasks?.allowances_write && (
-                <Link href="/allowances/add">
-                  <button>Add Allowance Remitee</button>
-                </Link>
-              )}
+            {cookies.data.identity?.ux_render?.tasks?.allowances_write && (
+              <Link href="/allowances/add">
+                <button>Add Allowance Remitee</button>
+              </Link>
+            )}
           </div>
         </div>
         <hr className="page-title" />

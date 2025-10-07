@@ -27,12 +27,20 @@ export default async function Page({
 
   // quick check for redirect if auth'd cookies not present
   const cookies = await getAuthCookies(`/images/${slug}`);
+  if (!cookies.ok) {
+    console.log(
+      `${pageError}: due to fialed auth cookie check: ${
+        cookies.error ? cookies.error.message : "unknown error"
+      }`
+    );
+    return handlePageLoadFailure(401, cookies.error.message, "/login");
+  }
 
   // check if identity cookie has scopes_read permission
   // ie, gaurd pattern or access hint gating
-  if (!cookies.identity || !cookies.identity.ux_render?.gallery?.image_read) {
+  if (!cookies.data.identity?.ux_render?.gallery?.image_read) {
     console.log(
-      `${pageError}: user ${cookies.identity?.username} does not have rights to view this image.`
+      `${pageError}: user ${cookies.data.identity?.username} does not have rights to view this image.`
     );
     return handlePageLoadFailure(
       401,
@@ -50,11 +58,11 @@ export default async function Page({
   // get image record data from gateway
   const imgResult = await callGatewayData<ImageData>({
     endpoint: `/images/${slug}`,
-    session: cookies.session,
+    session: cookies.data.session,
   });
   if (!imgResult.ok) {
     console.log(
-      `${pageError} for user ${cookies.identity?.username}: ${imgResult.error.message}`
+      `${pageError} for user ${cookies.data.identity?.username}: ${imgResult.error.message}`
     );
     return handlePageLoadFailure(
       imgResult.error.code,
@@ -65,7 +73,7 @@ export default async function Page({
   const imageData = imgResult.data;
 
   // check if identity cookie has images_write permission and get csrf if so for image form
-  const editAllowed = cookies.identity.ux_render?.gallery?.image_write;
+  const editAllowed = cookies.data.identity.ux_render?.gallery?.image_write;
 
   // if edit is allowed, fetch the CSRF token for the form
   let csrf: string | null = null;
@@ -74,20 +82,20 @@ export default async function Page({
   if (editAllowed) {
     // get csrf token, albums and permissions (for menus) from gateway for image form
     const [csrfResult, albumsResult, permissionsResult] = await Promise.all([
-      GetCsrf(cookies.session ? cookies.session : ""),
+      GetCsrf(cookies.data.session ?? ""),
       callGatewayData<Album[]>({
         endpoint: "/albums",
-        session: cookies.session,
+        session: cookies.data.session,
       }),
       callGatewayData<Permission[]>({
         endpoint: "/images/permissions",
-        session: cookies.session,
+        session: cookies.data.session,
       }),
     ]);
 
     if (!csrfResult.ok) {
       console.log(
-        `${pageError} for user ${cookies.identity?.username}: ${csrfResult.error.message}`
+        `${pageError} for user ${cookies.data.identity?.username}: ${csrfResult.error.message}`
       );
       return handlePageLoadFailure(
         csrfResult.error.code,
@@ -99,7 +107,7 @@ export default async function Page({
 
     if (!albumsResult.ok) {
       console.log(
-        `Error returned from gateway fetching menu albums for user ${cookies.identity?.username}: ${albumsResult.error.message}`
+        `Error returned from gateway fetching menu albums for user ${cookies.data.identity?.username}: ${albumsResult.error.message}`
       );
       return handlePageLoadFailure(
         albumsResult.error.code,
@@ -112,7 +120,7 @@ export default async function Page({
 
     if (!permissionsResult.ok) {
       console.log(
-        `Error returned from gateway fetching menu permissions for user ${cookies.identity?.username}: ${permissionsResult.error.message}`
+        `Error returned from gateway fetching menu permissions for user ${cookies.data.identity?.username}: ${permissionsResult.error.message}`
       );
       return handlePageLoadFailure(
         permissionsResult.error.code,

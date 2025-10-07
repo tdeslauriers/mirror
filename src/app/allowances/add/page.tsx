@@ -18,16 +18,27 @@ const pageError = "Failed to load allowance add page";
 
 export default async function Page() {
   // quick for redirect if auth'd cookies not present
-  const cookies: UiCookies = await getAuthCookies("/allowances/add");
+  const cookies = await getAuthCookies("/allowances/add");
+  if (!cookies.ok) {
+    console.log(
+      `${pageError}: failed auth cookie check: ${
+        cookies.error ? cookies.error.message : "unknown error"
+      }`
+    );
+    return handlePageLoadFailure(
+      401,
+      cookies.error
+        ? cookies.error.message
+        : "unknown error related to session cookies.",
+      "/login"
+    );
+  }
 
   // check if identity cookie has allowances_write permission
   // ie, gaurd pattern or access hint gating
-  if (
-    !cookies.identity ||
-    !cookies.identity.ux_render?.tasks?.allowances_write
-  ) {
+  if (!cookies.data.identity?.ux_render?.tasks?.allowances_write) {
     console.log(
-      `${pageError} User ${cookies.identity?.username} does not have allowances_write permission.`
+      `${pageError} User ${cookies.data.identity?.username} does not have allowances_write permission.`
     );
     return handlePageLoadFailure(
       401,
@@ -38,16 +49,16 @@ export default async function Page() {
 
   // get csrf token and users (for menu) from gateway for add allowance form
   const [csrfResult, usersResult] = await Promise.all([
-    GetCsrf(cookies.session ? cookies.session : ""),
+    GetCsrf(cookies.data.session ?? ""),
     callGatewayData<UserProfile[]>({
       endpoint: "/users",
-      session: cookies.session,
+      session: cookies.data.session,
     }),
   ]);
 
   if (!csrfResult.ok) {
     console.log(
-      `Failed to fetch csrf from gateway for user ${cookies.identity?.username}: ${csrfResult.error.message}`
+      `Failed to fetch csrf from gateway for user ${cookies.data.identity?.username}: ${csrfResult.error.message}`
     );
     return handlePageLoadFailure(
       csrfResult.error.code,
@@ -59,7 +70,7 @@ export default async function Page() {
 
   if (!usersResult.ok) {
     console.log(
-      `Failed to fetch users for allowance users ${cookies.identity?.username}: ${usersResult.error.message}`
+      `Failed to fetch users for allowance users ${cookies.data.identity?.username}: ${usersResult.error.message}`
     );
     return handlePageLoadFailure(
       usersResult.error.code,
