@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Album } from "..";
 import styles from "../album.module.css";
 import AlbumForm from "@/components/forms/album-form";
+import { useParams } from "next/navigation";
 
 export default function AlbumDisplay({
   csrf,
@@ -19,6 +20,10 @@ export default function AlbumDisplay({
   albumFormUpdate: (prevState: any, formData: FormData) => any | Promise<any>;
 }) {
   const [isEditing, setIsEditing] = useState(false);
+
+  // need to know if the slug is "staged" to disable editing
+  const params = useParams();
+
   return (
     <div className="card">
       <div className={styles.title}>
@@ -36,7 +41,7 @@ export default function AlbumDisplay({
         )}
 
         {/* edit button */}
-        {editAllowed && (
+        {editAllowed && params.slug !== "staged" && (
           <div
             className={isEditing ? `actionsError` : `actions ${styles.edit}`}
           >
@@ -67,7 +72,7 @@ export default function AlbumDisplay({
       )}
 
       {/* album form */}
-      {isEditing && (
+      {isEditing && params.slug !== "staged" && (
         <div className={styles.form}>
           <AlbumForm
             csrf={csrf}
@@ -75,6 +80,19 @@ export default function AlbumDisplay({
             album={albumData}
             handleAlbumForm={albumFormUpdate}
           />
+        </div>
+      )}
+
+      {/* banner for staged album */}
+      {params.slug === "staged" && (
+        <div className={styles.stagedbanner}>
+          <ul>
+            <li>
+              You cannot edit the Staged album&apos;s <strong>title</strong> or{" "}
+              <strong>description</strong> because it doesnt exist in the
+              database.
+            </li>
+          </ul>
         </div>
       )}
     </div>

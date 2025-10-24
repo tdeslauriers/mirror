@@ -31,3 +31,15 @@
 .form {
   margin-top: 1rem;
 }
+
+.stagedbanner {
+  background: var(--highlight-info);
+  font-weight: bold;
+  text-decoration: none;
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+  margin-top: 2rem;
+  font-size: 0.75rem;
+}

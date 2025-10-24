@@ -69,7 +69,7 @@ export default async function TasksPage({
   const paramErrors = validateUrlParams(sanitizedParams);
   if (paramErrors.length > 0) {
     console.log("paramErrors", paramErrors);
-    throw new Error(pageError + "Invalid query params: " + paramErrors);
+    throw new Error(`${pageError}.  Invalid query parameters: ${paramErrors}`);
   }
 
   const prepared = prepareQueryParams(sanitizedParams);

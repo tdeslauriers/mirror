@@ -3,14 +3,13 @@ import { getAuthCookies } from "@/components/checkCookies";
 import Link from "next/link";
 import { Album, albumComparator } from ".";
 import Tile from "@/components/tile";
-import ErrorLoadPage from "@/components/errors/error-load-page";
 import handlePageLoadFailure from "@/components/errors/handle-page-load-errors";
 
 export const metadata = {
   robots: "noindex, nofollow",
 };
 
-const pageError = "Failed to load /albums page: ";
+const pageError = "Failed to load /albums page";
 
 export default async function AlbumsPage() {
   // quick check for auth
@@ -34,12 +33,11 @@ export default async function AlbumsPage() {
   // quick check if identity cookie has album_read access
   if (!cookiesResult.data.identity?.ux_render?.gallery?.album_read) {
     console.log(
-      pageError +
-        `user ${cookiesResult.data.identity?.username} does not have rights to view albums.`
+      `${pageError}: user ${cookiesResult.data.identity?.username} does not have rights to view /albums.`
     );
     return handlePageLoadFailure(
       401,
-      "you do not have rights to view /albums."
+      `${pageError}: ${cookiesResult.data.identity?.given_name}, it appears you do not have access to view albums.`
     );
   }
 
@@ -50,7 +48,7 @@ export default async function AlbumsPage() {
   });
   if (!result.ok) {
     console.log(
-      `Error returned from gateway for user ${cookiesResult.data.identity?.username}: ${result.error.message}`
+      `${pageError}.  Error returned from gateway for user ${cookiesResult.data.identity?.username}: ${result.error.message}`
     );
     return handlePageLoadFailure(result.error.code, result.error.message);
   }
@@ -61,6 +59,10 @@ export default async function AlbumsPage() {
   if (!albums || albums.length === 0) {
     console.log(
       `No albums data returned from gateway for user: ${cookiesResult.data.identity?.username}`
+    );
+    return handlePageLoadFailure(
+      401,
+      `${pageError}: ${cookiesResult.data.identity?.given_name}, it appears you do not have access to any albums yet.`
     );
   }
 

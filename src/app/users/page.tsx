@@ -15,12 +15,26 @@ const pageError = "Failed to load users page";
 export default async function UsersPage() {
   // quick for redirect if auth'd cookies not present
   const cookies = await getAuthCookies("/users");
+  if (!cookies.ok) {
+    console.log(
+      `${pageError}: could not verify session cookies: ${
+        cookies.error ? cookies.error.message : "unknown error"
+      }`
+    );
+    return handlePageLoadFailure(
+      401,
+      cookies.error
+        ? cookies.error.message
+        : "unknown error related to session cookies.",
+      "/login"
+    );
+  }
 
   // check if identity cookie has user_read permission
   // ie, gaurd pattern or access hint gating
-  if (!cookies.identity || !cookies.identity.ux_render?.users?.user_read) {
+  if (!cookies.data.identity?.ux_render?.users?.user_read) {
     console.log(
-      `${pageError}: user ${cookies.identity?.username} does not have rights to view /users.`
+      `${pageError}: user ${cookies.data.identity?.username} does not have rights to view /users.`
     );
     return handlePageLoadFailure(401, `you do not have rights to view /users.`);
   }
@@ -28,11 +42,11 @@ export default async function UsersPage() {
   // get user data from gateway
   const result = await callGatewayData<User[]>({
     endpoint: "/users",
-    session: cookies.session,
+    session: cookies.data.session,
   });
   if (!result.ok) {
     console.log(
-      `${pageError} for user ${cookies.identity?.username}: ${result.error.message}`
+      `${pageError} for user ${cookies.data.identity?.username}: ${result.error.message}`
     );
     return handlePageLoadFailure(result.error.code, result.error.message);
   }

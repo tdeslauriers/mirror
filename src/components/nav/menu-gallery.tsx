@@ -58,6 +58,22 @@ export default function MenuGallery({
                 </li>
               )}
 
+              {/* staged - only show if user has both album read and image write permissions
+               because only exists to update images which failed pipeline processing */}
+              {render &&
+                render.gallery?.album_read &&
+                render.gallery?.image_write && (
+                  <li>
+                    <Link
+                      className={`locallink`}
+                      href={"/albums/staged"}
+                      onClick={linkClick}
+                    >
+                      staged
+                    </Link>
+                  </li>
+                )}
+
               {/* albums */}
               {render && render.gallery?.album_read && (
                 <li>

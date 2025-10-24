@@ -54,23 +54,48 @@ export async function imageFormUpdate(
   // light-weight validation of csrf token
   // true validation happpens in the gateway
   if (!csrf || csrf.trim().length < 16 || csrf.trim().length > 64) {
-    throw new Error(
-      "Image update CSRF token missing or not well formed.  This value is required and cannot be tampered with."
+    console.log(
+      `user ${cookies.data.identity?.username} image update failed: csrf token missing or not well formed.`
     );
+    return {
+      csrf: csrf,
+      slug: slug,
+      updateCmd: updated,
+      errors: {
+        csrf: [
+          "CSRF token is missing or not well formed.  This value is required and cannot be tampered with.",
+        ],
+      },
+    } as ImageActionCmd;
   }
 
   // light-weight validation of csrf token
   // true validation happpens in the gateway
   if (!slug || slug.trim().length < 16 || slug.trim().length > 64) {
-    throw new Error(
-      "Image slug is missing or not well formed.  This value is required and cannot be tampered with."
+    console.log(
+      `user ${cookies.data.identity?.username} image update failed: image slug missing or not well formed.`
     );
+    return {
+      csrf: csrf,
+      slug: slug,
+      updateCmd: updated,
+      errors: {
+        slug: [
+          "Image slug is missing or not well formed.  This value is required and cannot be tampered with.",
+        ],
+      },
+    } as ImageActionCmd;
   }
 
   // validate the updated image data
   const errors = validateUpdateImageCmd(updated);
   if (Object.keys(errors).length > 0) {
     // if there are errors, return the previous state with the errors
+    console.log(
+      `user ${
+        cookies.data.identity?.username
+      } image update failed validation: ${JSON.stringify(errors)}`
+    );
     return {
       csrf: csrf,
       slug: slug,

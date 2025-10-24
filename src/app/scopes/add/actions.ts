@@ -3,26 +3,18 @@
 import { Scope, ScopeActionCmd, validateScope } from "..";
 import { redirect } from "next/navigation";
 import { GatewayError, isGatewayError } from "@/app/api";
-import { getSessionCookie } from "@/components/checkCookies";
+import { getAuthCookies, getSessionCookie } from "@/components/checkCookies";
+import { cookies } from "next/headers";
 
 export async function handleScopeAdd(
   previousState: ScopeActionCmd,
   formData: FormData
 ) {
-  // get session token
-  const sessionCookie = await getSessionCookie();
-
-  // light-weight validation of csrf token
-  // true validation happpens in the gateway
   const csrf = previousState.csrf;
-  if (!csrf || csrf.trim().length < 16 || csrf.trim().length > 64) {
-    throw new Error(
-      "CSRF token is missing or not well formed.  This value is required and cannot be tampered with."
-    );
-  }
+
   // slug unnecessary, will be dropped even if submitted (which would indicate tampering from this page)
   let add: Scope = {
-    csrf: csrf,
+    csrf: csrf ?? "",
 
     service_name: formData.get("service_name") as string,
     scope: formData.get("scope") as string,
@@ -31,9 +23,50 @@ export async function handleScopeAdd(
     active: formData.get("active") === "on" ? true : false,
   };
 
+  // get auth cookie
+  const cookies = await getAuthCookies("/scopes/add");
+  if (!cookies.ok) {
+    console.log(
+      `Scope add failed because could not verify session cookies: ${
+        cookies.error ? cookies.error.message : "unknown error"
+      }`
+    );
+    return {
+      csrf: csrf,
+      // slug omitted because doesn't exist yet
+      scope: add,
+      errors: {
+        server: [
+          cookies.error?.message || "unknown error related to session cookies.",
+        ],
+      },
+    } as ScopeActionCmd;
+  }
+
+  // light-weight validation of csrf token
+  // true validation happpens in the gateway
+  if (!csrf || csrf.trim().length < 16 || csrf.trim().length > 64) {
+    console.log(
+      `User ${cookies.data.identity?.username} submitted empty or invalid CSRF token.`
+    );
+    return {
+      csrf: null,
+      // slug omitted because doesn't exist yet
+      scope: add,
+      errors: {
+        csrf: ["invalid CSRF token"],
+      },
+    } as ScopeActionCmd;
+  }
+
   // validate form data
   const errors = validateScope(add);
   if (errors && Object.keys(errors).length > 0) {
+    console.log(
+      `User ${
+        cookies.data.identity?.username
+      } submitted invalid scope data: ${JSON.stringify(errors)}`
+    );
     return {
       csrf: csrf,
       scope: add,
@@ -49,7 +82,7 @@ export async function handleScopeAdd(
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `${sessionCookie.value}`,
+          Authorization: `${cookies.data.session}`,
         },
         body: JSON.stringify(add),
       }
@@ -57,26 +90,67 @@ export async function handleScopeAdd(
 
     if (response.ok) {
       add = await response.json();
-      console.log("Scope record added successfully: ", add);
+      console.log(
+        `User ${cookies.data.identity?.username} successfully added scope ${add.scope} for service ${add.service_name}.`
+      );
     } else {
       const fail = await response.json();
       if (isGatewayError(fail)) {
         const errors = handleScopeErrors(fail);
+        console.log(
+          `User ${
+            cookies.data.identity?.username
+          } scope creation failed: ${JSON.stringify(errors)}`
+        );
         return {
           csrf: csrf,
           scope: add,
           errors: errors,
         } as ScopeActionCmd;
       } else {
-        throw new Error(
-          "Failed to add scope record due to unhandled gateway error."
+        console.log(
+          `User ${cookies.data.identity?.username} scope creation failed due to unhandled gateway error.`
         );
+        return {
+          csrf: csrf,
+          scope: add,
+          errors: {
+            server: [
+              "Failed to create scope due to unhandled gateway error.  Please try again.",
+            ],
+          },
+        } as ScopeActionCmd;
       }
     }
   } catch (error) {
-    console.log(error);
-    throw new Error("Unhandled error while attempting to call the gateway.");
+    if ((error as Error).message) {
+      console.log(
+        `User ${cookies.data.identity?.username} scope creation failed: ${
+          (error as Error).message
+        }`
+      );
+      return {
+        csrf: csrf,
+        scope: add,
+        errors: {
+          server: [(error as Error).message],
+        },
+      } as ScopeActionCmd;
+    }
+    console.log(
+      `User ${cookies.data.identity?.username} scope creation failed due to unknown error.`
+    );
+    return {
+      csrf: csrf,
+      scope: add,
+      errors: {
+        server: [
+          "Failed to call gateway service. If this error persists, please contact me.",
+        ],
+      },
+    } as ScopeActionCmd;
   }
+
   redirect("/scopes");
 }
 
