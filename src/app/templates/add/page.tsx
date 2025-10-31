@@ -50,7 +50,7 @@ export default async function AddPage() {
   const [csrfResult, assigneesResult] = await Promise.all([
     GetCsrf(cookies.data.session ?? ""),
     callGatewayData<AllowanceUser[]>({
-      endpoint: `/allowances/users`,
+      endpoint: `/templates/assignees`,
       session: cookies.data.session,
     }),
   ]);
