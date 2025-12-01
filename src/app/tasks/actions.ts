@@ -1,9 +1,9 @@
 "use server";
 
 import { checkUuid } from "@/validation/user_fields";
-import { Task, TaskStatusCmd, validateStatus } from ".";
+import { TaskStatusCmd, validateStatus } from ".";
 
-import { getAuthCookies, getSessionCookie } from "@/components/checkCookies";
+import { getAuthCookies } from "@/components/checkCookies";
 import { isGatewayError } from "../api";
 
 // NOTE: throws in this function are ok because caught by the caller, not nextjs

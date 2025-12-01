@@ -1,6 +1,6 @@
 "use server";
 
-import { getSessionCookie } from "@/components/checkCookies";
+import { getAuthCookies, getSessionCookie } from "@/components/checkCookies";
 import { AddImageCmd, validateImageData } from "..";
 import { GatewayError, isGatewayError } from "@/app/api";
 
@@ -29,7 +29,7 @@ export async function requestPresignedUrl(formdata: FormData) {
   } as AddImageCmd;
 
   // get auth cookies
-  const cookies = await getSessionCookie();
+  const cookies = await getAuthCookies("/images/add");
   if (!cookies.ok) {
     console.log("Could not verify session cookies.");
     return {
@@ -60,17 +60,16 @@ export async function requestPresignedUrl(formdata: FormData) {
 
   // send request to gateway for presigned URL
   try {
-    const response = await fetch(
-      `${process.env.GATEWAY_SERVICE_URL}/images/upload`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `${cookies.data.session}`,
-        },
-        body: JSON.stringify(addImageCmd),
-      }
-    );
+    const response = await fetch(`${process.env.GATEWAY_SERVICE_URL}/images/`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `${cookies.data.session}`,
+      },
+      body: JSON.stringify(addImageCmd),
+    });
+
+    console.log("RESPONSE:", response);
 
     if (response.ok) {
       const data = await response.json();

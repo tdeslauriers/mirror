@@ -115,7 +115,7 @@ export async function handleTemplateAdd(
   try {
     // call gateway to create a new task template
     const apiResponse = await fetch(
-      `${process.env.GATEWAY_SERVICE_URL}/templates`,
+      `${process.env.GATEWAY_SERVICE_URL}/templates/`,
       {
         method: "POST",
         headers: {

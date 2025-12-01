@@ -9,8 +9,6 @@ export async function handleAlbumAdd(
   previousScope: AlbumActionCmd,
   formData: FormData
 ) {
-
-
   // extract the CSRF token from the previous stat
   const csrf = previousScope.csrf;
 
@@ -23,7 +21,7 @@ export async function handleAlbumAdd(
     is_archived: formData.get("is_archived") === "on",
   };
 
-    // get auth cookies
+  // get auth cookies
   const cookies = await getAuthCookies("/albums/add");
   if (!cookies.ok) {
     console.error(
@@ -77,7 +75,7 @@ export async function handleAlbumAdd(
 
   // send the album data to the gateway
   try {
-    const response = await fetch(`${process.env.GATEWAY_SERVICE_URL}/albums`, {
+    const response = await fetch(`${process.env.GATEWAY_SERVICE_URL}/albums/`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

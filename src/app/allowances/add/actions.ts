@@ -88,7 +88,7 @@ export async function handleAddAllowance(
   // call gateway to add allowance
   try {
     const apiResponse = await fetch(
-      `${process.env.GATEWAY_SERVICE_URL}/allowances`,
+      `${process.env.GATEWAY_SERVICE_URL}/allowances/`,
       {
         method: "POST",
         headers: {
