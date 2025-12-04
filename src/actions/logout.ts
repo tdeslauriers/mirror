@@ -56,17 +56,14 @@ export async function logout() {
           console.error(
             "Error destroying session: " + errors.server.join("; ")
           );
-          return errors;
+          // don't return errors - just log them and continue with redirect
         } else {
           console.error("Failed to logout due to unhandled gateway error.");
-          return {
-            server: ["Failed to logout due to unhandled gateway error."],
-          };
         }
       }
     } catch (error: any) {
       console.error("Logout api call failed: ", error);
-      return { server: [error.message] };
+      // don't return errors - just log and continue
     }
 
     // redirect to home page

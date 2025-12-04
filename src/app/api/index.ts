@@ -1,4 +1,3 @@
-import { useRouter } from "next/navigation";
 // api json objects
 export type OauthExchange = {
   response_type?: string | null;

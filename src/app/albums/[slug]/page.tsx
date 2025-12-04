@@ -139,7 +139,7 @@ export default async function AlbumPage({
           {sortedImages &&
             sortedImages.length > 0 &&
             sortedImages.map((image) => (
-              <>
+              <div key={image.id ? image.id : Math.random()}>
                 {image.id ? (
                   <Tile
                     key={image.slug}
@@ -152,11 +152,11 @@ export default async function AlbumPage({
                     imageData={image}
                   />
                 ) : (
-                  <p>
+                  <p key={Math.random()}>
                     <span className="highlight-error">Empty image record.</span>
                   </p>
                 )}
-              </>
+              </div>
             ))}
           {(!album.images || album.images.length <= 0) && (
             <p>
