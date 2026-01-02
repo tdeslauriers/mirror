@@ -2,7 +2,7 @@ import { isGatewayError, GatewayError } from "./app/api";
 import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 
-export default async function middleware(request: NextRequest) {
+export default async function proxy(request: NextRequest) {
   const response: NextResponse = NextResponse.next();
 
   // check for session cookie
