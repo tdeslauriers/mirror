@@ -39,7 +39,7 @@ export default async function AllowancesPage() {
     );
     return handlePageLoadFailure(
       401,
-      `you do not have rights to view /allowances.`,
+      `you do not have rights to view /allowances.`
     );
   }
 
@@ -57,6 +57,7 @@ export default async function AllowancesPage() {
 
   // TODO: sort allowances by remitee name
   const allowances = result.data;
+
 
   return (
     <>
