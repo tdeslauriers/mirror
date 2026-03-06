@@ -1,5 +1,13 @@
+import {
+  checkCity,
+  checkCountry,
+  checkState,
+  checkStreetAddress,
+  checkZipCode,
+} from "@/validation/address_fields";
 import { Permission } from "../permissions";
 import { Scope } from "../scopes";
+import { ApiTimestamp } from "../api";
 
 export type User = {
   csrf?: string;
@@ -8,6 +16,8 @@ export type User = {
   username?: string;
   firstname?: string;
   lastname?: string;
+  nickname?: string;
+  dark_mode?: boolean;
   slug?: string;
   created_at?: string;
   enabled?: boolean;
@@ -36,3 +46,88 @@ export type ServicePermission = {
   service_name: string;
   permission_slug: string;
 };
+
+export type AddressActionCmd = {
+  csrf?: string | null;
+  slug?: string;
+  username?: string;
+  address?: Address | null;
+  errors: { [key: string]: string[] };
+};
+
+export type AddressCmd = {
+  csrf?: string | null;
+  slug?: string;
+  username?: string;
+  address: Address;
+};
+
+export type Address = {
+  id?: string;
+  slug?: string;
+  street_address?: string;
+  street_address_2?: string;
+  city?: string;
+  state_province?: string;
+  postal_code?: string;
+  country?: string;
+  is_current?: boolean;
+  updated_at?: ApiTimestamp;
+  created_at?: ApiTimestamp;
+};
+
+export function validateAddress(address: Address) {
+  const errors: { [key: string]: string[] } = {};
+
+  // check street address
+  const addressLine1Check = checkStreetAddress(
+    address.street_address?.trim() ?? "",
+  );
+  if (!addressLine1Check.isValid) {
+    errors.street_address = addressLine1Check.messages;
+  }
+
+  // check street address 2
+  if (address.street_address_2 && address.street_address_2.trim().length > 0) {
+    const addressLine2Check = checkStreetAddress(
+      address.street_address_2.trim(),
+    );
+    if (!addressLine2Check.isValid) {
+      errors.street_address_2 = addressLine2Check.messages;
+    }
+  }
+
+  // check city
+  if (address.city) {
+    const cityCheck = checkCity(address.city.trim());
+    if (!cityCheck.isValid) {
+      errors.city = cityCheck.messages;
+    }
+  }
+
+  // check state: includes check against list of states
+  if (address.state_province) {
+    const stateCheck = checkState(address.state_province.trim());
+    if (!stateCheck.isValid) {
+      errors.state = stateCheck.messages;
+    }
+  }
+
+  // check postal code
+  if (address.postal_code) {
+    const zipCheck = checkZipCode(address.postal_code.trim());
+    if (!zipCheck.isValid) {
+      errors.zip_code = zipCheck.messages;
+    }
+  }
+
+  // check country: includes check against list of countries
+  if (address.country) {
+    const countryCheck = checkCountry(address.country.trim());
+    if (!countryCheck.isValid) {
+      errors.country = countryCheck.messages;
+    }
+  }
+
+  return errors;
+}

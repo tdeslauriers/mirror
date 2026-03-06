@@ -55,7 +55,14 @@ spec:
               valueFrom:
                 configMapKeyRef:
                   name: cm-gateway-service
-                  key: gateway-url
+                  key: gateway-k8-url
+            - name: NODE_EXTRA_CA_CERTS
+              value: /etc/ssl/certs/internal-ca.crt
+          volumeMounts:
+            - name: ca-cert
+              mountPath: /etc/ssl/certs/internal-ca.crt
+              subPath: server-ca-cert
+              readOnly: true
           resources:
             requests:
               memory: "256Mi"
@@ -63,3 +70,7 @@ spec:
             limits:
               memory: "512Mi"
               cpu: "500m"
+      volumes:
+        - name: ca-cert
+          secret:
+            secretName: secret-node-extra-ca

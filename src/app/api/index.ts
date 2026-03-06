@@ -1,4 +1,10 @@
 // api json objects
+
+// this the time.Time go object returned by go services like the gateway.
+export type ApiTimestamp = {
+  seconds: number;
+};
+
 export type OauthExchange = {
   response_type?: string | null;
   nonce?: string | null;

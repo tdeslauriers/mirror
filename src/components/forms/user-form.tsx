@@ -11,21 +11,24 @@ export default function UserForm({
   csrf,
   editAllowed,
   slug,
+  username,
   profile,
   userEdit,
 }: {
   csrf: string | null;
   editAllowed?: boolean; // just cookie check => ui rendering logic only
   slug?: string;
+  username?: string;
   profile: Profile | User | null;
   userEdit: (
     prevState: ProfileActionCmd,
-    formData: FormData
+    formData: FormData,
   ) => ProfileActionCmd | Promise<ProfileActionCmd>;
 }) {
   const [profileState, formAction] = useActionState(userEdit, {
     csrf: csrf,
     slug: slug,
+    username: username,
     profile: profile,
     errors: {},
   });
@@ -42,6 +45,7 @@ export default function UserForm({
           <ErrorField errorMsgs={profileState.errors.server} />
         )}
 
+        {/* Firstname */}
         <div className={`row`}>
           <div className={`field`}>
             <label className={`label`} htmlFor="firstname">
@@ -66,6 +70,7 @@ export default function UserForm({
           </div>
         </div>
 
+        {/* Lastname */}
         <div className={`row`}>
           <div className={`field`}>
             <label className={`label`} htmlFor="lastname">
@@ -90,6 +95,39 @@ export default function UserForm({
           </div>
         </div>
 
+        {/* Nickname */}
+        <div className={`row`}>
+          <div className={`field`}>
+            <label className={`label`} htmlFor="nickname">
+              Nickname{" "}
+              <sup>
+                <span
+                  className={`highlight`}
+                  style={{ textTransform: "lowercase" }}
+                >
+                  optional
+                </span>
+              </sup>
+            </label>
+            {profileState.errors.nickname && (
+              <ErrorField errorMsgs={profileState.errors.nickname} />
+            )}
+            <input
+              className={`form`}
+              name="nickname"
+              type="text"
+              title="Only letters, hyphens, apostrophes, underscores, and spaces allowed"
+              minLength={NAME_MIN_LENGTH}
+              maxLength={NAME_MAX_LENGTH}
+              pattern={`^[a-zA-Z\\-\'\_\ ]+`}
+              defaultValue={profileState.profile?.nickname}
+              placeholder="Nickname"
+              required
+              disabled={!editAllowed}
+            />
+          </div>
+        </div>
+
         {age && (
           <>
             <h2 style={{ paddingBottom: "0.5rem", paddingTop: "rem" }}>
@@ -98,6 +136,7 @@ export default function UserForm({
           </>
         )}
 
+        {/* Birthdate */}
         <div className={`row`}>
           <div className={`date`}>
             <label
@@ -161,6 +200,7 @@ export default function UserForm({
           </div>
         </div>
 
+        {/* Enabled */}
         {profileState.slug && (
           <div className="checkbox-row">
             <div className="field">
@@ -179,6 +219,7 @@ export default function UserForm({
               />
             </div>
 
+            {/* Expired */}
             <div className="field">
               <label className="label" htmlFor="account_expired">
                 Account Expired
@@ -195,6 +236,7 @@ export default function UserForm({
               />
             </div>
 
+            {/* Locked */}
             <div className="field">
               <label className="label" htmlFor="account_locked">
                 Account Locked
@@ -213,6 +255,7 @@ export default function UserForm({
           </div>
         )}
 
+        {/* Submit */}
         {editAllowed && (
           <div className={`row`} style={{ marginTop: "1.5rem" }}>
             <FormSubmit

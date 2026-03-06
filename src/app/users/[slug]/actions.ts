@@ -14,21 +14,24 @@ import {
 } from "@/components/forms";
 import { validateScopeSlugs } from "@/app/services";
 import { validatePermissionSlugs } from "@/app/permissions";
-import { getAuthCookies, getSessionCookie } from "@/components/checkCookies";
+import { getAuthCookies } from "@/components/checkCookies";
 
 export async function handleUserEdit(
   previousState: ProfileActionCmd,
-  formData: FormData
+  formData: FormData,
 ) {
   // get form data
   const csrf = previousState.csrf;
   const slug = previousState.slug;
+  const username = previousState.username;
 
   let updated: User = {
     csrf: csrf ?? "",
+    username: username ?? "",
 
     firstname: formData.get("firstname") as string,
     lastname: formData.get("lastname") as string,
+    nickname: formData.get("nickname") as string,
     birth_year: parseInt(formData.get("birthYear") as string),
     birth_month: parseInt(formData.get("birthMonth") as string),
     birth_day: parseInt(formData.get("birthDay") as string),
@@ -43,11 +46,12 @@ export async function handleUserEdit(
     console.log(
       `User update failed because could not verify session cookies: ${
         cookies.error ? cookies.error.message : "unknown error"
-      }`
+      }`,
     );
     return {
       csrf: csrf,
       slug: slug,
+      username: username,
       profile: updated,
       errors: {
         server: [
@@ -61,11 +65,12 @@ export async function handleUserEdit(
   // true validation happpens in the gateway
   if (!csrf || csrf.trim().length < 16 || csrf.trim().length > 64) {
     console.log(
-      `User ${cookies.data.identity?.username} submitted empty or invalid CSRF token.`
+      `User ${cookies.data.identity?.username} submitted empty or invalid CSRF token.`,
     );
     return {
       csrf: null,
       slug: slug,
+      username: username,
       profile: updated,
       errors: {
         server: ["CSRF token is required and cannot be tampered with."],
@@ -77,14 +82,34 @@ export async function handleUserEdit(
   // true validation happens in the gateway
   if (!slug || slug.trim().length < 16 || slug.trim().length > 64) {
     console.log(
-      `User ${cookies.data.identity?.username} submitted empty or invalid user slug.`
+      `User ${cookies.data.identity?.username} submitted empty or invalid user slug.`,
     );
     return {
       csrf: csrf,
       slug: undefined,
+      username: username,
       profile: updated,
       errors: {
         server: ["User slug is required and cannot be tampered with."],
+      },
+    } as ProfileActionCmd;
+  }
+
+  // light-weight validation of username > 5 chars and < 255 chars > email spec
+  // true validation happens in the gateway
+  if (!username || username.trim().length < 5 || username.trim().length > 255) {
+    console.log(
+      `User ${cookies.data.identity?.username} submitted empty or invalid username.`,
+    );
+    return {
+      csrf: csrf,
+      slug: slug,
+      username: undefined,
+      profile: updated,
+      errors: {
+        server: [
+          "Username is required and must be between 5 and 255 characters.",
+        ],
       },
     } as ProfileActionCmd;
   }
@@ -95,7 +120,7 @@ export async function handleUserEdit(
     console.log(
       `User ${
         cookies.data.identity?.username
-      } submitted invalid user profile update: ${JSON.stringify(errors)}`
+      } submitted invalid user profile update: ${JSON.stringify(errors)}`,
     );
     return { csrf: csrf, profile: updated, errors: errors } as ProfileActionCmd;
   }
@@ -110,17 +135,18 @@ export async function handleUserEdit(
           Authorization: `${cookies.data.session}`,
         },
         body: JSON.stringify(updated),
-      }
+      },
     );
 
     if (apiResponse.ok) {
       const success = await apiResponse.json();
       console.log(
-        `User ${cookies.data.identity?.username} successfully updated user ${updated.username}.`
+        `User ${cookies.data.identity?.username} successfully updated user ${updated.username}.`,
       );
       return {
         csrf: csrf,
         slug: slug,
+        username: username,
         profile: success,
         errors: errors,
       } as ProfileActionCmd;
@@ -131,21 +157,23 @@ export async function handleUserEdit(
         console.log(
           `User ${
             cookies.data.identity?.username
-          } user update failed: ${JSON.stringify(errors)}`
+          } user update failed: ${JSON.stringify(errors)}`,
         );
         return {
           csrf: csrf,
           slug: slug,
+          username: username,
           profile: updated,
           errors: errors,
         } as ProfileActionCmd;
       } else {
         console.log(
-          `User ${cookies.data.identity?.username} user update failed due to unhandled gateway error.`
+          `User ${cookies.data.identity?.username} user update failed due to unhandled gateway error.`,
         );
         return {
           csrf: csrf,
           slug: slug,
+          username: username,
           profile: updated,
           errors: { server: ["Unhandled gateway error.  Please try again."] },
         } as ProfileActionCmd;
@@ -156,21 +184,23 @@ export async function handleUserEdit(
       console.log(
         `User ${cookies.data.identity?.username} user update failed: ${
           (error as Error).message
-        }`
+        }`,
       );
       return {
         csrf: csrf,
         slug: slug,
+        username: username,
         profile: updated,
         errors: { server: [(error as Error).message] },
       } as ProfileActionCmd;
     }
     console.log(
-      `User ${cookies.data.identity?.username} user update failed due to unknown error.`
+      `User ${cookies.data.identity?.username} user update failed due to unknown error.`,
     );
     return {
       csrf: csrf,
       slug: slug,
+      username: username,
       profile: updated,
       errors: { server: ["Unknown error.  Please try again."] },
     } as ProfileActionCmd;
@@ -180,7 +210,7 @@ export async function handleUserEdit(
 // handles socpes update
 export async function handleScopesUpdate(
   previousState: EntityScopesActionCmd,
-  formData: FormData
+  formData: FormData,
 ) {
   // get form data
   const csrf = previousState.csrf;
@@ -192,7 +222,7 @@ export async function handleScopesUpdate(
     console.log(
       `User scopes update failed because could not verify session cookies: ${
         cookies.error ? cookies.error.message : "unknown error"
-      }`
+      }`,
     );
     return {
       csrf: csrf,
@@ -209,7 +239,7 @@ export async function handleScopesUpdate(
   // true validation happens in the gateway
   if (!csrf || csrf.trim().length < 16 || csrf.trim().length > 64) {
     console.log(
-      `User ${cookies.data.identity?.username} submitted empty or invalid CSRF token.`
+      `User ${cookies.data.identity?.username} submitted empty or invalid CSRF token.`,
     );
     return {
       csrf: null,
@@ -224,7 +254,7 @@ export async function handleScopesUpdate(
   // the slug will not be found, or invalid, etc.
   if (!slug || slug.trim().length < 16 || slug.trim().length > 64) {
     console.log(
-      `User ${cookies.data.identity?.username} submitted empty or invalid user slug.`
+      `User ${cookies.data.identity?.username} submitted empty or invalid user slug.`,
     );
     return {
       csrf: csrf,
@@ -253,7 +283,7 @@ export async function handleScopesUpdate(
     console.log(
       `User ${
         cookies.data.identity?.username
-      } submitted invalid scope slugs: ${JSON.stringify(errors)}`
+      } submitted invalid scope slugs: ${JSON.stringify(errors)}`,
     );
     return {
       csrf: csrf,
@@ -282,12 +312,12 @@ export async function handleScopesUpdate(
           "Content-Type": "application/json",
         },
         body: JSON.stringify(cmd),
-      }
+      },
     );
 
     if (apiResponse.ok) {
       console.log(
-        `User ${cookies.data.identity?.username} successfully updated scopes for user ${slug}.`
+        `User ${cookies.data.identity?.username} successfully updated scopes for user ${slug}.`,
       );
       return {
         csrf: csrf,
@@ -301,7 +331,7 @@ export async function handleScopesUpdate(
         console.log(
           `User ${
             cookies.data.identity?.username
-          } scopes update failed: ${JSON.stringify(errors)}`
+          } scopes update failed: ${JSON.stringify(errors)}`,
         );
         return {
           csrf: csrf,
@@ -310,7 +340,7 @@ export async function handleScopesUpdate(
         } as EntityScopesActionCmd;
       } else {
         console.log(
-          `User ${cookies.data.identity?.username} scopes update failed due to unhandled gateway error.`
+          `User ${cookies.data.identity?.username} scopes update failed due to unhandled gateway error.`,
         );
         return {
           csrf: csrf,
@@ -325,7 +355,7 @@ export async function handleScopesUpdate(
     }
   } catch (error) {
     console.log(
-      `User ${cookies.data.identity?.username} scopes update failed due to unknown error.`
+      `User ${cookies.data.identity?.username} scopes update failed due to unknown error.`,
     );
     return {
       csrf: csrf,
@@ -342,7 +372,7 @@ export async function handleScopesUpdate(
 // handles permissions update
 export async function handlePermissionsUpdate(
   previousState: EntityPermissionsActionCmd,
-  formData: FormData
+  formData: FormData,
 ) {
   const csrf = previousState.csrf;
   const slug = previousState.entitySlug;
@@ -357,7 +387,7 @@ export async function handlePermissionsUpdate(
     console.log(
       `User permissions update failed because could not verify session cookies: ${
         cookies.error ? cookies.error.message : "unknown error"
-      }`
+      }`,
     );
     return {
       csrf: csrf,
@@ -374,7 +404,7 @@ export async function handlePermissionsUpdate(
   // true validation happens in the gateway
   if (!csrf || csrf.trim().length < 16 || csrf.trim().length > 64) {
     console.log(
-      `User ${cookies.data.identity?.username} submitted empty or invalid CSRF token.`
+      `User ${cookies.data.identity?.username} submitted empty or invalid CSRF token.`,
     );
     return {
       csrf: null,
@@ -389,7 +419,7 @@ export async function handlePermissionsUpdate(
   // the slug will not be found, or invalid, etc.
   if (!slug || slug.trim().length < 16 || slug.trim().length > 64) {
     console.log(
-      `User ${cookies.data.identity?.username} submitted empty or invalid user slug.`
+      `User ${cookies.data.identity?.username} submitted empty or invalid user slug.`,
     );
     return {
       csrf: csrf,
@@ -407,7 +437,7 @@ export async function handlePermissionsUpdate(
     console.log(
       `User ${
         cookies.data.identity?.username
-      } submitted invalid permission slugs: ${JSON.stringify(errors)}`
+      } submitted invalid permission slugs: ${JSON.stringify(errors)}`,
     );
     return {
       csrf: csrf,
@@ -449,12 +479,12 @@ export async function handlePermissionsUpdate(
           "Content-Type": "application/json",
         },
         body: JSON.stringify(cmd),
-      }
+      },
     );
 
     if (apiResponse.ok) {
       console.log(
-        `User ${cookies.data.identity?.username} successfully updated permissions for user ${slug}.`
+        `User ${cookies.data.identity?.username} successfully updated permissions for user ${slug}.`,
       );
       return {
         csrf: csrf,
@@ -468,7 +498,7 @@ export async function handlePermissionsUpdate(
         console.log(
           `User ${
             cookies.data.identity?.username
-          } permissions update failed: ${JSON.stringify(errors)}`
+          } permissions update failed: ${JSON.stringify(errors)}`,
         );
         return {
           csrf: csrf,
@@ -477,7 +507,7 @@ export async function handlePermissionsUpdate(
         } as EntityPermissionsActionCmd;
       } else {
         console.log(
-          `User ${cookies.data.identity?.username} permissions update failed due to unhandled gateway error.`
+          `User ${cookies.data.identity?.username} permissions update failed due to unhandled gateway error.`,
         );
         return {
           csrf: csrf,
@@ -492,7 +522,7 @@ export async function handlePermissionsUpdate(
     }
   } catch (error) {
     console.log(
-      `User ${cookies.data.identity?.username} permissions update failed due to unknown error.`
+      `User ${cookies.data.identity?.username} permissions update failed due to unknown error.`,
     );
     return {
       csrf: csrf,

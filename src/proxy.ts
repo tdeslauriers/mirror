@@ -14,6 +14,7 @@ export default async function proxy(request: NextRequest) {
   // if session cookie is missing, fetch anonymous session data
   if (!hasSession || hasSession.value === "") {
     try {
+      console.log("fetching anonymous session data...");
       const apiResponse = await fetch(
         `${process.env.GATEWAY_SERVICE_URL}/session/anonymous`,
         {
@@ -21,7 +22,7 @@ export default async function proxy(request: NextRequest) {
           headers: {
             "Content-Type": "application/json",
           },
-        }
+        },
       );
       if (apiResponse.ok) {
         const success = await apiResponse.json();
@@ -49,14 +50,14 @@ export default async function proxy(request: NextRequest) {
           });
         } else {
           throw new Error(
-            "An error occurred fetching anonymous session data. Please try again. If the problem persists, please contact me."
+            "An error occurred fetching anonymous session data. Please try again. If the problem persists, please contact me.",
           );
         }
       }
     } catch (error: any) {
       console.log(
         "unhandled error fetching anonymous session data: ",
-        error.message
+        error.message,
       );
       return response;
     }

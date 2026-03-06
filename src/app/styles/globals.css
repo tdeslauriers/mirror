@@ -1,7 +1,8 @@
 [data-theme="light"] {
   --max-width: 1100px;
   --border-radius: 12px;
-  --font-mono: ui-monospace, Menlo, Monaco, "Cascadia Mono", "Segoe UI Mono",
+  --font-mono:
+    ui-monospace, Menlo, Monaco, "Cascadia Mono", "Segoe UI Mono",
     "Roboto Mono", "Oxygen Mono", "Ubuntu Monospace", "Source Code Pro",
     "Fira Mono", "Droid Sans Mono", "Courier New", monospace;
 
@@ -48,13 +49,14 @@
 :root {
   --max-width: 1100px;
   --border-radius: 12px;
-  --font-mono: ui-monospace, Menlo, Monaco, "Cascadia Mono", "Segoe UI Mono",
+  --font-mono:
+    ui-monospace, Menlo, Monaco, "Cascadia Mono", "Segoe UI Mono",
     "Roboto Mono", "Oxygen Mono", "Ubuntu Monospace", "Source Code Pro",
     "Fira Mono", "Droid Sans Mono", "Courier New", monospace;
 
   --foreground-rgb: 225, 225, 225;
   --background-start-rgb: 0, 0, 0;
-  --background-end-rgb: 44, 43, 43;
+  --background-end-rgb: 24, 23, 23;
 
   --drawer-width: 15vw;
   --drawer-width-tablet: 20vw;
@@ -117,9 +119,9 @@
     var(--primary-site-fade)
   );
 
-  --highlight-text-glow: 0 0 10px var(--primary-site-color),
-    0 0 20px var(--primary-site-color), 0 0 30px var(--primary-site-color),
-    0 0 40px var(--primary-site-color);
+  --highlight-text-glow:
+    0 0 10px var(--primary-site-color), 0 0 20px var(--primary-site-color),
+    0 0 30px var(--primary-site-color), 0 0 40px var(--primary-site-color);
 
   --highlight-link: linear-gradient(
     to left,
@@ -127,9 +129,9 @@
     var(--secondary-site-fade)
   );
 
-  --highlight-link-glow: 0 0 10px var(--secondary-site-color),
-    0 0 20px var(--secondary-site-color), 0 0 30px var(--secondary-site-color),
-    0 0 40px var(--secondary-site-color);
+  --highlight-link-glow:
+    0 0 10px var(--secondary-site-color), 0 0 20px var(--secondary-site-color),
+    0 0 30px var(--secondary-site-color), 0 0 40px var(--secondary-site-color);
 
   --highlight-info: linear-gradient(
     to left,
@@ -143,9 +145,9 @@
     var(--error-site-fade)
   );
 
-  --highlight-error-glow: 0 0 10px var(--error-site-color),
-    0 0 20px var(--error-site-color), 0 0 30px var(--error-site-color),
-    0 0 40px var(--error-site-color);
+  --highlight-error-glow:
+    0 0 10px var(--error-site-color), 0 0 20px var(--error-site-color),
+    0 0 30px var(--error-site-color), 0 0 40px var(--error-site-color);
 
   --highlight-disabled: linear-gradient(
     to left,
@@ -153,9 +155,9 @@
     var(--disabled-site-fade)
   );
 
-  --highlight-disabled-glow: 0 0 10px var(--disabled-site-color),
-    0 0 20px var(--disabled-site-color), 0 0 30px var(--disabled-site-color),
-    0 0 40px var(--disabled-site-color);
+  --highlight-disabled-glow:
+    0 0 10px var(--disabled-site-color), 0 0 20px var(--disabled-site-color),
+    0 0 30px var(--disabled-site-color), 0 0 40px var(--disabled-site-color);
 }
 
 * {
@@ -174,12 +176,7 @@ body {
 
 body {
   color: rgb(var(--foreground-rgb));
-  background: linear-gradient(
-      to top,
-      transparent,
-      rgb(var(--background-end-rgb))
-    )
-    rgb(var(--background-start-rgb));
+  background: rgb(var(--background-end-rgb));
 }
 
 h1,

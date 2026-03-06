@@ -97,13 +97,17 @@
 
 @keyframes glow-input {
   0% {
-    box-shadow: 0 0 5px var(--primary-site-color),
-      0 0 10px var(--primary-site-color), 0 0 15px var(--primary-site-color),
+    box-shadow:
+      0 0 5px var(--primary-site-color),
+      0 0 10px var(--primary-site-color),
+      0 0 15px var(--primary-site-color),
       0 0 20px var(--primary-site-color);
   }
   100% {
-    box-shadow: 0 0 10px var(--primary-site-color),
-      0 0 20px var(--primary-site-color), 0 0 30px var(--primary-site-color),
+    box-shadow:
+      0 0 10px var(--primary-site-color),
+      0 0 20px var(--primary-site-color),
+      0 0 30px var(--primary-site-color),
       0 0 40px var(--primary-site-color);
   }
 }
@@ -158,6 +162,6 @@
 
 @media (min-width: 700px) and (max-width: 1500px) {
   .drawer {
-    width: var(--drawer-width-tablet); 
+    width: var(--drawer-width-tablet);
   }
 }

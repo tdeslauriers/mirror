@@ -1,7 +1,8 @@
 // process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 import UserForm from "../../components/forms/user-form";
 import { Profile } from ".";
-import { handleReset, handleUserEdit } from "./actions";
+import { handleUserEdit } from "./actions_profile";
+import { handleReset } from "./actions_reset";
 import GetCsrf from "@/components/csrf-token";
 import ResetForm from "../../components/forms/reset-form";
 import { Suspense } from "react";
@@ -9,6 +10,7 @@ import Loading from "@/components/loading";
 import { getAuthCookies } from "@/components/checkCookies";
 import callGatewayData from "@/components/call-gateway-data";
 import handlePageLoadFailure from "@/components/errors/handle-page-load-errors";
+import AddressSection from "@/components/forms/address-section";
 
 export const metadata = {
   robots: "noindex, nofollow",
@@ -22,15 +24,17 @@ export default async function ProfilePage() {
   if (!cookies.ok) {
     console.log(
       `${pageError}: failed auth cookie check: ${
-        cookies.error ? cookies.error.message : "unknown error related to session cookies."
-      }`
+        cookies.error
+          ? cookies.error.message
+          : "unknown error related to session cookies."
+      }`,
     );
     return handlePageLoadFailure(
       401,
       cookies.error
         ? cookies.error.message
         : "unknown error related to session cookies.",
-      "/login"
+      "/login",
     );
   }
 
@@ -45,26 +49,28 @@ export default async function ProfilePage() {
 
   if (!csrfResult.ok) {
     console.log(
-      `${pageError} for user ${cookies.data.identity?.username}: ${csrfResult.error.message}`
+      `${pageError} for user ${cookies.data.identity?.username}: ${csrfResult.error.message}`,
     );
     return handlePageLoadFailure(
       csrfResult.error.code,
       csrfResult.error.message,
-      "/"
+      "/",
     );
   }
+
   const csrf = csrfResult.data.csrf_token;
 
   if (!profileResult.ok) {
     console.log(
-      `${pageError} for user ${cookies.data.identity?.username}: ${profileResult.error.message}`
+      `${pageError} for user ${cookies.data.identity?.username}: ${profileResult.error.message}`,
     );
     return handlePageLoadFailure(
       profileResult.error.code,
       profileResult.error.message,
-      "/"
+      "/",
     );
   }
+
   const profile = profileResult.data;
 
   return (
@@ -88,6 +94,7 @@ export default async function ProfilePage() {
           </div>
         )}
 
+        {/* Identity Form */}
         <div className="card-title">
           <h2>Identity</h2>
         </div>
@@ -96,13 +103,51 @@ export default async function ProfilePage() {
             <UserForm
               csrf={csrf}
               profile={profile}
+              username={
+                profile?.username === cookies.data.identity?.username
+                  ? profile.username
+                  : undefined
+              }
               userEdit={handleUserEdit}
-              editAllowed={profile?.username === cookies.data.identity?.username}
+              editAllowed={
+                profile?.username === cookies.data.identity?.username
+              }
             />
           </Suspense>
         </div>
 
-        <br />
+        {/* Address Form */}
+        <div className="card-title">
+          <h2>
+            Address(es){" "}
+            <sup>
+              <span
+                className={`highlight`}
+                style={{ textTransform: "lowercase" }}
+              >
+                optional
+              </span>
+            </sup>
+          </h2>
+        </div>
+        <div className={`card`}>
+          <Suspense fallback={<Loading />}>
+            <AddressSection
+              profileAddresses={profile?.addresses ?? null}
+              editAllowed={
+                profile?.username === cookies.data.identity?.username
+              }
+              csrf={csrf}
+              username={
+                profile?.username === cookies.data.identity?.username
+                  ? profile.username
+                  : undefined
+              }
+            />
+          </Suspense>
+        </div>
+
+        {/* Reset Form */}
         <div className="card-title">
           <h2>Reset Password</h2>
         </div>

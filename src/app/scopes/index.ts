@@ -12,6 +12,7 @@ const allowedServices = new Set([
   "pixie",
   "ran",
   "shaw",
+  "silhouette",
 ]);
 
 export type Scope = {
@@ -69,7 +70,7 @@ export function validateScope(scope: Scope) {
       `Service "${
         scope.service_name
       }" is not allowed. Allowed services are: ${Array.from(
-        allowedServices
+        allowedServices,
       ).join(", ")}`,
     ];
   }
@@ -105,7 +106,7 @@ export function validateScope(scope: Scope) {
 
   if (scope.description && scope.description.trim().length > 0) {
     const descriptionCheck: FieldValidation = checkScopeDescription(
-      scope.description
+      scope.description,
     );
     if (!descriptionCheck.isValid) {
       errors.description = descriptionCheck.messages;

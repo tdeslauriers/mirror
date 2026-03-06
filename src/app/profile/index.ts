@@ -1,9 +1,12 @@
+import { ErrNewConfirmPwMismatch, ErrPasswordInvalid, ErrPasswordInvalidContains, ErrPasswordUsedPreviously } from "@/components/forms";
 import {
   allNumbersValid,
   checkBirthdate,
   checkName,
   FieldValidation,
 } from "@/validation/user_fields";
+import { ErrMsgGeneric, GatewayError } from "../api";
+import { Address } from "../users";
 
 export type Profile = {
   csrf?: string;
@@ -12,6 +15,8 @@ export type Profile = {
   username?: string;
   firstname?: string;
   lastname?: string;
+  nickname?: string;
+  dark_mode?: boolean;
   slug?: string;
   created_at?: string;
   enabled?: boolean;
@@ -20,11 +25,13 @@ export type Profile = {
   birth_month?: number;
   birth_day?: number;
   birth_year?: number;
+  addresses?: Address[] | null;
 };
 
 export type ProfileActionCmd = {
   csrf?: string | null;
   slug?: string;
+  username?: string;
   profile: Profile | null;
   errors: { [key: string]: string[] };
 };
@@ -54,6 +61,14 @@ export function validateUpdateProfile(profile: Profile) {
     const lastnameCheck: FieldValidation = checkName(profile.lastname);
     if (!lastnameCheck.isValid) {
       errors.lastname = lastnameCheck.messages;
+    }
+  }
+
+  // check nickname
+  if (profile.nickname && profile.nickname.trim().length > 0) {
+    const nicknameCheck: FieldValidation = checkName(profile.nickname);
+    if (!nicknameCheck.isValid) {
+      errors.nickname = nicknameCheck.messages;
     }
   }
 
@@ -91,7 +106,7 @@ export function validateUpdateProfile(profile: Profile) {
     const birthdate: FieldValidation = checkBirthdate(
       profile.birth_year,
       profile.birth_month,
-      profile.birth_day
+      profile.birth_day,
     );
     if (!birthdate.isValid) {
       errors.birthdate = birthdate.messages;
@@ -99,4 +114,53 @@ export function validateUpdateProfile(profile: Profile) {
   }
 
   return errors;
+}
+
+export function handleProfileErrors(gatewayError: GatewayError) {
+  const errors: { [key: string]: string[] } = {};
+
+  switch (gatewayError.code) {
+    case 400:
+      errors.server = [gatewayError.message];
+      return errors;
+    case 401:
+      errors.server = [gatewayError.message];
+    case 403:
+      errors.server = [gatewayError.message];
+    case 404:
+      errors.server = [gatewayError.message];
+    case 405:
+      errors.server = [gatewayError.message];
+      return errors;
+    case 422:
+      // temporary fix for now: determine which error received
+      switch (true) {
+        case gatewayError.message.includes("firstname"):
+          errors.firstname = [gatewayError.message];
+          return errors;
+        case gatewayError.message.includes("lastname"):
+          errors.lastname = [gatewayError.message];
+          return errors;
+        case gatewayError.message.includes("birthdate"):
+          errors.birthdate = [gatewayError.message];
+          return errors;
+        case gatewayError.message.includes(ErrPasswordUsedPreviously):
+          errors.confirm_password = [gatewayError.message];
+          return errors;
+        case gatewayError.message.includes(ErrNewConfirmPwMismatch):
+          errors.confirm_password = [gatewayError.message];
+          return errors;
+        case gatewayError.message.includes(ErrPasswordInvalid):
+          errors.confirm_password = [gatewayError.message];
+          return errors;
+        case gatewayError.message.includes(ErrPasswordInvalidContains):
+          errors.confirm_password = [gatewayError.message];
+          return errors;
+        default:
+          break;
+      }
+    default:
+      errors.server = [gatewayError.message || ErrMsgGeneric];
+      return errors;
+  }
 }

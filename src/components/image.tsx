@@ -1,10 +1,9 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
 
-import { ImageData } from "@/app/images";
-
-import styles from "./image.module.css";
 import { useMemo, useState } from "react";
+import { ImageData } from "@/app/images";
+import styles from "./image.module.css";
 
 export default function Image({
   alt,

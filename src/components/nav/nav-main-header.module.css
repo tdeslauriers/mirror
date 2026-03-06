@@ -11,11 +11,11 @@
   /* border-bottom: 1px solid var(--primary-border-color); */
   box-shadow: 1px 0 55px rgba(13, 14, 13, 0.5);
   background: linear-gradient(
-      to left,
+      to right,
       transparent,
       rgb(var(--background-end-rgb))
     )
-    rgb(38, 41, 38);
+    rgb(40, 41, 40);
   z-index: 9999;
 }
 

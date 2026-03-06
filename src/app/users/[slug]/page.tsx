@@ -12,9 +12,7 @@ import { getAuthCookies } from "@/components/checkCookies";
 import callGatewayData from "@/components/call-gateway-data";
 import ManageScopesForm from "@/components/forms/manage-scopes-form";
 import ManagePermissionsForm from "@/components/forms/manage-permissions-form";
-import { all } from "axios";
 import handlePageLoadFailure from "@/components/errors/handle-page-load-errors";
-import { Profile } from "@/app/profile";
 import { Scope } from "@/app/scopes";
 import { Permission } from "@/app/permissions";
 import { User } from "..";
@@ -39,14 +37,14 @@ export default async function Page({
     console.log(
       `${pageError}: could not verify session cookies: ${
         cookies.error ? cookies.error.message : "unknown error"
-      }`
+      }`,
     );
     return handlePageLoadFailure(
       401,
       cookies.error
         ? cookies.error.message
         : "unknown error related to session cookies.",
-      "/login"
+      "/login",
     );
   }
 
@@ -54,12 +52,12 @@ export default async function Page({
   // ie, gaurd pattern or access hint gating
   if (!cookies.data.identity?.ux_render?.users?.user_read) {
     console.log(
-      `${pageError}: user ${cookies.data.identity?.username} does not have rights to view /users/${slug}.`
+      `${pageError}: user ${cookies.data.identity?.username} does not have rights to view /users/${slug}.`,
     );
     return handlePageLoadFailure(
       401,
       `you do not have rights to view /users/${slug}.`,
-      "/users"
+      "/users",
     );
   }
 
@@ -89,48 +87,48 @@ export default async function Page({
 
     if (!csrfResult.ok) {
       console.log(
-        `${pageError} for user ${cookies.data.identity?.username}: ${csrfResult.error.message}`
+        `${pageError} for user ${cookies.data.identity?.username}: ${csrfResult.error.message}`,
       );
       return handlePageLoadFailure(
         csrfResult.error.code,
         csrfResult.error.message,
-        "/users"
+        "/users",
       );
     }
     csrf = csrfResult.data.csrf_token;
 
     if (!userResult.ok) {
       console.log(
-        `${pageError} for user ${cookies.data.identity?.username}: ${userResult.error.message}`
+        `${pageError} for user ${cookies.data.identity?.username}: ${userResult.error.message}`,
       );
       return handlePageLoadFailure(
         userResult.error.code,
         userResult.error.message,
-        "/users"
+        "/users",
       );
     }
     user = userResult.data;
 
     if (!scopesResult.ok) {
       console.log(
-        `${pageError} for user ${cookies.data.identity?.username}: ${scopesResult.error.message}`
+        `${pageError} for user ${cookies.data.identity?.username}: ${scopesResult.error.message}`,
       );
       return handlePageLoadFailure(
         scopesResult.error.code,
         scopesResult.error.message,
-        "/users"
+        "/users",
       );
     }
     allScopes = scopesResult.data;
 
     if (!permissionsResult.ok) {
       console.log(
-        `${pageError} for user ${cookies.data.identity?.username}: ${permissionsResult.error.message}`
+        `${pageError} for user ${cookies.data.identity?.username}: ${permissionsResult.error.message}`,
       );
       return handlePageLoadFailure(
         permissionsResult.error.code,
         permissionsResult.error.message,
-        "/users"
+        "/users",
       );
     }
     allPermissions = permissionsResult.data;
@@ -178,6 +176,7 @@ export default async function Page({
               csrf={csrf}
               editAllowed={cookies.data.identity?.ux_render?.users?.user_write}
               slug={slug}
+              username={user?.username}
               profile={user}
               userEdit={handleUserEdit}
             />
