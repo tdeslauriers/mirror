@@ -7,15 +7,17 @@ import {
   handlePermissionsUpdate,
   handleScopesUpdate,
   handleUserEdit,
-} from "./actions";
+} from "./actions-profile";
 import { getAuthCookies } from "@/components/checkCookies";
 import callGatewayData from "@/components/call-gateway-data";
 import ManageScopesForm from "@/components/forms/manage-scopes-form";
 import ManagePermissionsForm from "@/components/forms/manage-permissions-form";
 import handlePageLoadFailure from "@/components/errors/handle-page-load-errors";
-import { Scope } from "@/app/scopes";
+import { compareScopesByNameAsc, Scope } from "@/app/scopes";
 import { Permission } from "@/app/permissions";
 import { User } from "..";
+import AddressSection from "@/components/forms/address-section";
+import PhoneSection from "@/components/forms/phone-section";
 
 export const metadata = {
   robots: "noindex, nofollow",
@@ -119,7 +121,7 @@ export default async function Page({
         "/users",
       );
     }
-    allScopes = scopesResult.data;
+    allScopes = [...(scopesResult.data ?? []).sort(compareScopesByNameAsc)];
 
     if (!permissionsResult.ok) {
       console.log(
@@ -138,7 +140,7 @@ export default async function Page({
     <>
       <main className={`main main-drawer`}>
         <div className="center"></div>
-        <div className="page-title">
+        <div className={`page-title`}>
           <div
             className="actions"
             style={{
@@ -166,6 +168,8 @@ export default async function Page({
             })}
           </div>
         )}
+
+        {/* User Identity Form */}
         <div className="card-title">
           <h2>User Uuid: {<span className="highlight">{user?.id}</span>}</h2>
         </div>
@@ -183,7 +187,69 @@ export default async function Page({
           </div>
         </Suspense>
 
-        {/* manage permissions form */}
+        {/* Address Section */}
+        <div className="card-title">
+          <h2>
+            {user && Array.isArray(user.addresses) && user.addresses.length > 0
+              ? "Addresses"
+              : "Address"}{" "}
+            <sup>
+              <span
+                className={`highlight`}
+                style={{ textTransform: "lowercase" }}
+              >
+                optional
+              </span>
+            </sup>
+          </h2>
+        </div>
+        <div className={`card`}>
+          <Suspense fallback={<Loading />}>
+            <AddressSection
+              profileAddresses={user?.addresses ?? null}
+              editAllowed={cookies.data.identity.ux_render?.users?.client_write}
+              csrf={csrf}
+              username={
+                user?.username === cookies.data.identity?.username
+                  ? user.username
+                  : undefined
+              }
+            />
+          </Suspense>
+        </div>
+
+        {/* phone section */}
+        <div className="card-title">
+          <h2>
+            {user && Array.isArray(user.phones) && user.phones.length > 0
+              ? "Phones"
+              : "Phone"}{" "}
+            <sup>
+              <span
+                className={`highlight`}
+                style={{ textTransform: "lowercase" }}
+              >
+                optional
+              </span>
+            </sup>
+          </h2>
+        </div>
+        <div className={`card`}>
+          <Suspense fallback={<Loading />}>
+            <PhoneSection
+              profilePhones={user?.phones ?? null}
+              editAllowed={cookies.data.identity.ux_render?.users?.client_write}
+              csrf={csrf}
+              username={
+                user?.username === cookies.data.identity?.username
+                  ? user.username
+                  : undefined
+              }
+            />
+          </Suspense>
+        </div>
+
+        {/* Permissions form */}
         <div className="card-title">
           <h2>
             Permissions:{" "}
@@ -209,7 +275,7 @@ export default async function Page({
           </div>
         </Suspense>
 
-        {/* manage scopes form */}
+        {/* Scopes form */}
         <div className="card-title">
           <h2>
             Scopes:{" "}

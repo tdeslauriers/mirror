@@ -64,28 +64,36 @@
   --primary-border-color: rgb(76, 79, 76);
   --primary-border-fade: rgb(23, 24, 23);
 
+  --primary-menutext-color: rgb(159, 164, 159);
   --menu-button-primary: rgb(90, 93, 90);
   --menu-button-fade: rgb(59, 61, 59);
 
-  --primary-title-color: rgb(255, 255, 255);
-  --primary-title-fade: rgb(220, 220, 220);
+  --primary-title-color: rgb(152, 152, 152);
+  --primary-title-fade: rgb(235, 233, 233);
 
+  --primary-site-text: rgb(7, 145, 2);
   --primary-site-color: rgb(21, 255, 0);
   --primary-site-fade: rgb(144, 250, 144);
 
+  --secondary-site-text: rgb(165, 3, 162);
   --secondary-site-color: rgb(255, 3, 247);
   --secondary-site-fade: rgb(253, 149, 251);
 
+  --info-site-text: rgb(151, 101, 0);
   --info-site-color: rgb(253, 169, 2);
   --info-site-fade: rgb(248, 198, 97);
 
+  --remove-site-text: rgb(159, 164, 159);
+  --remove-site-color: rgb(59, 61, 59);
+  --remove-site-fade: rgb(90, 93, 90);
+
+  --error-site-text: rgb(145, 2, 2);
   --error-site-color: rgb(255, 3, 3);
   --error-site-fade: rgb(254, 100, 100);
 
+  --disabled-site-text: rgb(41, 42, 41);
   --disabled-site-color: rgb(104, 106, 104);
   --disabled-site-fade: rgb(159, 164, 159);
-
-  --primary-menutext-color: rgb(159, 164, 159);
 
   --primary-glow: radial-gradient(rgba(196, 1, 255, 0.4), rgba(1, 65, 255, 0));
   --secondary-glow: linear-gradient(

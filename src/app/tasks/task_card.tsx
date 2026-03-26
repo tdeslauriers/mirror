@@ -43,7 +43,7 @@ export default function TaskCard({
           updateTaskStatusAction(
             task.task_slug as string,
             csrf as string,
-            "is_complete"
+            "is_complete",
           )
             .then((response) => {
               if (response?.confirmed !== optimisticIsComplete) {
@@ -68,7 +68,7 @@ export default function TaskCard({
           updateTaskStatusAction(
             task.task_slug as string,
             csrf as string,
-            "is_satisfactory"
+            "is_satisfactory",
           )
             .then((response) => {
               if (response?.confirmed !== optimisticIsSatisfactory) {
@@ -92,7 +92,7 @@ export default function TaskCard({
           updateTaskStatusAction(
             task.task_slug as string,
             csrf as string,
-            "is_proactive"
+            "is_proactive",
           )
             .then((response) => {
               if (response?.confirmed !== optimisticIsProactive) {
@@ -111,7 +111,7 @@ export default function TaskCard({
         break;
       default:
         setStatusError(
-          "Unknown status type. You many only update is_complete, is_satisfactory, or is_proactive."
+          "Unknown status type. You many only update is_complete, is_satisfactory, or is_proactive.",
         );
         break;
     }
@@ -164,7 +164,7 @@ export default function TaskCard({
       <hr />
 
       <div className={`${style.row}`}>
-        <div className={`${isComplete ? style.status : style.statusError}`}>
+        <div className={`${isComplete ? `actions ` : `actionsError`}`}>
           <button
             name="is_complete"
             type="button"
@@ -176,7 +176,7 @@ export default function TaskCard({
             {isComplete ? "Complete" : "Incomplete"}
           </button>
         </div>
-        <div className={`${isSatisfactory ? style.status : style.statusError}`}>
+        <div className={`${isSatisfactory ? `actions` : `actionsError`}`}>
           <button
             name="is_satisfactory"
             type="button"
@@ -192,7 +192,7 @@ export default function TaskCard({
             {isSatisfactory ? "Satisfactory" : "Deficient"}
           </button>
         </div>
-        <div className={`${isProactive ? style.status : style.statusError}`}>
+        <div className={`${isProactive ? `actions` : `actionsError`}`}>
           <button
             name="is_proactive"
             title={

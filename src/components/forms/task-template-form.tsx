@@ -30,7 +30,7 @@ export default function TemplateForm({
   template: TaskTemplate | null;
   templateFormUpdate: (
     prevState: TemplateActionCmd,
-    formData: FormData
+    formData: FormData,
   ) => TemplateActionCmd | Promise<TemplateActionCmd>;
 }) {
   const [templateState, formAction] = useActionState(templateFormUpdate, {
@@ -41,19 +41,18 @@ export default function TemplateForm({
   });
 
   const [selectedCategory, setSelectedCategory] = useState<string | undefined>(
-    templateState?.template?.category || ""
+    templateState?.template?.category || "",
   );
 
   const [selectedCadence, setSelectedCadence] = useState<string | undefined>(
-    templateState?.template?.cadence || ""
+    templateState?.template?.cadence || "",
   );
-
-  const [fieldErrors, setFieldErrors] = useState<Err>({});
 
   const handleSelectCategory = (e: React.ChangeEvent<HTMLSelectElement>) => {
     e.preventDefault();
     if (e.target.value !== "") {
       setSelectedCategory(e.target.value);
+      return;
     }
   };
 
@@ -61,12 +60,13 @@ export default function TemplateForm({
     e.preventDefault();
     if (e.target.value !== "") {
       setSelectedCadence(e.target.value);
+      return;
     }
   };
 
   // assignees
   const [currentUsers, setCurrentUsers] = useState<AllowanceUser[] | null>(
-    templateState?.template?.assignees || []
+    templateState?.template?.assignees || [],
   );
 
   const [selectedUser, setSelectedUser] = useState("");

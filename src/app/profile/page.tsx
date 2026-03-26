@@ -1,8 +1,8 @@
 // process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 import UserForm from "../../components/forms/user-form";
 import { Profile } from ".";
-import { handleUserEdit } from "./actions_profile";
-import { handleReset } from "./actions_reset";
+import { handleUserEdit } from "./actions-profile";
+import { handleReset } from "./actions-reset";
 import GetCsrf from "@/components/csrf-token";
 import ResetForm from "../../components/forms/reset-form";
 import { Suspense } from "react";
@@ -11,12 +11,13 @@ import { getAuthCookies } from "@/components/checkCookies";
 import callGatewayData from "@/components/call-gateway-data";
 import handlePageLoadFailure from "@/components/errors/handle-page-load-errors";
 import AddressSection from "@/components/forms/address-section";
+import PhoneSection from "@/components/forms/phone-section";
 
 export const metadata = {
   robots: "noindex, nofollow",
 };
 
-const pageError: string = "Failed to load profile page: ";
+const pageError: string = "Failed to load profile page";
 
 export default async function ProfilePage() {
   // quick for redirect if auth'd cookies not present
@@ -54,7 +55,7 @@ export default async function ProfilePage() {
     return handlePageLoadFailure(
       csrfResult.error.code,
       csrfResult.error.message,
-      "/",
+      "",
     );
   }
 
@@ -67,7 +68,7 @@ export default async function ProfilePage() {
     return handlePageLoadFailure(
       profileResult.error.code,
       profileResult.error.message,
-      "/",
+      "",
     );
   }
 
@@ -116,10 +117,14 @@ export default async function ProfilePage() {
           </Suspense>
         </div>
 
-        {/* Address Form */}
+        {/* Address Section */}
         <div className="card-title">
           <h2>
-            Address(es){" "}
+            {profile &&
+            Array.isArray(profile.addresses) &&
+            profile.addresses.length > 1
+              ? "Addresses"
+              : "Address"}{" "}
             <sup>
               <span
                 className={`highlight`}
@@ -134,6 +139,41 @@ export default async function ProfilePage() {
           <Suspense fallback={<Loading />}>
             <AddressSection
               profileAddresses={profile?.addresses ?? null}
+              editAllowed={
+                profile?.username === cookies.data.identity?.username
+              }
+              csrf={csrf}
+              username={
+                profile?.username === cookies.data.identity?.username
+                  ? profile.username
+                  : undefined
+              }
+            />
+          </Suspense>
+        </div>
+
+        {/* phone section */}
+        <div className="card-title">
+          <h2>
+            {profile &&
+            Array.isArray(profile.phones) &&
+            profile.phones.length > 1
+              ? "Phones"
+              : "Phone"}{" "}
+            <sup>
+              <span
+                className={`highlight`}
+                style={{ textTransform: "lowercase" }}
+              >
+                optional
+              </span>
+            </sup>
+          </h2>
+        </div>
+        <div className={`card`}>
+          <Suspense fallback={<Loading />}>
+            <PhoneSection
+              profilePhones={profile?.phones ?? null}
               editAllowed={
                 profile?.username === cookies.data.identity?.username
               }

@@ -121,11 +121,7 @@ export default function MobileMenu() {
                   </Link>
                 </li>
                 <li>
-                  <form
-                    className={loginStyle.logoutform}
-                    action={logout}
-                    method="post"
-                  >
+                  <form className={loginStyle.logoutform} action={logout}>
                     <button className={loginStyle.logoutbutton}>Logout</button>
                   </form>
                 </li>

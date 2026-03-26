@@ -18,8 +18,12 @@ export default function FormSubmit({
 
   return (
     <>
-      <div className={`actions`}>
-        <button type="submit" disabled={status.pending }>
+      <div className={`actions`} style={{ width: "100%" }}>
+        <button
+          style={{ width: "100%" }}
+          type="submit"
+          disabled={status.pending}
+        >
           <strong>
             {status.pending ? pending.toUpperCase() : buttonLabel.toUpperCase()}
           </strong>

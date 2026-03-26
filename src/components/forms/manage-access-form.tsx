@@ -7,7 +7,6 @@ import Link from "next/link";
 import FormSubmit from "./form-submit";
 import ErrorField from "../errors/error-field";
 
-
 export type AccessItem = {
   csrf?: string;
 
@@ -39,7 +38,7 @@ export default function ManageAccessForm({
   menuAccessItems: AccessItem[];
   updateAccessItems: (
     previousState: EntityScopesActionCmd | EntityPermissionsActionCmd,
-    formData: FormData
+    formData: FormData,
   ) =>
     | EntityScopesActionCmd
     | EntityPermissionsActionCmd
@@ -201,7 +200,7 @@ export default function ManageAccessForm({
                   {/* remove button */}
                   <div
                     style={{ width: "auto", alignItems: "right" }}
-                    className={`actions  ${styles.right}`}
+                    className={`actionsRemove  ${styles.right}`}
                   >
                     <button
                       type="button"

@@ -7,7 +7,8 @@ import AddressForm from "./address-form";
 import {
   handleAddressAdd,
   handleAddressEdit,
-} from "@/app/profile/actions_address";
+  handleAddressRemove,
+} from "@/app/profile/actions-address";
 
 export default function AddressSection({
   profileAddresses,
@@ -28,10 +29,10 @@ export default function AddressSection({
 
   const handleAddClick = () => {
     // check that there are not already 3 addresses on record before allowing add form to show
-    if (addresses && addresses.length >= 10) {
+    if (addresses && addresses.length >= 3) {
       // should not be possible to click add if 3 addresses already, but just in case
       setDisableShowForm(true);
-      alert("You can only have up to 3 addresses on record.");
+      alert("You can only have up to 3 addresses on a record.");
       return;
     }
     setShowForm(!showForm);
@@ -42,6 +43,13 @@ export default function AddressSection({
       {/* add button */}
       <div className="row">
         <div className={`${styles.box}`}>
+          {/* no addresses on file */}
+          {(!addresses || addresses.length === 0) && (
+            <span className="highlight-info">
+              No addresses on record. You may add up to 3.
+            </span>
+          )}
+
           {/* Addresses count between 0 and 3  */}
           {addresses && addresses.length > 0 && addresses.length < 3 && (
             <span
@@ -51,7 +59,7 @@ export default function AddressSection({
                   : `highlight-info`
               }
             >
-              {`You have ${addresses?.length ?? 0} address${addresses && addresses?.length > 1 ? "es" : ""} on record. You may add
+              {`${addresses?.length ?? 0} address${addresses && addresses?.length > 1 ? "es" : ""} on record. You may add
                 up to 3.`}
             </span>
           )}
@@ -59,16 +67,17 @@ export default function AddressSection({
           {/* 3 addresses on file */}
           {((addresses && addresses.length >= 3) || disableShowForm) && (
             <span className="highlight-info">
-              You cannot add another address.
+              You cannot add another address record.
             </span>
           )}
         </div>
 
+        {/* add button */}
         <div className={`${styles.box} ${styles.right} actions`}>
-          {(!addresses || addresses.length < 10) && (
+          {editAllowed && (!addresses || addresses.length < 3) && (
             <button
               name="add_address"
-              className={`btn`}
+              className={`add-address-button`}
               onClick={handleAddClick}
               disabled={disableShowForm}
             >
@@ -108,7 +117,7 @@ export default function AddressSection({
             style={{ marginBottom: "1.5rem", marginTop: "2rem" }}
           />
           <h2>
-            <span className="highlight">{`Address ${index + 1}`}</span>
+            <span className="highlight">{`Address Record ${index + 1}`}</span>
           </h2>
           <AddressForm
             key={address.slug}
@@ -118,6 +127,20 @@ export default function AddressSection({
             username={username ?? undefined}
             address={address}
             addressEdit={handleAddressEdit}
+            onRemove={async () => {
+              const result = await handleAddressRemove(
+                address.slug ?? "",
+                csrf ?? "",
+                username ?? "",
+              );
+              if (result.ok) {
+                setAddresses(
+                  (prev) =>
+                    prev?.filter((a) => a.slug !== address.slug) ?? null,
+                );
+              }
+              return result;
+            }}
           />
         </div>
       ))}

@@ -57,12 +57,12 @@
 }
 
 .menubutton:hover,
-.menubutton:active,
+
 .menubutton:focus {
   transition: 0.3s;
   outline-style: none;
-  /* box-shadow: 0 0 40px var(--primary-site-color); */
-  /* animation: glow-input 5s ease-in-out infinite alternate; */
+  box-shadow: 0 0 40px var(--primary-site-color); 
+  animation: glow-input 5s ease-in-out infinite alternate;
 }
 
 .submenu {

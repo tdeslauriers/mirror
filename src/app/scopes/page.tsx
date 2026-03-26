@@ -5,7 +5,7 @@ import Link from "next/link";
 import { getAuthCookies } from "@/components/checkCookies";
 import callGatewayData from "@/components/call-gateway-data";
 import handlePageLoadFailure from "@/components/errors/handle-page-load-errors";
-import { Scope } from ".";
+import { compareScopesByNameAsc, Scope } from ".";
 
 export const metadata = {
   robots: "noindex, nofollow",
@@ -54,7 +54,7 @@ export default async function ScopesPage() {
     );
     return handlePageLoadFailure(result.error.code, result.error.message);
   }
-  const scopes = result.data;
+  const scopes = result.data.sort(compareScopesByNameAsc);
 
   return (
     <>

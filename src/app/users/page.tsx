@@ -19,14 +19,14 @@ export default async function UsersPage() {
     console.log(
       `${pageError}: could not verify session cookies: ${
         cookies.error ? cookies.error.message : "unknown error"
-      }`
+      }`,
     );
     return handlePageLoadFailure(
       401,
       cookies.error
         ? cookies.error.message
         : "unknown error related to session cookies.",
-      "/login"
+      "/login",
     );
   }
 
@@ -34,7 +34,7 @@ export default async function UsersPage() {
   // ie, gaurd pattern or access hint gating
   if (!cookies.data.identity?.ux_render?.users?.user_read) {
     console.log(
-      `${pageError}: user ${cookies.data.identity?.username} does not have rights to view /users.`
+      `${pageError}: user ${cookies.data.identity?.username} does not have rights to view /users.`,
     );
     return handlePageLoadFailure(401, `you do not have rights to view /users.`);
   }
@@ -46,7 +46,7 @@ export default async function UsersPage() {
   });
   if (!result.ok) {
     console.log(
-      `${pageError} for user ${cookies.data.identity?.username}: ${result.error.message}`
+      `${pageError} for user ${cookies.data.identity?.username}: ${result.error.message}`,
     );
     return handlePageLoadFailure(result.error.code, result.error.message);
   }

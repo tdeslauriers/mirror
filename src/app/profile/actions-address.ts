@@ -25,6 +25,7 @@ export async function handleAddressAdd(
     postal_code: formData.get("postal_code") as string,
     country: formData.get("country") as string,
     is_current: formData.get("is_current") === "on" ? true : false,
+    is_primary: formData.get("is_primary") === "on" ? true : false,
   };
 
   // get the auth cookies
@@ -58,14 +59,11 @@ export async function handleAddressAdd(
       address: address,
       errors: errors,
     } as AddressActionCmd;
+  }
 
-    // light-weight validation of username
-    // true validation happpens in the gateway
-  } else if (
-    !username ||
-    username.trim().length < 3 ||
-    username.trim().length > 30
-  ) {
+  // light-weight validation of username
+  // true validation happpens in the gateway
+  if (!username || username.trim().length < 3 || username.trim().length > 30) {
     console.log(
       `User ${cookies.data.identity?.username} submitted username which is missing or not well formed.`,
     );
@@ -211,6 +209,7 @@ export async function handleAddressEdit(
     postal_code: formData.get("postal_code") as string,
     country: formData.get("country") as string,
     is_current: formData.get("is_current") === "on" ? true : false,
+    is_primary: formData.get("is_primary") === "on" ? true : false,
   };
 
   // get the auth cookies
@@ -279,6 +278,7 @@ export async function handleAddressEdit(
     ];
     return {
       csrf: csrf,
+      slug: slug,
       username: username,
       address: address,
       errors: errors,
@@ -404,6 +404,79 @@ export async function handleAddressEdit(
   }
 }
 
+export async function handleAddressRemove(
+  slug: string,
+  csrf: string,
+  username: string,
+): Promise<{ ok: boolean; error?: string }> {
+  // get cookies
+  const cookies = await getAuthCookies("/profile");
+  if (!cookies.ok) {
+    return {
+      ok: false,
+      error: cookies.error.message || "Failed to get auth cookies.",
+    };
+  }
+
+  // lightweight validation of csrf
+  if (!csrf || csrf.trim().length < 16 || csrf.trim().length > 64) {
+    return { ok: false, error: "CSRF token missing or not well formed." };
+  }
+
+  // lightweight validation of slug
+  if (!slug || slug.trim().length < 16 || slug.trim().length > 64) {
+    return { ok: false, error: "Address slug missing or not well formed." };
+  }
+
+  // lightweight validation of username
+  if (!username || username.trim().length < 3 || username.trim().length > 30) {
+    return { ok: false, error: "Username missing or not well formed." };
+  }
+
+  try {
+    const apiResponse = await fetch(
+      `${process.env.GATEWAY_SERVICE_URL}/addresses`,
+      {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `${cookies.data.session}`,
+        },
+        body: JSON.stringify({ csrf, slug, username }),
+      },
+    );
+
+    if (apiResponse.ok) {
+      console.log(
+        `Address ${slug} removed successfully for user ${cookies.data.identity?.username}`,
+      );
+      return { ok: true };
+    } else {
+      const fail = await apiResponse.json();
+      if (isGatewayError(fail)) {
+        return { ok: false, error: fail.message };
+      }
+      console.error(
+        `Address remove failed for user ${cookies.data.identity?.username} due to unhandled gateway error: ${apiResponse.status} ${apiResponse.statusText}`,
+      );
+      return {
+        ok: false,
+        error: "Address remove failed due to an unhandled gateway error.",
+      };
+    }
+  } catch (error) {
+    console.error(
+      `Address remove failed for user ${cookies.data.identity?.username}: ${(error as Error).message}`,
+    );
+    return {
+      ok: false,
+      error:
+        (error as Error).message ||
+        "Address remove failed due to an unexpected error.",
+    };
+  }
+}
+
 function handleAddressErrors(gatewayError: GatewayError) {
   const errors: { [key: string]: string[] } = {};
 
@@ -413,10 +486,13 @@ function handleAddressErrors(gatewayError: GatewayError) {
       return errors;
     case 401:
       errors.server = [gatewayError.message];
+      return errors;
     case 403:
       errors.server = [gatewayError.message];
+      return errors;
     case 404:
       errors.server = [gatewayError.message];
+      return errors;
     case 405:
       errors.server = [gatewayError.message];
       return errors;
@@ -440,6 +516,12 @@ function handleAddressErrors(gatewayError: GatewayError) {
           return errors;
         case gatewayError.message.includes("country"):
           errors.country = [gatewayError.message];
+          return errors;
+        case gatewayError.message.includes("current"):
+          errors.is_current = [gatewayError.message];
+          return errors;
+        case gatewayError.message.includes("primary"):
+          errors.is_primary = [gatewayError.message];
           return errors;
         default:
           break;

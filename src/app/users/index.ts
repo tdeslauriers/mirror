@@ -8,6 +8,11 @@ import {
 import { Permission } from "../permissions";
 import { Scope } from "../scopes";
 import { ApiTimestamp } from "../api";
+import {
+  checkCountryCode,
+  checkExtension,
+  checkPhoneNumber,
+} from "@/validation/phone_fields";
 
 export type User = {
   csrf?: string;
@@ -26,6 +31,8 @@ export type User = {
   birth_month?: number;
   birth_day?: number;
   birth_year?: number;
+  addresses?: Address[] | null;
+  phones?: Phone[] | null;
   scopes?: Scope[];
   permissions?: Permission[];
 };
@@ -49,8 +56,8 @@ export type ServicePermission = {
 
 export type AddressActionCmd = {
   csrf?: string | null;
-  slug?: string;
-  username?: string;
+  slug?: string | null;
+  username?: string | null;
   address?: Address | null;
   errors: { [key: string]: string[] };
 };
@@ -72,6 +79,7 @@ export type Address = {
   postal_code?: string;
   country?: string;
   is_current?: boolean;
+  is_primary?: boolean;
   updated_at?: ApiTimestamp;
   created_at?: ApiTimestamp;
 };
@@ -127,6 +135,77 @@ export function validateAddress(address: Address) {
     if (!countryCheck.isValid) {
       errors.country = countryCheck.messages;
     }
+  }
+
+  return errors;
+}
+
+export type PhoneActionCmd = {
+  csrf?: string | null;
+  slug?: string | null;
+  username?: string;
+  phone?: Phone | null;
+  errors: { [key: string]: string[] };
+};
+
+export type PhoneCmd = {
+  csrf?: string | null;
+  slug?: string | null;
+  username?: string;
+  phone: Phone;
+};
+
+export const PhoneTypes: Map<number, string> = new Map([
+  [0, "Unspecified"],
+  [1, "Mobile"],
+  [2, "Home"],
+  [3, "Work"],
+]);
+
+export type Phone = {
+  id?: string;
+  slug?: string;
+  country_code?: string;
+  phone_number?: string;
+  extension?: string;
+  phone_type?: number;
+  is_primary?: boolean;
+  is_current?: boolean;
+  updated_at?: ApiTimestamp;
+  created_at?: ApiTimestamp;
+};
+
+export function validatePhone(phone: Phone) {
+  const errors: { [key: string]: string[] } = {};
+
+  // check country code
+  const countryCodeCheck = checkCountryCode(phone.country_code?.trim() ?? "");
+  if (!countryCodeCheck.isValid) {
+    errors.country_code = countryCodeCheck.messages;
+  }
+
+  // check phone number
+  const phoneNumberCheck = checkPhoneNumber(phone.phone_number?.trim() ?? "");
+  if (!phoneNumberCheck.isValid) {
+    errors.phone_number = phoneNumberCheck.messages;
+  }
+
+  // check extension if provided
+  if (phone.extension && phone.extension.trim().length > 0) {
+    const extensionCheck = checkExtension(phone.extension.trim());
+    if (!extensionCheck.isValid) {
+      errors.extension = extensionCheck.messages;
+    }
+  }
+
+  // check phone type
+  if (
+    phone.phone_type !== undefined &&
+    ![...PhoneTypes.keys()].includes(phone.phone_type)
+  ) {
+    errors.phone_type = [
+      `Phone type must be one of the following: ${[...PhoneTypes.values()].join(", ")}.`,
+    ];
   }
 
   return errors;

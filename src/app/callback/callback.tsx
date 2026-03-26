@@ -1,7 +1,7 @@
 "use client";
 
 import { useSearchParams } from "next/navigation";
-import { use, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { State } from "../api";
 import Loading from "@/components/loading";
 import ErrorLoadPage from "@/components/errors/error-load-page";

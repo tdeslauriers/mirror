@@ -3,7 +3,13 @@
 import { Address, AddressActionCmd } from "@/app/users";
 import { US_STATES, COUNTRIES } from "@/validation/address_fields";
 import ErrorField from "../errors/error-field";
-import { useActionState, useEffect, useRef, useState } from "react";
+import {
+  useActionState,
+  useEffect,
+  useRef,
+  useState,
+  useTransition,
+} from "react";
 import styles from "./address-form.module.css";
 import FormSubmit from "./form-submit";
 import { ApiTimestamp } from "@/app/api";
@@ -16,6 +22,7 @@ export default function AddressForm({
   address,
   addressEdit,
   onSuccess,
+  onRemove,
 }: {
   csrf: string | null;
   editAllowed?: boolean; // just cookie check => ui rendering logic only
@@ -27,6 +34,7 @@ export default function AddressForm({
     formData: FormData,
   ) => AddressActionCmd | Promise<AddressActionCmd>;
   onSuccess?: (address: Address) => void;
+  onRemove?: () => Promise<{ ok: boolean; error?: string }>;
 }) {
   const [addressState, formAction] = useActionState(addressEdit, {
     csrf: csrf,
@@ -58,6 +66,20 @@ export default function AddressForm({
     if (e.target.value !== "") {
       setCountry(e.target.value);
     }
+  };
+
+  const [removeError, setRemoveError] = useState<string | null>(null);
+  const [removePending, startRemoveTransition] = useTransition();
+
+  const handleRemove = () => {
+    if (!onRemove) return;
+    startRemoveTransition(async () => {
+      setRemoveError(null);
+      const result = await onRemove();
+      if (!result.ok) {
+        setRemoveError(result.error ?? "Failed to remove address.");
+      }
+    });
   };
 
   const onSuccessRef = useRef(onSuccess);
@@ -101,6 +123,7 @@ export default function AddressForm({
 
         {/* Current and primary checkboxes */}
         <div className="checkbox-row" style={{ marginBottom: "1rem" }}>
+          {/* is current checkbox */}
           <div className="field">
             <label className="label" htmlFor="is_current">
               Current
@@ -113,6 +136,23 @@ export default function AddressForm({
               name="is_current"
               type="checkbox"
               defaultChecked={addressState.address?.is_current ?? false}
+              disabled={!editAllowed}
+            />
+          </div>
+
+          {/* is primary checkbox */}
+          <div className="field" style={{ marginLeft: "2rem" }}>
+            <label className="label" htmlFor="is_primary">
+              Primary
+            </label>
+            {addressState.errors.is_primary && (
+              <ErrorField errorMsgs={addressState.errors.is_primary} />
+            )}
+            <input
+              className="form"
+              name="is_primary"
+              type="checkbox"
+              defaultChecked={addressState.address?.is_primary ?? false}
               disabled={!editAllowed}
             />
           </div>
@@ -134,7 +174,7 @@ export default function AddressForm({
               title="Must be between 1-100 characters long and may only include letters, numbers, spaces, commas, periods, apostrophes, hashes, and hyphens."
               pattern="[a-zA-Z0-9\s,.'#-]{1,100}"
               defaultValue={addressState.address?.street_address ?? ""}
-              placeholder="Street Address"
+              placeholder="Address Line 1"
               required
               disabled={!editAllowed}
             />
@@ -165,7 +205,7 @@ export default function AddressForm({
               title="Must be between 1-100 characters long and may only include letters, numbers, spaces, commas, periods, apostrophes, hashes, and hyphens."
               pattern="[a-zA-Z0-9\s,.'#-]{0,100}"
               defaultValue={addressState.address?.street_address_2 ?? ""}
-              placeholder="Street Address 2"
+              placeholder="Address Line 2"
               disabled={!editAllowed}
             />
           </div>
@@ -278,6 +318,21 @@ export default function AddressForm({
               buttonLabel={`${addressState.slug ? "update" : "save"} address`}
               pendingLabel={`${addressState.slug ? "updating" : "saving"} address record...`}
             />
+          </div>
+        )}
+
+        {/* Remove */}
+        {editAllowed && onRemove && (
+          <div className={`row actionsRemove`} style={{ marginTop: "0.75rem" }}>
+            {removeError && <ErrorField errorMsgs={[removeError]} />}
+            <button
+              type="button"
+              className={`btn`}
+              onClick={handleRemove}
+              disabled={removePending}
+            >
+              {removePending ? "removing address..." : "remove address"}
+            </button>
           </div>
         )}
       </form>

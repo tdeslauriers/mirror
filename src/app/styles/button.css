@@ -1,7 +1,3 @@
-.actions {
-  width: 100%;
-}
-
 .actions button {
   border: 0;
   border: none;
@@ -12,13 +8,13 @@
     var(--primary-site-fade),
     var(--primary-site-color)
   );
-  width: 100%;
+
   cursor: pointer;
   font: inherit;
   font-size: 1.25rem;
   font-weight: bold;
   text-transform: uppercase;
-  color: rgb(var(--foreground-rgb));
+  color: var(--primary-site-text);
 }
 
 .actions button:hover,
@@ -31,13 +27,64 @@
 
 .actions button:disabled {
   background: #ccc;
-  color: #979797;
+  color: #4f4e4e;
   cursor: not-allowed;
 }
 
 .actions button:hover:disabled,
 .actions button:focus:disabled {
   box-shadow: 0 0 40px #60635f;
+  animation: glow-input-fix 3s ease-in-out infinite alternate;
+  transform: translateZ(0); /* trigger GPU acceleration */
+  will-change: transform; /* inform the browser that this element will be animated */
+}
+
+.actionsRemove button {
+  /* margin-top: 1rem; */
+  border: 0;
+  border: none;
+  border-radius: 4px;
+  padding: 0.75rem 2rem;
+  background: linear-gradient(
+    90deg,
+    var(--remove-site-fade),
+    var(--remove-site-color)
+  );
+  width: 100%;
+  cursor: pointer;
+  font: inherit;
+  font-size: 1.25rem;
+  font-weight: bold;
+  text-transform: uppercase;
+  color: var(--remove-site-text);
+}
+
+.actionsRemove button:hover,
+.actionsRemove button:focus {
+  color: var(--error-site-text);
+  background: linear-gradient(
+    90deg,
+    var(--error-site-fade),
+    var(--error-site-color)
+  );
+  transition: 0.3s;
+  outline-style: none;
+  /* box-shadow: 0 0 40px var(--primary-site-color); */
+  animation: glow-error 5s ease-in-out infinite alternate;
+}
+
+.actionsRemove button:disabled {
+  background: #ccc;
+  color: #979797;
+  cursor: not-allowed;
+}
+
+.actionsRemove button:hover:disabled,
+.actionsRemove button:focus:disabled {
+  background: #ccc;
+  color: #4f4e4e;
+  cursor: not-allowed;
+  box-shadow: 0 0 40px var(--primary-border-color);
   animation: glow-input-fix 3s ease-in-out infinite alternate;
   transform: translateZ(0); /* trigger GPU acceleration */
   will-change: transform; /* inform the browser that this element will be animated */
@@ -60,7 +107,7 @@
   font-size: 1.25rem;
   font-weight: bold;
   text-transform: uppercase;
-  color: rgb(var(--foreground-rgb));
+  color: var(--error-site-text);
 }
 
 .actionsError button:hover,
@@ -79,47 +126,40 @@
 
 .actionsError button:hover:disabled,
 .actionsError button:focus:disabled {
+  background: #ccc;
+  color: #4f4e4e;
+  cursor: not-allowed;
   box-shadow: 0 0 40px var(--primary-border-color);
   animation: glow-input-fix 3s ease-in-out infinite alternate;
   transform: translateZ(0); /* trigger GPU acceleration */
   will-change: transform; /* inform the browser that this element will be animated */
 }
 
-@keyframes glow-input {
-  0% {
-    box-shadow: 0 0 5px var(--primary-site-color),
-      0 0 10px var(--primary-site-color), 0 0 15px var(--primary-site-color),
-      0 0 20px var(--primary-site-color);
+@media ((min-width: 701) and (max-width: 1500px)) {
+  .actions {
+    flex-direction: column;
   }
-  100% {
-    box-shadow: 0 0 10px var(--primary-site-color),
-      0 0 20px var(--primary-site-color), 0 0 30px var(--primary-site-color),
-      0 0 40px var(--primary-site-color);
-  }
-}
 
-@keyframes glow-input-fix {
-  0% {
-    box-shadow: 0 0 5px var(--disabled-site-color),
-      0 0 10px var(--disabled-site-color), 0 0 15px var(--disabled-site-color),
-      0 0 20px var(--disabled-site-color);
+  .actions button {
+    width: 100%;
+    margin-top: 0.5rem;
+    margin-bottom: 0.5rem;
   }
-  100% {
-    box-shadow: 0 0 10px var(--disabled-site-color),
-      0 0 20px var(--disabled-site-color), 0 0 30px var(--disabled-site-color),
-      0 0 40px var(--disabled-site-color);
-  }
-}
 
-@keyframes glow-error {
-  0% {
-    box-shadow: 0 0 5px var(--error-site-color), 0 0 5px var(--error-site-color),
-      0 0 15px var(--error-site-color), 0 0 20px var(--error-site-color);
+  .actionsError {
+    flex-direction: column;
   }
-  100% {
-    box-shadow: 0 0 10px var(--error-site-color),
-      0 0 20px var(--error-site-color), 0 0 30px var(--error-site-color),
-      0 0 40px var(--error-site-color);
+
+  .actionsError button {
+    width: 100%;
+    margin-top: 0.5rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .actionsDisabled button {
+    width: 100%;
+    margin-top: 0.5rem;
+    margin-bottom: 0.5rem;
   }
 }
 
@@ -132,5 +172,89 @@
     width: 100%;
     margin-top: 0.5rem;
     margin-bottom: 0.5rem;
+  }
+
+  .actionsError {
+    flex-direction: column;
+  }
+
+  .actionsError button {
+    width: 100%;
+    margin-top: 0.5rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .actionsDisabled button {
+    width: 100%;
+    margin-top: 0.5rem;
+    margin-bottom: 0.5rem;
+  }
+}
+
+@keyframes glow-input {
+  0% {
+    box-shadow:
+      0 0 5px var(--primary-site-color),
+      0 0 10px var(--primary-site-color),
+      0 0 15px var(--primary-site-color),
+      0 0 20px var(--primary-site-color);
+  }
+  100% {
+    box-shadow:
+      0 0 10px var(--primary-site-color),
+      0 0 20px var(--primary-site-color),
+      0 0 30px var(--primary-site-color),
+      0 0 40px var(--primary-site-color);
+  }
+}
+
+@keyframes glow-input-fix {
+  0% {
+    box-shadow:
+      0 0 5px var(--disabled-site-color),
+      0 0 10px var(--disabled-site-color),
+      0 0 15px var(--disabled-site-color),
+      0 0 20px var(--disabled-site-color);
+  }
+  100% {
+    box-shadow:
+      0 0 10px var(--disabled-site-color),
+      0 0 20px var(--disabled-site-color),
+      0 0 30px var(--disabled-site-color),
+      0 0 40px var(--disabled-site-color);
+  }
+}
+
+@keyframes glow-remove {
+  0% {
+    box-shadow:
+      0 0 5px var(--remove-site-color),
+      0 0 5px var(--remove-site-color),
+      0 0 15px var(--remove-site-color),
+      0 0 20px var(--remove-site-color);
+  }
+  100% {
+    box-shadow:
+      0 0 10px var(--remove-site-color),
+      0 0 20px var(--remove-site-color),
+      0 0 30px var(--remove-site-color),
+      0 0 40px var(--remove-site-color);
+  }
+}
+
+@keyframes glow-error {
+  0% {
+    box-shadow:
+      0 0 5px var(--error-site-color),
+      0 0 5px var(--error-site-color),
+      0 0 15px var(--error-site-color),
+      0 0 20px var(--error-site-color);
+  }
+  100% {
+    box-shadow:
+      0 0 10px var(--error-site-color),
+      0 0 20px var(--error-site-color),
+      0 0 30px var(--error-site-color),
+      0 0 40px var(--error-site-color);
   }
 }

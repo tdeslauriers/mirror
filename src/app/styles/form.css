@@ -137,36 +137,51 @@ span.highlightError {
 
 @keyframes glow-input {
   0% {
-    box-shadow: 0 0 5px var(--primary-site-color),
-      0 0 10px var(--primary-site-color), 0 0 15px var(--primary-site-color),
+    box-shadow:
+      0 0 5px var(--primary-site-color),
+      0 0 10px var(--primary-site-color),
+      0 0 15px var(--primary-site-color),
       0 0 20px var(--primary-site-color);
   }
   100% {
-    box-shadow: 0 0 10px var(--primary-site-color),
-      0 0 20px var(--primary-site-color), 0 0 30px var(--primary-site-color),
+    box-shadow:
+      0 0 10px var(--primary-site-color),
+      0 0 20px var(--primary-site-color),
+      0 0 30px var(--primary-site-color),
       0 0 40px var(--primary-site-color);
   }
 }
 
 @keyframes glow-input-fix {
   0% {
-    box-shadow: 0 0 5px var(--info-site-color), 0 0 10px var(--info-site-color),
-      0 0 15px var(--info-site-color), 0 0 20px var(--info-site-color);
+    box-shadow:
+      0 0 5px var(--info-site-color),
+      0 0 10px var(--info-site-color),
+      0 0 15px var(--info-site-color),
+      0 0 20px var(--info-site-color);
   }
   100% {
-    box-shadow: 0 0 10px var(--info-site-color), 0 0 20px var(--info-site-color),
-      0 0 30px var(--info-site-color), 0 0 40px var(--info-site-color);
+    box-shadow:
+      0 0 10px var(--info-site-color),
+      0 0 20px var(--info-site-color),
+      0 0 30px var(--info-site-color),
+      0 0 40px var(--info-site-color);
   }
 }
 
 @keyframes glow-error {
   0% {
-    box-shadow: 0 0 5px var(--error-site-color), 0 0 5px var(--error-site-color),
-      0 0 15px var(--error-site-color), 0 0 20px var(--error-site-color);
+    box-shadow:
+      0 0 5px var(--error-site-color),
+      0 0 5px var(--error-site-color),
+      0 0 15px var(--error-site-color),
+      0 0 20px var(--error-site-color);
   }
   100% {
-    box-shadow: 0 0 10px var(--error-site-color),
-      0 0 20px var(--error-site-color), 0 0 30px var(--error-site-color),
+    box-shadow:
+      0 0 10px var(--error-site-color),
+      0 0 20px var(--error-site-color),
+      0 0 30px var(--error-site-color),
       0 0 40px var(--error-site-color);
   }
 }

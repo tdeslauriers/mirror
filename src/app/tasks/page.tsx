@@ -35,7 +35,7 @@ export default async function TasksPage({
   // after sanitizing the params, check if user is auth'd and has tasks_read permission
   // if not, redirect to login page
   const query = new URLSearchParams(
-    sanitizedParams as Record<string, string>
+    sanitizedParams as Record<string, string>,
   ).toString();
   const fullpath = `/tasks${query ? `?${query}` : ""}`;
 
@@ -45,14 +45,14 @@ export default async function TasksPage({
     console.log(
       `${pageError}: failed auth cookie check: ${
         cookies.error ? cookies.error.message : "unknown error"
-      }`
+      }`,
     );
     return handlePageLoadFailure(
       401,
       cookies.error
         ? cookies.error.message
         : "unknown error related to session cookies.",
-      "/login"
+      "/login",
     );
   }
 
@@ -60,7 +60,7 @@ export default async function TasksPage({
   // ie, gaurd pattern or access hint gating
   if (!cookies.data.identity?.ux_render?.tasks?.tasks_read) {
     console.log(
-      `${pageError}: user ${cookies.data.identity?.username} does not have rights to view /tasks.`
+      `${pageError}: user ${cookies.data.identity?.username} does not have rights to view /tasks.`,
     );
     return handlePageLoadFailure(401, `you do not have rights to view /tasks.`);
   }
@@ -82,11 +82,11 @@ export default async function TasksPage({
   });
   if (!tasksResult.ok) {
     console.log(
-      `${pageError} for user ${cookies.data.identity?.username}: ${tasksResult.error.message}`
+      `${pageError} for user ${cookies.data.identity?.username}: ${tasksResult.error.message}`,
     );
     return handlePageLoadFailure(
       tasksResult.error.code,
-      tasksResult.error.message
+      tasksResult.error.message,
     );
   }
   const tasks = tasksResult.data;
@@ -99,11 +99,11 @@ export default async function TasksPage({
     const csrfResult = await GetCsrf(cookies.data.session ?? "");
     if (!csrfResult.ok) {
       console.log(
-        `${pageError} for user ${cookies.data.identity?.username}: ${csrfResult.error.message}`
+        `${pageError} for user ${cookies.data.identity?.username}: ${csrfResult.error.message}`,
       );
       return handlePageLoadFailure(
         csrfResult.error.code,
-        csrfResult.error.message
+        csrfResult.error.message,
       );
     }
     csrf = csrfResult.data.csrf_token;
@@ -136,16 +136,15 @@ export default async function TasksPage({
           )}
 
           {tasks.map((task: Task) => (
-            <>
+            <div key={task.task_slug}>
               <TaskCard
-                key={task.task_slug}
                 task={task}
                 csrf={csrf}
                 reviewAllowed={
                   cookies.data.identity?.ux_render?.tasks?.allowances_write
                 }
               />
-            </>
+            </div>
           ))}
         </div>
       </main>

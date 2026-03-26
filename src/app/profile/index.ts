@@ -1,4 +1,9 @@
-import { ErrNewConfirmPwMismatch, ErrPasswordInvalid, ErrPasswordInvalidContains, ErrPasswordUsedPreviously } from "@/components/forms";
+import {
+  ErrNewConfirmPwMismatch,
+  ErrPasswordInvalid,
+  ErrPasswordInvalidContains,
+  ErrPasswordUsedPreviously,
+} from "@/components/forms";
 import {
   allNumbersValid,
   checkBirthdate,
@@ -6,7 +11,7 @@ import {
   FieldValidation,
 } from "@/validation/user_fields";
 import { ErrMsgGeneric, GatewayError } from "../api";
-import { Address } from "../users";
+import { Address, Phone } from "../users";
 
 export type Profile = {
   csrf?: string;
@@ -26,6 +31,7 @@ export type Profile = {
   birth_day?: number;
   birth_year?: number;
   addresses?: Address[] | null;
+  phones?: Phone[] | null;
 };
 
 export type ProfileActionCmd = {

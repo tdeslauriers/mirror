@@ -115,3 +115,28 @@ export function validateScope(scope: Scope) {
 
   return errors;
 }
+
+// scopes comparator for sorting by name in ascending order
+export function compareScopesByNameAsc(a: Scope, b: Scope) {
+  const nameA = (a.name ?? "").trim();
+  const nameB = (b.name ?? "").trim();
+
+  // rows with missing names go to the bottom
+  if (!nameA && !nameB) {
+    return (a.slug ?? "").localeCompare(b.slug ?? "", undefined, {
+      sensitivity: "base",
+    });
+  }
+  if (!nameA) return 1;
+  if (!nameB) return -1;
+
+  const byName = nameA.localeCompare(nameB, undefined, {
+    sensitivity: "base",
+  });
+
+  if (byName !== 0) return byName;
+
+  return (a.scope ?? "").localeCompare(b.scope ?? "", undefined, {
+    sensitivity: "base",
+  });
+}
