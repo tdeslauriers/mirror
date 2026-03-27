@@ -16,7 +16,7 @@ import ManageScopesForm from "@/components/forms/manage-scopes-form";
 import PatGenForm from "@/components/forms/pat-gen-form";
 import { ServiceClient } from "..";
 import handlePageLoadFailure from "@/components/errors/handle-page-load-errors";
-import { Scope } from "@/app/scopes";
+import { compareScopesByNameAsc, Scope } from "@/app/scopes";
 
 export const metadata = {
   robots: "noindex, nofollow",
@@ -38,14 +38,14 @@ export default async function Page({
     console.log(
       `${pageError}: failed auth cookie check: ${
         cookies.error ? cookies.error.message : "unknown error"
-      }`
+      }`,
     );
     return handlePageLoadFailure(
       401,
       cookies.error
         ? cookies.error.message
         : "unknown error related to session cookies.",
-      "/login"
+      "/login",
     );
   }
 
@@ -53,12 +53,12 @@ export default async function Page({
   // ie, gaurd pattern or access hint gating
   if (!cookies.data.identity?.ux_render?.users?.client_read) {
     console.log(
-      `${pageError}: user ${cookies.data.identity?.username} does not have rights to view /services/${slug}.`
+      `${pageError}: user ${cookies.data.identity?.username} does not have rights to view /services/${slug}.`,
     );
     return handlePageLoadFailure(
       401,
       `you do not have rights to view /services/${slug}.`,
-      "/services"
+      "/services",
     );
   }
 
@@ -82,39 +82,40 @@ export default async function Page({
 
     if (!csrfResult.ok) {
       console.log(
-        `${pageError} for user ${cookies.data.identity?.username}: ${csrfResult.error.message}`
+        `${pageError} for user ${cookies.data.identity?.username}: ${csrfResult.error.message}`,
       );
       return handlePageLoadFailure(
         csrfResult.error.code,
         csrfResult.error.message,
-        "/services"
+        "/services",
       );
     }
     csrf = csrfResult.data.csrf_token;
 
     if (!clientResult.ok) {
       console.log(
-        `${pageError} for user ${cookies.data.identity?.username}: ${clientResult.error.message}`
+        `${pageError} for user ${cookies.data.identity?.username}: ${clientResult.error.message}`,
       );
       return handlePageLoadFailure(
         clientResult.error.code,
         clientResult.error.message,
-        "/services"
+        "/services",
       );
     }
     client = clientResult.data;
 
     if (!scopesResult.ok) {
       console.log(
-        `${pageError} for user ${cookies.data.identity?.username}: ${scopesResult.error.message}`
+        `${pageError} for user ${cookies.data.identity?.username}: ${scopesResult.error.message}`,
       );
       return handlePageLoadFailure(
         scopesResult.error.code,
         scopesResult.error.message,
-        "/services"
+        "/services",
       );
     }
-    allScopes = scopesResult.data;
+
+    allScopes = [...(scopesResult.data ?? []).sort(compareScopesByNameAsc)];
   }
 
   return (

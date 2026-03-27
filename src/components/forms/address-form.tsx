@@ -141,7 +141,7 @@ export default function AddressForm({
           </div>
 
           {/* is primary checkbox */}
-          <div className="field" style={{ marginLeft: "2rem" }}>
+          <div className="field" >
             <label className="label" htmlFor="is_primary">
               Primary
             </label>

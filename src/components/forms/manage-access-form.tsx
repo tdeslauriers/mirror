@@ -110,8 +110,8 @@ export default function ManageAccessForm({
                   onChange={handleSelect}
                 >
                   <option value="">{`Select ${accessLabel}...`}</option>
-                  {menuAccessItems.map((m) => (
-                    <option key={m.slug} value={m.slug}>
+                  {menuAccessItems.map((m, i) => (
+                    <option key={i} value={m.slug}>
                       {m.name}
                     </option>
                   ))}
@@ -162,8 +162,8 @@ export default function ManageAccessForm({
 
         {/* if there are access items attached to an entity */}
         {currentAccessItems &&
-          currentAccessItems.map((item) => (
-            <div key={item.slug} className={styles.scopecard}>
+          currentAccessItems.map((item, index) => (
+            <div key={index} className={styles.scopecard}>
               {/* the box object that contains the access item representation */}
               {/* first row with the link to the access object and the service name */}
               <div className={styles.row} style={{ fontSize: "2rem" }}>
