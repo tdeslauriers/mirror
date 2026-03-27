@@ -209,11 +209,7 @@ export default async function Page({
               profileAddresses={user?.addresses ?? null}
               editAllowed={cookies.data.identity.ux_render?.users?.client_write}
               csrf={csrf}
-              username={
-                user?.username === cookies.data.identity?.username
-                  ? user.username
-                  : undefined
-              }
+              username={user?.username}
             />
           </Suspense>
         </div>
@@ -240,11 +236,7 @@ export default async function Page({
               profilePhones={user?.phones ?? null}
               editAllowed={cookies.data.identity.ux_render?.users?.client_write}
               csrf={csrf}
-              username={
-                user?.username === cookies.data.identity?.username
-                  ? user.username
-                  : undefined
-              }
+              username={user?.username}
             />
           </Suspense>
         </div>

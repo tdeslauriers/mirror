@@ -53,7 +53,7 @@ export async function handlePhoneAdd(
       `User ${cookies.data.identity?.username} submitted CSRF token which is missing or not well formed.`,
     );
     const errors: { [key: string]: string[] } = {};
-    errors.csrf = [
+    errors.server = [
       "CSRF token missing or not well formed. This value is required and cannot be tampered with.",
     ];
     return {
@@ -66,12 +66,12 @@ export async function handlePhoneAdd(
 
   // light-weight validation of username
   // true validation happpens in the gateway
-  if (!username || username.trim().length < 3 || username.trim().length > 30) {
+  if (!username || username.trim().length < 5 || username.trim().length > 255) {
     console.log(
       `User ${cookies.data.identity?.username} submitted username which is missing or not well formed.`,
     );
     const errors: { [key: string]: string[] } = {};
-    errors.username = [
+    errors.server = [
       "Username missing or not well formed. This value is required and cannot be tampered with.",
     ];
     return {
@@ -224,7 +224,7 @@ export async function handlePhoneEdit(
       `User ${cookies.data.identity?.username} submitted CSRF token which is missing or not well formed.`,
     );
     const errors: { [key: string]: string[] } = {};
-    errors.csrf = [
+    errors.server = [
       "CSRF token missing or not well formed. This value is required and cannot be tampered with.",
     ];
     return {
@@ -243,7 +243,7 @@ export async function handlePhoneEdit(
       `User ${cookies.data.identity?.username} submitted address slug which is missing or not well formed.`,
     );
     const errors: { [key: string]: string[] } = {};
-    errors.slug = [
+    errors.server = [
       "Address slug missing or not well formed. This value is required and cannot be tampered with.",
     ];
     return {
@@ -262,7 +262,7 @@ export async function handlePhoneEdit(
       `User ${cookies.data.identity?.username} submitted username which is missing or not well formed.`,
     );
     const errors: { [key: string]: string[] } = {};
-    errors.username = [
+    errors.server = [
       "Username missing or not well formed. This value is required and cannot be tampered with.",
     ];
     return {

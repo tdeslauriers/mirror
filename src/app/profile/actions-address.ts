@@ -50,7 +50,7 @@ export async function handleAddressAdd(
       `User ${cookies.data.identity?.username} submitted CSRF token which is missing or not well formed.`,
     );
     const errors: { [key: string]: string[] } = {};
-    errors.csrf = [
+    errors.server = [
       "CSRF token missing or not well formed. This value is required and cannot be tampered with.",
     ];
     return {
@@ -68,7 +68,7 @@ export async function handleAddressAdd(
       `User ${cookies.data.identity?.username} submitted username which is missing or not well formed.`,
     );
     const errors: { [key: string]: string[] } = {};
-    errors.username = [
+    errors.server = [
       "Username missing or not well formed. This value is required and cannot be tampered with.",
     ];
     return {
@@ -235,7 +235,7 @@ export async function handleAddressEdit(
       `User ${cookies.data.identity?.username} submitted CSRF token which is missing or not well formed.`,
     );
     const errors: { [key: string]: string[] } = {};
-    errors.csrf = [
+    errors.server = [
       "CSRF token missing or not well formed. This value is required and cannot be tampered with.",
     ];
     return {
@@ -254,7 +254,7 @@ export async function handleAddressEdit(
       `User ${cookies.data.identity?.username} submitted address slug which is missing or not well formed.`,
     );
     const errors: { [key: string]: string[] } = {};
-    errors.slug = [
+    errors.server = [
       "Address slug missing or not well formed. This value is required and cannot be tampered with.",
     ];
     return {
@@ -273,7 +273,7 @@ export async function handleAddressEdit(
       `User ${cookies.data.identity?.username} submitted username which is missing or not well formed.`,
     );
     const errors: { [key: string]: string[] } = {};
-    errors.username = [
+    errors.server = [
       "Username missing or not well formed. This value is required and cannot be tampered with.",
     ];
     return {
