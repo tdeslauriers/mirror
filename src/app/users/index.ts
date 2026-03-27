@@ -210,3 +210,45 @@ export function validatePhone(phone: Phone) {
 
   return errors;
 }
+
+export function sortUsersByLastFirstAsc(a: User, b: User) {
+  const lastNameA = (a.lastname ?? "").trim().toLocaleLowerCase();
+  const lastNameB = (b.lastname ?? "").trim().toLocaleLowerCase();
+  const firstNameA = (a.firstname ?? "").trim().toLocaleLowerCase();
+  const firstNameB = (b.firstname ?? "").trim().toLocaleLowerCase();
+
+  // if both last and first names are missing, sort by username
+  if (!lastNameA && !firstNameA && !lastNameB && !firstNameB) {
+    return (a.username ?? "").localeCompare(b.username ?? "", undefined, {
+      sensitivity: "base",
+    });
+  }
+
+  // rows with missing last names go to the bottom
+  if (!lastNameA && !lastNameB) {
+    return (a.firstname ?? "").localeCompare(b.firstname ?? "", undefined, {
+      sensitivity: "base",
+    });
+  }
+  if (!lastNameA) return 1;
+  if (!lastNameB) return -1;
+
+  const byLastName = lastNameA.localeCompare(lastNameB, undefined, {
+    sensitivity: "base",
+  });
+
+  if (byLastName !== 0) return byLastName;
+
+  // if last names are the same, sort by first name
+  if (!firstNameA && !firstNameB) {
+    return (a.username ?? "").localeCompare(b.username ?? "", undefined, {
+      sensitivity: "base",
+    });
+  }
+  if (!firstNameA) return 1;
+  if (!firstNameB) return -1;
+
+  return firstNameA.localeCompare(firstNameB, undefined, {
+    sensitivity: "base",
+  });
+}

@@ -3,7 +3,7 @@ import { Suspense } from "react";
 import UserTable from "./user-table";
 import { getAuthCookies } from "@/components/checkCookies";
 import callGatewayData from "@/components/call-gateway-data";
-import { User } from ".";
+import { sortUsersByLastFirstAsc, User } from ".";
 import handlePageLoadFailure from "@/components/errors/handle-page-load-errors";
 
 export const metadata = {
@@ -50,7 +50,7 @@ export default async function UsersPage() {
     );
     return handlePageLoadFailure(result.error.code, result.error.message);
   }
-  const users = result.data;
+  const users = result.data.sort(sortUsersByLastFirstAsc);
 
   return (
     <>
