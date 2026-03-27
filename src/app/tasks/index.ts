@@ -38,7 +38,7 @@ export const TaskViews: string[] = ["today"];
 export const AssigneeCodes: string[] = ["me", "all"];
 
 export function validateUrlParams(
-  searchParams: Record<string, string | string[] | undefined>
+  searchParams: Record<string, string | string[] | undefined>,
 ) {
   let errors: string[] = [];
 
@@ -137,7 +137,7 @@ export function validateUrlParams(
   // check if is_satisfactory is a boolean if it exists
   if (searchParams["is_satisfactory"]) {
     const checkIsSatisfactory = validateBoolParam(
-      searchParams["is_satisfactory"]
+      searchParams["is_satisfactory"],
     );
     if (checkIsSatisfactory.length > 0) {
       const errMsg =
@@ -190,10 +190,10 @@ function validateAssignee(assignee: string) {
     !AssigneeCodes.includes(assignee.trim().toLowerCase())
   ) {
     console.log(
-      "Assignee param must be a valid UUID, email address, or known shorthand code like 'me' or 'all'"
+      "Assignee param must be a valid UUID, email address, or known shorthand code like 'me' or 'all'",
     );
     errors.push(
-      "Assignee param must be a valid UUID, email address, or known shorthand code like 'me' or 'all'"
+      "Assignee param must be a valid UUID, email address, or known shorthand code like 'me' or 'all'",
     );
   }
 
@@ -212,20 +212,20 @@ function validateBoolParam(param: string | string[]) {
 
   if (typeof param !== "string") {
     console.log(
-      "param must be a boolean in string from like 'true' or 'false'"
+      "param must be a boolean in string from like 'true' or 'false'",
     );
     errors.push(
-      "param must be a boolean in string from like 'true' or 'false'"
+      "param must be a boolean in string from like 'true' or 'false'",
     );
   }
 
   // check if is_complete is a boolean
   if (param !== "true" && param !== "false") {
     console.log(
-      "param must be a boolean in string from like 'true' or 'false'"
+      "param must be a boolean in string from like 'true' or 'false'",
     );
     errors.push(
-      "param must be a boolean in string from like 'true' or 'false'"
+      "param must be a boolean in string from like 'true' or 'false'",
     );
   }
 
@@ -249,4 +249,28 @@ export function validateStatus(status: string) {
     console.log("Invalid status: ", status);
     throw new Error("Invalid status: " + status);
   }
+}
+
+export function sortTasksByNameAsc(a: Task, b: Task) {
+  const nameA = (a.name ?? "").trim();
+  const nameB = (b.name ?? "").trim();
+
+  // rows with missing names go to the bottom
+  if (!nameA && !nameB) {
+    return (a.task_slug ?? "").localeCompare(b.task_slug ?? "", undefined, {
+      sensitivity: "base",
+    });
+  }
+  if (!nameA) return 1;
+  if (!nameB) return -1;
+
+  const byName = nameA.localeCompare(nameB, undefined, {
+    sensitivity: "base",
+  });
+
+  if (byName !== 0) return byName;
+
+  return (a.name ?? "").localeCompare(b.name ?? "", undefined, {
+    sensitivity: "base",
+  });
 }

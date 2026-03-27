@@ -1,6 +1,11 @@
 import callGatewayData from "@/components/call-gateway-data";
 import { getAuthCookies } from "@/components/checkCookies";
-import { Task, TaskQueryParams, validateUrlParams } from ".";
+import {
+  sortTasksByNameAsc,
+  Task,
+  TaskQueryParams,
+  validateUrlParams,
+} from ".";
 import {
   prepareQueryParams,
   safeSearchParams,
@@ -89,7 +94,7 @@ export default async function TasksPage({
       tasksResult.error.message,
     );
   }
-  const tasks = tasksResult.data;
+  const tasks = tasksResult.data.sort(sortTasksByNameAsc);
 
   // get csrf token from gateway for updating task statuses
   // check if identity cookie has template_write permission

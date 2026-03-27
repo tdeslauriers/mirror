@@ -2,7 +2,7 @@ import callGatewayData from "@/components/call-gateway-data";
 import Link from "next/link";
 import TemplatesTable from "./templates-table";
 import { getAuthCookies } from "@/components/checkCookies";
-import { TaskTemplate } from ".";
+import { sortTemplatesByNameAsc, TaskTemplate } from ".";
 import handlePageLoadFailure from "@/components/errors/handle-page-load-errors";
 
 export const metadata = {
@@ -18,14 +18,14 @@ export default async function TemplatesPage() {
     console.log(
       `${pageError}: could not verify session cookies: ${
         cookies.error ? cookies.error.message : "unknown error"
-      }`
+      }`,
     );
     return handlePageLoadFailure(
       401,
       cookies.error
         ? cookies.error.message
         : "unknown error related to session cookies.",
-      "/login"
+      "/login",
     );
   }
 
@@ -33,11 +33,11 @@ export default async function TemplatesPage() {
   // ie, gaurd pattern or access hint gating
   if (!cookies.data.identity?.ux_render?.tasks?.templates_read) {
     console.log(
-      `${pageError}: user ${cookies.data.identity?.username} does not have rights to view /templates.`
+      `${pageError}: user ${cookies.data.identity?.username} does not have rights to view /templates.`,
     );
     return handlePageLoadFailure(
       401,
-      `you do not have rights to view /templates.`
+      `you do not have rights to view /templates.`,
     );
   }
 
@@ -48,11 +48,13 @@ export default async function TemplatesPage() {
   });
   if (!result.ok) {
     console.log(
-      `${pageError} for user ${cookies.data.identity?.username}: ${result.error.message}`
+      `${pageError} for user ${cookies.data.identity?.username}: ${result.error.message}`,
     );
     return handlePageLoadFailure(result.error.code, result.error.message);
   }
-  const templates = result.data;
+
+  // sort the templates by name
+  const templates = result.data.sort(sortTemplatesByNameAsc);
 
   return (
     <>
