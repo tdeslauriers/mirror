@@ -72,14 +72,15 @@ const identityCookieSchema = {
   fullname: "stringOrNull",
   given_name: "stringOrNull",
   family_name: "stringOrNull",
-  birthdate: "string", // optional
+  nickname: "stringOrNull", // optional
+  birthdate: "stringOrNull", // optional
   ux_render: uxRenderSchema,
 };
 
 // checks for identity cookie and if does not exist, redirects to login,
 // and sets the state var to the current page.
 export async function getAuthCookies(
-  page: string
+  page: string,
 ): Promise<AuthCookieResult<UiCookies>> {
   const cookieStore = await cookies();
 
@@ -126,7 +127,7 @@ export async function getAuthCookies(
     const oauth = await GetOauthExchange(hasSession?.value, page);
     if (oauth) {
       redirect(
-        `/login?client_id=${oauth.client_id}&response_type=${oauth.response_type}&state=${oauth.state}&nonce=${oauth.nonce}&redirect_url=${oauth.redirect_url}`
+        `/login?client_id=${oauth.client_id}&response_type=${oauth.response_type}&state=${oauth.state}&nonce=${oauth.nonce}&redirect_url=${oauth.redirect_url}`,
       );
     } else {
       redirect("/login");
@@ -291,7 +292,7 @@ export async function getAuthCookies(
     const check = checkBirthdate(
       dob.getFullYear(),
       dob.getMonth(),
-      dob.getDate()
+      dob.getDate(),
     );
     if (!check.isValid) {
       const err =

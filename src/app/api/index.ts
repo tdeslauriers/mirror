@@ -56,6 +56,7 @@ export type CallbackResponse = {
   fullname: string;
   given_name: string;
   family_name: string;
+  nickname?: string;
   birthdate?: string;
   ux_render?: UxRender;
 };
@@ -69,6 +70,7 @@ export type IdentityCookie = {
   fullname: string | null;
   given_name: string | null;
   family_name: string | null;
+  nickname?: string;
   birthdate?: string;
   ux_render?: UxRender;
 };

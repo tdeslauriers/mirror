@@ -6,6 +6,7 @@ import { getAuthCookies } from "@/components/checkCookies";
 import callGatewayData from "@/components/call-gateway-data";
 import handlePageLoadFailure from "@/components/errors/handle-page-load-errors";
 import { Allowance } from "@/components/forms";
+import { sortAllowancesByRemiteeAsc } from ".";
 
 export const metadata = {
   robots: "noindex, nofollow",
@@ -20,14 +21,14 @@ export default async function AllowancesPage() {
     console.log(
       `${pageError} due to failed auth cookie check: ${
         cookies.error ? cookies.error.message : "unknown error"
-      }`
+      }`,
     );
     return handlePageLoadFailure(
       401,
       cookies.error
         ? cookies.error.message
         : "unknown error related to session cookies.",
-      "/login"
+      "/login",
     );
   }
 
@@ -35,11 +36,11 @@ export default async function AllowancesPage() {
   // ie, gaurd pattern or access hint gating
   if (!cookies.data.identity?.ux_render?.tasks?.allowances_read) {
     console.log(
-      `${pageError}: user ${cookies.data.identity?.username} does not have rights to view /allowances.`
+      `${pageError}: user ${cookies.data.identity?.username} does not have rights to view /allowances.`,
     );
     return handlePageLoadFailure(
       401,
-      `you do not have rights to view /allowances.`
+      `you do not have rights to view /allowances.`,
     );
   }
 
@@ -50,14 +51,13 @@ export default async function AllowancesPage() {
   });
   if (!result.ok) {
     console.log(
-      `${pageError} for user ${cookies.data.identity?.username}: ${result.error.message}`
+      `${pageError} for user ${cookies.data.identity?.username}: ${result.error.message}`,
     );
     return handlePageLoadFailure(result.error.code, result.error.message);
   }
 
   // TODO: sort allowances by remitee name
-  const allowances = result.data;
-
+  const allowances = result.data.sort(sortAllowancesByRemiteeAsc);
 
   return (
     <>

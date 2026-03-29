@@ -6,7 +6,7 @@ import UploadForm from "./upload-form";
 import callGatewayData from "@/components/call-gateway-data";
 import { Album, albumComparator } from "@/app/albums";
 import handlePageLoadFailure from "@/components/errors/handle-page-load-errors";
-import { Permission } from "@/app/permissions";
+import { Permission, sortPermissionsByName } from "@/app/permissions";
 
 export const metadata = {
   robots: "noindex, nofollow",
@@ -21,14 +21,14 @@ export default async function AddImagePage() {
     console.log(
       `${pageError} due to failed auth cookie check: ${
         cookies.error ? cookies.error.message : "unknown error"
-      }`
+      }`,
     );
     return handlePageLoadFailure(
       401,
       cookies.error
         ? cookies.error.message
         : "unknown error related to session cookies.",
-      "/login"
+      "/login",
     );
   }
 
@@ -36,11 +36,11 @@ export default async function AddImagePage() {
   // ie, gaurd pattern or access hint gating
   if (!cookies.data.identity?.ux_render?.gallery?.image_write) {
     console.log(
-      `${pageError}: user ${cookies.data.identity?.username} does not have rights to add an image.`
+      `${pageError}: user ${cookies.data.identity?.username} does not have rights to add an image.`,
     );
     return handlePageLoadFailure(
       401,
-      "You do not have rights to add an image."
+      "You do not have rights to add an image.",
     );
   }
 
@@ -59,39 +59,41 @@ export default async function AddImagePage() {
 
   if (!csrfResult.ok) {
     console.log(
-      `${pageError} for user ${cookies.data.identity?.username}: ${csrfResult.error.message}`
+      `${pageError} for user ${cookies.data.identity?.username}: ${csrfResult.error.message}`,
     );
     return handlePageLoadFailure(
       csrfResult.error.code,
       csrfResult.error.message,
-      "/albums"
+      "/albums",
     );
   }
   const csrf = csrfResult.data.csrf_token;
 
   if (!albumsResult.ok) {
     console.log(
-      `${pageError} for user ${cookies.data.identity?.username}: ${albumsResult.error.message}`
+      `${pageError} for user ${cookies.data.identity?.username}: ${albumsResult.error.message}`,
     );
     return handlePageLoadFailure(
       albumsResult.error.code,
       albumsResult.error.message,
-      "/albums"
+      "/albums",
     );
   }
   const sortedAlbums = [...(albumsResult.data ?? [])].sort(albumComparator);
 
   if (!permissionsResult.ok) {
     console.log(
-      `${pageError} for user ${cookies.data.identity?.username}: ${permissionsResult.error.message}`
+      `${pageError} for user ${cookies.data.identity?.username}: ${permissionsResult.error.message}`,
     );
     return handlePageLoadFailure(
       permissionsResult.error.code,
       permissionsResult.error.message,
-      "/albums"
+      "/albums",
     );
   }
-  const galleryPermissions = permissionsResult.data ?? [];
+  const galleryPermissions = [
+    ...(permissionsResult.data ?? []).sort(sortPermissionsByName),
+  ];
 
   return (
     <>

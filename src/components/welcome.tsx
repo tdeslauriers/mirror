@@ -12,13 +12,7 @@ export default async function Welcome() {
   if (hasIdenity) {
     const user = JSON.parse(hasIdenity.value);
     if (user) {
-      if (user.given_name) {
-        bannerName = user.given_name;
-      } else if (user.fullname) {
-        bannerName = user.fullname;
-      } else {
-        bannerName = user.username;
-      }
+      bannerName = user.nickname || user.given_name || user.username || "";
     }
   }
 
@@ -31,11 +25,11 @@ export default async function Welcome() {
         </span>
         {bannerName.length > 0 ? (
           <>
-            {" "}
-            world,{" "}
+            {" world, "}
             <Link className={`locallink`} href={`/profile`}>
-              {bannerName}!
+              {bannerName}
             </Link>
+            {"!"}
           </>
         ) : (
           " world!"

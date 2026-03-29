@@ -44,8 +44,8 @@ export default function Table<T>({
     const searchLower = search.toLowerCase();
     return data.filter((row) =>
       filterKeys.some((key) =>
-        String(row[key]).toLowerCase().includes(searchLower)
-      )
+        String(row[key]).toLowerCase().includes(searchLower),
+      ),
     );
   }, [data, search, filterKeys]);
 
@@ -124,7 +124,7 @@ export default function Table<T>({
                 className={column.sortable ? "sortable" : ""}
                 onClick={() => column.sortable && handleSort(column.accessor)}
               >
-                {column.header}
+                <span className="highlight">{column.header}</span>
                 {column.sortable && sortConfig?.key === column.accessor && (
                   <span>{sortConfig.direction === "asc" ? " ▲" : " ▼"}</span>
                 )}

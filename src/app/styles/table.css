@@ -41,7 +41,7 @@ th.sortable:hover,
 th.sortable:focus,
 th.sortable:active {
   /* Column highlight on hover */
-  color: var(--primary-site-color);
+  
   transition: 0.3s;
   text-shadow: var(--highlight-text-glow);
   outline: none;
@@ -160,7 +160,7 @@ tr.no-hover:hover {
 
 .pagination button {
   padding: 0.75rem 2rem;
-  color: rgb(var(--foreground-rgb));
+  color: var(--primary-site-text);
 
   border: 0;
   border: none;
@@ -202,25 +202,34 @@ tr.no-hover:hover {
 
 @keyframes glow-input {
   0% {
-    box-shadow: 0 0 5px var(--primary-site-color),
-      0 0 10px var(--primary-site-color), 0 0 15px var(--primary-site-color),
+    box-shadow:
+      0 0 5px var(--primary-site-color),
+      0 0 10px var(--primary-site-color),
+      0 0 15px var(--primary-site-color),
       0 0 20px var(--primary-site-color);
   }
   100% {
-    box-shadow: 0 0 10px var(--primary-site-color),
-      0 0 20px var(--primary-site-color), 0 0 30px var(--primary-site-color),
+    box-shadow:
+      0 0 10px var(--primary-site-color),
+      0 0 20px var(--primary-site-color),
+      0 0 30px var(--primary-site-color),
       0 0 40px var(--primary-site-color);
   }
 }
 
 @keyframes glow-error {
   0% {
-    box-shadow: 0 0 5px var(--error-site-color), 0 0 5px var(--error-site-color),
-      0 0 15px var(--error-site-color), 0 0 20px var(--error-site-color);
+    box-shadow:
+      0 0 5px var(--error-site-color),
+      0 0 5px var(--error-site-color),
+      0 0 15px var(--error-site-color),
+      0 0 20px var(--error-site-color);
   }
   100% {
-    box-shadow: 0 0 10px var(--error-site-color),
-      0 0 20px var(--error-site-color), 0 0 30px var(--error-site-color),
+    box-shadow:
+      0 0 10px var(--error-site-color),
+      0 0 20px var(--error-site-color),
+      0 0 30px var(--error-site-color),
       0 0 40px var(--error-site-color);
   }
 }

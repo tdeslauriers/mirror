@@ -6,7 +6,7 @@ import { imageFormUpdate } from "./actions";
 import ClipboardButton from "@/components/clipboard-button";
 import { headers } from "next/headers";
 import { Album, albumComparator } from "@/app/albums";
-import { Permission } from "@/app/permissions";
+import { Permission, sortPermissionsByName } from "@/app/permissions";
 import BackButton from "@/components/nav/back";
 import handlePageLoadFailure from "@/components/errors/handle-page-load-errors";
 import { ImageData } from "..";
@@ -31,7 +31,7 @@ export default async function Page({
     console.log(
       `${pageError}: due to fialed auth cookie check: ${
         cookies.error ? cookies.error.message : "unknown error"
-      }`
+      }`,
     );
     return handlePageLoadFailure(401, cookies.error.message, "/login");
   }
@@ -40,12 +40,12 @@ export default async function Page({
   // ie, gaurd pattern or access hint gating
   if (!cookies.data.identity?.ux_render?.gallery?.image_read) {
     console.log(
-      `${pageError}: user ${cookies.data.identity?.username} does not have rights to view this image.`
+      `${pageError}: user ${cookies.data.identity?.username} does not have rights to view this image.`,
     );
     return handlePageLoadFailure(
       401,
       `you do not have rights to view /images/${slug}.`,
-      "/albums"
+      "/albums",
     );
   }
 
@@ -62,12 +62,12 @@ export default async function Page({
   });
   if (!imgResult.ok) {
     console.log(
-      `${pageError} for user ${cookies.data.identity?.username}: ${imgResult.error.message}`
+      `${pageError} for user ${cookies.data.identity?.username}: ${imgResult.error.message}`,
     );
     return handlePageLoadFailure(
       imgResult.error.code,
       imgResult.error.message,
-      "/albums"
+      "/albums",
     );
   }
   const imageData = imgResult.data;
@@ -95,24 +95,24 @@ export default async function Page({
 
     if (!csrfResult.ok) {
       console.log(
-        `${pageError} for user ${cookies.data.identity?.username}: ${csrfResult.error.message}`
+        `${pageError} for user ${cookies.data.identity?.username}: ${csrfResult.error.message}`,
       );
       return handlePageLoadFailure(
         csrfResult.error.code,
         csrfResult.error.message,
-        `/images/${slug}`
+        `/images/${slug}`,
       );
     }
     csrf = csrfResult.data.csrf_token;
 
     if (!albumsResult.ok) {
       console.log(
-        `Error returned from gateway fetching menu albums for user ${cookies.data.identity?.username}: ${albumsResult.error.message}`
+        `Error returned from gateway fetching menu albums for user ${cookies.data.identity?.username}: ${albumsResult.error.message}`,
       );
       return handlePageLoadFailure(
         albumsResult.error.code,
         albumsResult.error.message,
-        `/albums`
+        `/albums`,
       );
     }
     const sortedAlbums = [...(albumsResult.data ?? [])].sort(albumComparator);
@@ -120,15 +120,17 @@ export default async function Page({
 
     if (!permissionsResult.ok) {
       console.log(
-        `Error returned from gateway fetching menu permissions for user ${cookies.data.identity?.username}: ${permissionsResult.error.message}`
+        `Error returned from gateway fetching menu permissions for user ${cookies.data.identity?.username}: ${permissionsResult.error.message}`,
       );
       return handlePageLoadFailure(
         permissionsResult.error.code,
         permissionsResult.error.message,
-        `/albums`
+        `/albums`,
       );
     }
-    menuPermissions = permissionsResult.data ?? [];
+    menuPermissions = [
+      ...(permissionsResult.data ?? []).sort(sortPermissionsByName),
+    ];
   }
 
   return (

@@ -60,7 +60,7 @@ export function validatePermission(permission: Permission) {
 
   if (permission.service_name && permission.service_name.trim().length > 0) {
     const serviceName: FieldValidation = checkServiceName(
-      permission.service_name
+      permission.service_name,
     );
     if (!serviceName.isValid) {
       errors.service_name = serviceName.messages;
@@ -76,7 +76,7 @@ export function validatePermission(permission: Permission) {
       `Service "${
         permission.service_name
       }" is not allowed. Allowed services are: ${Array.from(
-        allowedServices
+        allowedServices,
       ).join(", ")}`,
     ];
   }
@@ -88,7 +88,7 @@ export function validatePermission(permission: Permission) {
 
   if (permission.permission && permission.permission.trim().length > 0) {
     const permissionCheck: FieldValidation = checkPermission(
-      permission.permission
+      permission.permission,
     );
     if (!permissionCheck.isValid) {
       errors.permission = permissionCheck.messages;
@@ -114,7 +114,7 @@ export function validatePermission(permission: Permission) {
 
   if (permission.description && permission.description.trim().length > 0) {
     const descriptionCheck: FieldValidation = checkPermissionDescription(
-      permission.description
+      permission.description,
     );
     if (!descriptionCheck.isValid) {
       errors.description = descriptionCheck.messages;
@@ -166,4 +166,32 @@ export function validatePermissionSlugs(slugs: string[]) {
   });
 
   return errors;
+}
+
+export function sortPermissionsByName(a: Permission, b: Permission) {
+  const nameA = a.name ? a.name.toLowerCase() : "";
+  const nameB = b.name ? b.name.toLowerCase() : "";
+
+  if (!nameA && !nameB) {
+    return (a.slug || "").localeCompare(b.slug || "", undefined, {
+      sensitivity: "base",
+    });
+  }
+
+  if (!nameA) {
+    return 1;
+  }
+  if (!nameB) {
+    return -1;
+  }
+
+  const byName = nameA.localeCompare(nameB, undefined, { sensitivity: "base" });
+
+  if (byName !== 0) {
+    return byName;
+  }
+
+  return (a.permission || "").localeCompare(b.permission || "", undefined, {
+    sensitivity: "base",
+  });
 }

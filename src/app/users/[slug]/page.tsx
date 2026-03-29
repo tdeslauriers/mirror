@@ -14,7 +14,7 @@ import ManageScopesForm from "@/components/forms/manage-scopes-form";
 import ManagePermissionsForm from "@/components/forms/manage-permissions-form";
 import handlePageLoadFailure from "@/components/errors/handle-page-load-errors";
 import { compareScopesByNameAsc, Scope } from "@/app/scopes";
-import { Permission } from "@/app/permissions";
+import { Permission, sortPermissionsByName } from "@/app/permissions";
 import { User } from "..";
 import AddressSection from "@/components/forms/address-section";
 import PhoneSection from "@/components/forms/phone-section";
@@ -133,7 +133,9 @@ export default async function Page({
         "/users",
       );
     }
-    allPermissions = permissionsResult.data;
+    allPermissions = [
+      ...(permissionsResult.data ?? []).sort(sortPermissionsByName),
+    ];
   }
 
   return (

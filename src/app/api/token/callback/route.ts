@@ -32,39 +32,39 @@ export async function POST(req: NextRequest) {
       response_type.trim().length > 10
     ) {
       console.log(
-        "'response type' url query param missing,too short, or too long."
+        "'response type' url query param missing,too short, or too long.",
       );
       errors.oauth.push(
-        "'response_type' callback url query param missing,too short, or too long."
+        "'response_type' callback url query param missing,too short, or too long.",
       );
     }
 
     const state = searchParams.get("state");
     if (!state || state.trim().length <= 0 || state.trim().length > 256) {
       console.log(
-        "'state' callback url query param either missing or not well formed."
+        "'state' callback url query param either missing or not well formed.",
       );
       errors.oauth.push(
-        "'state' callback url query param either missing or not well formed."
+        "'state' callback url query param either missing or not well formed.",
       );
     }
     const nonce = searchParams.get("nonce");
     if (!nonce || !checkUuid(nonce).isValid) {
       console.log(
-        "'nonce' callback url query param either missing or not well formed."
+        "'nonce' callback url query param either missing or not well formed.",
       );
       errors.oauth.push(
-        "'nonce' callback url query param either missing or not well formed."
+        "'nonce' callback url query param either missing or not well formed.",
       );
     }
 
     const client_id = searchParams.get("client_id");
     if (!client_id || !checkUuid(client_id).isValid) {
       console.log(
-        "'client_id' url query param either missing or not well formed."
+        "'client_id' url query param either missing or not well formed.",
       );
       errors.oauth.push(
-        "Client_id url query param either missing or not well formed."
+        "Client_id url query param either missing or not well formed.",
       );
     }
 
@@ -72,10 +72,10 @@ export async function POST(req: NextRequest) {
     const redirectUrl = searchParams.get("redirect_url");
     if (!redirectUrl || redirectUrl.trim().length < 11) {
       console.log(
-        "'redirect_url' callback url query param missing or too short for a valid url."
+        "'redirect_url' callback url query param missing or too short for a valid url.",
       );
       errors.oauth.push(
-        "redirect_url' callback query param missing or too short for a valid url."
+        "redirect_url' callback query param missing or too short for a valid url.",
       );
     }
 
@@ -84,10 +84,10 @@ export async function POST(req: NextRequest) {
 
     if (!auth_code || !checkUuid(auth_code).isValid) {
       console.log(
-        "'auth_code' callback url query param either missing or not well formed."
+        "'auth_code' callback url query param either missing or not well formed.",
       );
       errors.oauth.push(
-        "'auth_code' callback url query param either missing or not well formed."
+        "'auth_code' callback url query param either missing or not well formed.",
       );
     }
 
@@ -115,7 +115,7 @@ export async function POST(req: NextRequest) {
             "Content-Type": "application/json",
           },
           body: JSON.stringify(cmd),
-        }
+        },
       );
       if (apiResponse.ok) {
         // handle redirect to home or restricted url content
@@ -142,6 +142,12 @@ export async function POST(req: NextRequest) {
           ux_render: callback.ux_render,
         };
 
+        // add nickname if it exists in callback response, this is optional
+        if (callback.nickname) {
+          user.nickname = callback.nickname;
+        }
+
+        // add birthdate if it exists in callback response, this is optional
         if (callback.birthdate) {
           user.birthdate = callback.birthdate;
         }
@@ -159,7 +165,7 @@ export async function POST(req: NextRequest) {
             headers: {
               "Content-Type": "application/json",
             },
-          }
+          },
         );
       } else {
         const fail = await apiResponse.json();
@@ -189,7 +195,7 @@ export async function POST(req: NextRequest) {
           headers: {
             "Content-Type": "application/json",
           },
-        }
+        },
       );
     }
   } else {
@@ -201,7 +207,7 @@ export async function POST(req: NextRequest) {
         headers: {
           "Content-Type": "application/json",
         },
-      }
+      },
     );
   }
 }
