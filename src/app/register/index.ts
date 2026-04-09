@@ -36,7 +36,6 @@ export type RegistrationActionCmd = {
 // api submission cmd
 export type RegistrationCmd = {
   csrf?: string;
-  session?: string;
 
   username?: string;
   password?: string;
@@ -187,7 +186,7 @@ export function validateRegistration(registration: RegistrationData) {
     const birthdate: FieldValidation = checkBirthdate(
       registration.birthYear,
       registration.birthMonth,
-      registration.birthDay
+      registration.birthDay,
     );
     if (!birthdate.isValid) {
       errors.birthdate = birthdate.messages;

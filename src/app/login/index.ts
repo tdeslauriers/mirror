@@ -19,10 +19,10 @@ export type LoginData = {
 };
 
 export type LoginCmd = {
+  csrf?: string | null;
+
   username?: string | null;
   password?: string | null;
-  csrf?: string | null;
-  session?: string | null;
   response_type?: string | null;
   state?: string | null;
   nonce?: string | null;
@@ -52,7 +52,7 @@ export function validateLogin(login: LoginData) {
       login.username.trim().length > EMAIL_MAX_LENGTH)
   ) {
     console.log(
-      `Email/username must be between ${EMAIL_MIN_LENGTH} and ${EMAIL_MAX_LENGTH} characters.`
+      `Email/username must be between ${EMAIL_MIN_LENGTH} and ${EMAIL_MAX_LENGTH} characters.`,
     );
     errors.username = [
       `Email/username must be between ${EMAIL_MIN_LENGTH} and ${EMAIL_MAX_LENGTH} characters.`,
@@ -70,7 +70,7 @@ export function validateLogin(login: LoginData) {
       login.password.trim().length > PASSWORD_MAX_LENGTH)
   ) {
     console.log(
-      `password between ${PASSWORD_MIN_LENGTH} and ${PASSWORD_MAX_LENGTH} characters.`
+      `password between ${PASSWORD_MIN_LENGTH} and ${PASSWORD_MAX_LENGTH} characters.`,
     );
     errors.password = [
       `password between ${PASSWORD_MIN_LENGTH} and ${PASSWORD_MAX_LENGTH} characters.`,
@@ -89,7 +89,7 @@ export function validateOauth(oauth: OauthExchange) {
     !checkUuid(oauth.client_id.trim()).isValid
   ) {
     console.log(
-      "client_id url query param either missing or not well formed uuid"
+      "client_id url query param either missing or not well formed uuid",
     );
     throw new Error(ErrLoginSumbit);
   }
@@ -100,7 +100,7 @@ export function validateOauth(oauth: OauthExchange) {
     oauth.response_type.trim().length > 10
   ) {
     console.log(
-      "response type url query param missing,too short, or too long."
+      "response type url query param missing,too short, or too long.",
     );
     throw new Error(ErrLoginSumbit);
   }
@@ -130,7 +130,7 @@ export function validateOauth(oauth: OauthExchange) {
     oauth.redirect_url.trim().length > 2048
   ) {
     console.log(
-      "redirect url query param missing, too short or too long for a valid url."
+      "redirect url query param missing, too short or too long for a valid url.",
     );
     throw new Error(ErrLoginSumbit);
   }

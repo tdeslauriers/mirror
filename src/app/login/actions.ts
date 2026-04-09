@@ -14,7 +14,7 @@ import { redirect } from "next/navigation";
 
 export async function handleLogin(
   previousState: LoginActionCmd,
-  formData: FormData
+  formData: FormData,
 ) {
   let login: LoginData = {
     username: formData.get("username") as string,
@@ -35,7 +35,7 @@ export async function handleLogin(
   // validate oauth flow data
   if (!previousState.oauth) {
     console.log(
-      `Login failed for username ${login.username}: OAuth data is missing from login form.`
+      `Login failed for username ${login.username}: OAuth data is missing from login form.`,
     );
     throw new Error(ErrLoginSumbit);
   }
@@ -50,7 +50,7 @@ export async function handleLogin(
     previousState.csrf.trim().length > 64
   ) {
     console.log(
-      `Login failed for username ${login.username}: csrf token missing or not well formed.`
+      `Login failed for username ${login.username}: csrf token missing or not well formed.`,
     );
     throw new Error(ErrLoginSumbit);
   }
@@ -69,7 +69,7 @@ export async function handleLogin(
     hasSession.value.length > 64
   ) {
     console.log(
-      `Login failed for username ${login.username}: session cookie is missing, or not well formed.`
+      `Login failed for username ${login.username}: session cookie is missing, or not well formed.`,
     );
     throw new Error(ErrLoginSumbit);
   }
@@ -84,7 +84,6 @@ export async function handleLogin(
     nonce: previousState.oauth.nonce?.trim(),
     redirect: previousState.oauth.redirect_url?.trim(),
 
-    session: hasSession.value?.trim(),
     csrf: previousState.csrf?.trim(),
   };
 
@@ -100,9 +99,10 @@ export async function handleLogin(
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          Authorization: `${hasSession.value?.trim()}`,
         },
         body: JSON.stringify(loginCmd),
-      }
+      },
     );
 
     if (apiResponse.ok) {
@@ -132,14 +132,14 @@ export async function handleLogin(
         } as LoginActionCmd;
       } else {
         console.log(
-          `Gateway returned unhandled error for username ${login.username}: ${fail})`
+          `Gateway returned unhandled error for username ${login.username}: ${fail})`,
         );
         throw new Error(ErrLoginSumbit);
       }
     }
   } catch (error) {
     console.log(
-      `Login call to gateway failed for username ${login.username}: ${error})`
+      `Login call to gateway failed for username ${login.username}: ${error})`,
     );
     throw new Error(ErrLoginSumbit);
   }
@@ -148,7 +148,7 @@ export async function handleLogin(
     redirect(callback);
   } else {
     console.log(
-      `Login failed for username ${login.username}: callback url not set.`
+      `Login failed for username ${login.username}: callback url not set.`,
     );
     throw new Error(ErrLoginSumbit);
   }

@@ -12,7 +12,7 @@ import { GatewayError, isGatewayError } from "../api";
 
 export async function handleRegistration(
   previousState: RegistrationActionCmd,
-  formData: FormData
+  formData: FormData,
 ) {
   // any fields that are not allowed to be changed by user will not be submitted
   // likewise, gateway/identity will dump any fields that are not allowed to be changed
@@ -33,7 +33,7 @@ export async function handleRegistration(
     console.log(
       `Registration validation failed for proposed username ${
         registration.username
-      }: ${JSON.stringify(errors)}`
+      }: ${JSON.stringify(errors)}`,
     );
     return {
       csrf: previousState.csrf,
@@ -50,7 +50,7 @@ export async function handleRegistration(
     previousState.csrf.trim().length > 64
   ) {
     console.log(
-      `CSRF token missing or not well formed for a registration attempt, proposed username: ${registration.username}.`
+      `CSRF token missing or not well formed for a registration attempt, proposed username: ${registration.username}.`,
     );
     return {
       csrf: previousState.csrf,
@@ -76,7 +76,7 @@ export async function handleRegistration(
     hasSession.value.trim().length > 64
   ) {
     console.log(
-      `Session cookie is missing or not well formed for a registration attempt, proposed username: ${registration.username}.`
+      `Session cookie is missing or not well formed for a registration attempt, proposed username: ${registration.username}.`,
     );
     return {
       csrf: previousState.csrf,
@@ -93,7 +93,6 @@ export async function handleRegistration(
   // if any of the fields are missing, the gateway will return a 400
   const registrationCmd: RegistrationCmd = {
     csrf: previousState.csrf,
-    session: hasSession.value,
 
     username: registration.username,
     password: registration.password,
@@ -128,15 +127,16 @@ export async function handleRegistration(
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          Authorization: `${hasSession.value.trim()}`,
         },
         body: JSON.stringify(registrationCmd),
-      }
+      },
     );
 
     if (apiResponse.ok) {
       const success = await apiResponse.json();
       console.log(
-        `Registration successful for new user ${registration.username}.`
+        `Registration successful for new user ${registration.username}.`,
       );
       return {
         complete: true,
@@ -150,7 +150,7 @@ export async function handleRegistration(
         console.log(
           `Registration failed for proposed username ${
             registration.username
-          }: ${JSON.stringify(errors)}`
+          }: ${JSON.stringify(errors)}`,
         );
         return {
           complete: false,
@@ -159,7 +159,7 @@ export async function handleRegistration(
         } as RegistrationActionCmd;
       } else {
         console.error(
-          `Registration failed for proposed username ${registration.username} due to unhandled gateway error: ${fail.message}`
+          `Registration failed for proposed username ${registration.username} due to unhandled gateway error: ${fail.message}`,
         );
         return {
           complete: false,
@@ -176,7 +176,7 @@ export async function handleRegistration(
     }
   } catch (error) {
     console.error(
-      `Registration failed for proposed username ${registration.username}: ${error}`
+      `Registration failed for proposed username ${registration.username}: ${error}`,
     );
     return {
       complete: false,
