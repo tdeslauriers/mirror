@@ -13,6 +13,7 @@ import {
 import TaskCard from "./task_card";
 import GetCsrf from "@/components/csrf-token";
 import handlePageLoadFailure from "@/components/errors/handle-page-load-errors";
+import Link from "next/link";
 
 export const metadata = {
   robots: "noindex, nofollow",
@@ -128,6 +129,12 @@ export default async function TasksPage({
             }}
           >
             <h1>Tasks</h1>
+            {cookies.data.identity &&
+              cookies.data.identity.ux_render?.tasks?.templates_write && (
+                <Link href="/templates/add">
+                  <button>Add Task/Template</button>
+                </Link>
+              )}
           </div>
         </div>
         <hr className="page-title" />

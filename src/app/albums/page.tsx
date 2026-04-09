@@ -19,25 +19,25 @@ export default async function AlbumsPage() {
       pageError +
         `failed auth cookie check: ${
           cookiesResult.error ? cookiesResult.error.message : "unknown error"
-        }`
+        }`,
     );
     return handlePageLoadFailure(
       401,
       cookiesResult.error
         ? cookiesResult.error.message
         : "unknown error related to session cookies.",
-      "/login"
+      "/login",
     );
   }
 
   // quick check if identity cookie has album_read access
   if (!cookiesResult.data.identity?.ux_render?.gallery?.album_read) {
     console.log(
-      `${pageError}: user ${cookiesResult.data.identity?.username} does not have rights to view /albums.`
+      `${pageError}: user ${cookiesResult.data.identity?.username} does not have rights to view /albums.`,
     );
     return handlePageLoadFailure(
       401,
-      `${pageError}: ${cookiesResult.data.identity?.given_name}, it appears you do not have access to view albums.`
+      `${pageError}: ${cookiesResult.data.identity?.given_name}, it appears you do not have access to view albums.`,
     );
   }
 
@@ -48,7 +48,7 @@ export default async function AlbumsPage() {
   });
   if (!result.ok) {
     console.log(
-      `${pageError}.  Error returned from gateway for user ${cookiesResult.data.identity?.username}: ${result.error.message}`
+      `${pageError}.  Error returned from gateway for user ${cookiesResult.data.identity?.username}: ${result.error.message}`,
     );
     return handlePageLoadFailure(result.error.code, result.error.message);
   }
@@ -58,11 +58,11 @@ export default async function AlbumsPage() {
   // log empty return -> permissions error
   if (!albums || albums.length === 0) {
     console.log(
-      `No albums data returned from gateway for user: ${cookiesResult.data.identity?.username}`
+      `No albums data returned from gateway for user: ${cookiesResult.data.identity?.username}`,
     );
     return handlePageLoadFailure(
       401,
-      `${pageError}: ${cookiesResult.data.identity?.given_name}, it appears you do not have access to any albums yet.`
+      `${pageError}: ${cookiesResult.data.identity?.given_name}, it appears you do not have access to any albums yet.`,
     );
   }
 

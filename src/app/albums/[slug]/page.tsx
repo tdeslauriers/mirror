@@ -34,7 +34,7 @@ export default async function AlbumPage({
     console.log(
       `${pageError}: failed auth cookie check: ${
         cookiesResult.error ? cookiesResult.error.message : "unknown error"
-      }`
+      }`,
     );
     return handlePageLoadFailure(401, cookiesResult.error.message, "/login");
   }
@@ -44,12 +44,12 @@ export default async function AlbumPage({
     console.log(
       `${pageError}: user ${
         cookiesResult.ok ? cookiesResult.data.identity?.username : null
-      } does not have rights to view this album.`
+      } does not have rights to view this album.`,
     );
     return handlePageLoadFailure(
       401,
       `you do not have rights to view /albums/${slug}`,
-      "/albums."
+      "/albums.",
     );
   }
 
@@ -66,12 +66,12 @@ export default async function AlbumPage({
   });
   if (!result.ok) {
     console.log(
-      `${pageError} for user ${cookiesResult.data.identity?.username}: ${result.error.message}`
+      `${pageError} for user ${cookiesResult.data.identity?.username}: ${result.error.message}`,
     );
     return handlePageLoadFailure(
       result.error.code,
       result.error.message,
-      "/albums"
+      "/albums",
     );
   }
 
@@ -91,7 +91,7 @@ export default async function AlbumPage({
     const result = await GetCsrf(cookiesResult.data.session ?? "");
     if (!result.ok) {
       console.log(
-        `${pageError} for user ${cookiesResult.data.identity?.username}: ${result.error.message}`
+        `${pageError} for user ${cookiesResult.data.identity?.username}: ${result.error.message}`,
       );
       return handlePageLoadFailure(500, result.error.message, "/albums");
     }
@@ -99,6 +99,8 @@ export default async function AlbumPage({
     // set the csrf token for the album form
     csrf = result.data.csrf_token;
   }
+
+  console.log("ALBUM: ", sortedImages);
 
   return (
     <>
@@ -145,9 +147,9 @@ export default async function AlbumPage({
                     key={image.slug}
                     title={image.title}
                     link={`/images/${image.slug}?returnUrl=${encodeURIComponent(
-                      `/albums/${slug}`
+                      `/albums/${slug}`,
                     )}&returnDestination=${encodeURIComponent(
-                      album.title ?? "album"
+                      album.title ?? "album",
                     )}`}
                     imageData={image}
                   />

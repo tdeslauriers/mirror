@@ -122,7 +122,6 @@ export default function UserForm({
               pattern={`^[a-zA-Z\\-\'\_\ ]+`}
               defaultValue={profileState.profile?.nickname}
               placeholder="Nickname"
-              required
               disabled={!editAllowed}
             />
           </div>
