@@ -90,6 +90,8 @@ export default function ManageAccessForm({
     errors: {},
   });
 
+  console.log("currentAccessItems: ", currentAccessItems);
+
   return (
     <>
       <form className="form" action={formAction}>

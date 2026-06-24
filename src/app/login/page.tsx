@@ -1,4 +1,3 @@
-// process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 import { Suspense } from "react";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
@@ -41,7 +40,7 @@ export default async function LoginPage({
         hasIdentity.value
           ? (JSON.parse(hasIdentity.value) as IdentityCookie).username
           : ""
-      } has authenticated cookies. Redirecting to home.`
+      } has authenticated cookies. Redirecting to home.`,
     );
     redirect("/");
   }

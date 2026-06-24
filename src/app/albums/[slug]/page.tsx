@@ -100,8 +100,6 @@ export default async function AlbumPage({
     csrf = result.data.csrf_token;
   }
 
-  console.log("ALBUM: ", sortedImages);
-
   return (
     <>
       <main className="main main-drawer">
