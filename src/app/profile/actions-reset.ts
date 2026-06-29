@@ -5,7 +5,7 @@ import { ErrMsgGeneric, isGatewayError } from "../api";
 
 import { getAuthCookies } from "@/components/checkCookies";
 import { validatePasswords } from "../register";
-import { handleProfileErrors } from ".";
+import { handleProfileErrors, validateResetPasswords } from ".";
 
 export async function handleReset(
   previousState: ResetPwActionCmd,
@@ -54,7 +54,7 @@ export async function handleReset(
   }
 
   // field validation
-  const errors = validatePasswords(resetCmd);
+  const errors = validateResetPasswords(resetCmd);
   if (errors && Object.keys(errors).length > 0) {
     console.log(
       `Password reset validation failed for user ${

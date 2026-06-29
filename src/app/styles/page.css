@@ -98,6 +98,15 @@ hr.page-title {
   font-style: italic;
 }
 
+.navbox {
+  display: flex;
+  justify-content: space-between;
+}
+
+.navbox button {
+  margin-left: 0.5rem;
+}
+
 .card {
   display: block;
   width: 40vw;

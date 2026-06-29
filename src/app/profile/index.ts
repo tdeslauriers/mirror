@@ -3,6 +3,7 @@ import {
   ErrPasswordInvalid,
   ErrPasswordInvalidContains,
   ErrPasswordUsedPreviously,
+  ResetData,
 } from "@/components/forms";
 import {
   allNumbersValid,
@@ -117,6 +118,38 @@ export function validateUpdateProfile(profile: Profile) {
     if (!birthdate.isValid) {
       errors.birthdate = birthdate.messages;
     }
+  }
+
+  return errors;
+}
+
+export function validateResetPasswords(reset: ResetData) {
+  const errors: { [key: string]: string[] } = {};
+
+  // check current password
+  if (!reset.current_password || reset.current_password.trim().length === 0) {
+    errors.current_password = ["Current password is required."];
+  }
+
+  // check new password
+  if (!reset.new_password || reset.new_password.trim().length === 0) {
+    errors.new_password = ["New password is required."];
+  }
+
+  // check confirm password
+  if (!reset.confirm_password || reset.confirm_password.trim().length === 0) {
+    errors.confirm_password = ["Confirm password is required."];
+  }
+
+  // check if new and confirm passwords match
+  if (
+    reset.new_password &&
+    reset.confirm_password &&
+    reset.new_password !== reset.confirm_password
+  ) {
+    errors.confirm_password = [
+      "New password and confirm password do not match.",
+    ];
   }
 
   return errors;

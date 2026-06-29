@@ -31,6 +31,15 @@ export default function NavLogin() {
     }
   }, []);
 
+  const handleLogout = () => {
+    // do not call preventDefault here, since need form to submit and trigger the server action
+
+    // clear browser-only state before the server action redirects
+    sessionStorage.clear();
+    localStorage.setItem("logout", String(Date.now())); // broadcast to other tabs
+    // the server action clears cookies server-side and redirects
+  };
+
   return (
     <>
       {hasIdentity ? (
@@ -43,7 +52,11 @@ export default function NavLogin() {
                 </Link>
               </li>
               <li>
-                <form className={style.logoutform} action={logout}>
+                <form
+                  className={style.logoutform}
+                  action={logout}
+                  onSubmit={handleLogout}
+                >
                   <button className={style.logoutbutton}>Logout</button>
                 </form>
               </li>

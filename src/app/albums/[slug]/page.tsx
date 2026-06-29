@@ -8,9 +8,10 @@ import { handleAlbumUpdate } from "./actions";
 import { headers } from "next/headers";
 import ClipboardButton from "@/components/clipboard-button";
 import styles from "../album.module.css";
-import BackButton from "@/components/nav/back";
+import BackButton from "@/components/nav/nav-back";
 import { imageComparator } from "@/app/images";
 import handlePageLoadFailure from "@/components/errors/handle-page-load-errors";
+import AlbumImageSlugs from "./album-image-slugs";
 
 export const metadata = {
   robots: "noindex, nofollow",
@@ -133,6 +134,9 @@ export default async function AlbumPage({
           albumData={album}
           albumFormUpdate={handleAlbumUpdate}
         />
+
+        {/* sets an image slug array in session storage for prev-next nav */}
+        <AlbumImageSlugs imageSlugs={sortedImages.map((i) => i.slug)} />
 
         {/* images: display the thumbnail images of an album in a grid */}
         <div className={styles.tiledisplay}>

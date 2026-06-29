@@ -9,58 +9,82 @@ import MenuGallery from "./menu-gallery";
 import MenuBlog from "./menu-blog";
 import MenuTasks from "./menu-tasks";
 
+function getCookie(name: string): string | null {
+  if (typeof document === "undefined") {
+    // If document is not available, return null or handle as needed
+    return null;
+  }
+
+  const value = `; ${document.cookie}`;
+  const parts = value.split(`; ${name}=`);
+  if (parts.length === 2) {
+    return parts.pop()?.split(";").shift() || null;
+  }
+  return null;
+}
+
 export default function NavDrawer() {
   const [hasIdentity, setHasIdentity] = useState<boolean>(false);
   const [render, setRender] = useState<UxRender>({});
   const [showMenus, setShowMenus] = useState<ShowMenu>({});
 
   useEffect(() => {
-    function getCookie(name: string): string | null {
-      if (typeof document === "undefined") {
-        // If document is not available, return null or handle as needed
-        return null;
+    function syncIdentity() {
+      const identityCookie = getCookie("identity");
+      if (!identityCookie) {
+        setHasIdentity(false);
+        setRender({});
+        return;
       }
 
-      const value = `; ${document.cookie}`;
-      const parts = value.split(`; ${name}=`);
-      if (parts.length === 2) {
-        return parts.pop()?.split(";").shift() || null;
+      try {
+        const identityData = JSON.parse(decodeURIComponent(identityCookie));
+        setHasIdentity(true);
+        setRender(identityData.ux_render || {});
+      } catch (error) {
+        console.error("Failed to parse identity cookie:", error);
+        setHasIdentity(false);
+        setRender({});
       }
-      return null;
     }
 
-    // run on mount to chack for identity cookie
-    const identityCookie = getCookie("identity");
-    if (identityCookie) {
-      setHasIdentity(true);
-      const identity = JSON.parse(decodeURIComponent(identityCookie));
-      setRender(identity.ux_render);
-    } else {
-      setHasIdentity(false);
-    }
+    // run on mount
+    syncIdentity();
 
-    // run on storage change (cross-tab sync)
-    window.addEventListener("storage", (e) => {
-      if (e.key === "identity") {
-        const identityCookie = getCookie("identity");
-        if (identityCookie) {
-          setHasIdentity(true);
-          const identity = JSON.parse(decodeURIComponent(identityCookie));
-          setRender(identity.ux_render);
-        } else {
-          setHasIdentity(false);
-        }
+    // run on cross-tab logout broadcast
+    const handler = (event: StorageEvent) => {
+      if (event.key === "logout") {
+        sessionStorage.clear();
+        setShowMenus({});
+        syncIdentity();
       }
-    });
+    };
+
+    window.addEventListener("storage", handler);
+
+    return () => {
+      window.removeEventListener("storage", handler);
+    };
   }, []);
 
+  // hydrate the drawer open/closed state from sessionStorage on mount
   useEffect(() => {
     const sessionShowMenus = sessionStorage.getItem("drawerShowMenus");
-    if (sessionShowMenus) {
+    if (!sessionShowMenus) {
+      return;
+    }
+
+    try {
       setShowMenus(JSON.parse(sessionShowMenus));
+    } catch (error) {
+      console.error(
+        "Failed to parse drawerShowMenus from sessionStorage:",
+        error,
+      );
     }
   }, []);
 
+  // persist the drawer open/closed state to sessionStorage on change
   useEffect(() => {
     sessionStorage.setItem("drawerShowMenus", JSON.stringify(showMenus));
   }, [showMenus]);

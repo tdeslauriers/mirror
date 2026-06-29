@@ -1,15 +1,16 @@
 import callGatewayData from "@/components/call-gateway-data";
 import { getAuthCookies } from "@/components/checkCookies";
 import ImageDisplay from "./image-display";
-import GetCsrf, { CsrfToken } from "@/components/csrf-token";
+import GetCsrf from "@/components/csrf-token";
 import { imageFormUpdate } from "./actions";
 import ClipboardButton from "@/components/clipboard-button";
 import { headers } from "next/headers";
 import { Album, albumComparator } from "@/app/albums";
 import { Permission, sortPermissionsByName } from "@/app/permissions";
-import BackButton from "@/components/nav/back";
+import BackButton from "@/components/nav/nav-back";
 import handlePageLoadFailure from "@/components/errors/handle-page-load-errors";
 import { ImageData } from "..";
+import NextPrevButton from "@/components/nav/nav-next-prev";
 
 export const metadata = {
   robots: "noindex, nofollow",
@@ -143,7 +144,7 @@ export default async function Page({
             style={{
               display: "flex",
               justifyContent: "space-between",
-              paddingRight: "1rem",
+              
             }}
           >
             {/* share image - copy link button */}
@@ -152,9 +153,17 @@ export default async function Page({
               label={imageData ? `'${imageData.title}'` : "Image"}
             />
 
-            {/* back button */}
-            {/* setting it to albums generically since cant know what access is */}
-            <BackButton fallback="/albums" destination="albums" />
+            <div className="navbox">
+              {/* back button */}
+              {/* setting it to albums generically since cant know what access is */}
+              <BackButton fallback="/albums" destination="albums" />
+
+              {/* prev button */}
+              <NextPrevButton navKey="albumNav" direction="prev" />
+
+              {/* next button */}
+              <NextPrevButton navKey="albumNav" direction="next" />
+            </div>
           </div>
         </div>
         <hr className="page-title" />
