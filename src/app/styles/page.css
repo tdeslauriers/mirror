@@ -242,6 +242,15 @@ hr.page-title {
     font-family: "Montserrat", sans-serif;
   }
 
+  .navbox {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .navbox button {
+    margin-left: 0rem;
+  }
+
   .card,
   .card-title {
     width: 85vw;
@@ -255,6 +264,14 @@ hr.page-title {
 @media (min-width: 700px) and (max-width: 1500px) {
   .main-drawer {
     margin-left: calc(var(--drawer-width-tablet) + 2rem);
+  }
+
+  .navbox {
+    flex-direction: column;
+  }
+
+  .navbox button {
+    margin-left: 0rem;
   }
 
   .card,

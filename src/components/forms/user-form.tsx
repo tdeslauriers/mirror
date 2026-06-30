@@ -270,7 +270,7 @@ export default function UserForm({
 
 function getAge(year: number, month: number, day: number): number {
   const today = new Date(); // current date
-  const birth = new Date(year, month, day);
+  const birth = new Date(year, month - 1, day); // new Date uses 0-indexed months, so subtract 1 from the month
 
   let age = today.getFullYear() - birth.getFullYear();
 

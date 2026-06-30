@@ -26,7 +26,7 @@ export default function BackButton({
   };
   return (
     (canGoBack || target.returnUrl !== "/") && (
-      <div className={`actions`} style={{ width: "auto" }}>
+      <div className={`actions`} >
         <button className="back" onClick={handleBack}>
           <strong>{`Back to ${target.returnDestination}`}</strong>
         </button>

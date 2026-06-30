@@ -20,8 +20,7 @@ export default function NextPrevButton({
   const params = useParams();
   const currentSlug = params.slug as string;
 
-  // TODO: get rid of this
-  // to rebuild the url
+  // build back button target from search params, fallback, and destination
   const searchParams = useSearchParams();
   const target: ReturnParams = useMemo(
     () => getSafeReturnParams(searchParams),
