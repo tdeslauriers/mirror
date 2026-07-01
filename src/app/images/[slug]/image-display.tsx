@@ -99,6 +99,7 @@ export default function ImageDisplay({
                       year: "numeric",
                       month: "long",
                       day: "numeric",
+                      timeZone: "UTC",
                     })
                   ) : (
                     <span className="highlight-error">
