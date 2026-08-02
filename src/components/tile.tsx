@@ -25,7 +25,11 @@ export default function Tile({ title, link, imageData }: TileProps) {
             />
           </div>
         ) : (
-          null
+          <div className={styles.thumbnail}>
+            <div className={`${styles.title}`}>
+              <span className={"locallink"}>No Image Available</span>
+            </div>
+          </div>
         )}
 
         <div className={`${styles.title} locallink`}>{title}</div>

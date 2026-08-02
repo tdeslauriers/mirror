@@ -25,10 +25,10 @@ export default async function AlbumPage({
   params: Promise<{ slug: string }>;
 }) {
   // get slug param from url
-  const slug = (await params).slug;
+  const albumSlug = (await params).slug;
 
   // quick check for auth
-  const cookiesResult = await getAuthCookies(`/albums/${slug}`);
+  const cookiesResult = await getAuthCookies(`/albums/${albumSlug}`);
 
   // quick check if identity cookie exists
   if (!cookiesResult.ok) {
@@ -49,7 +49,7 @@ export default async function AlbumPage({
     );
     return handlePageLoadFailure(
       401,
-      `you do not have rights to view /albums/${slug}`,
+      `you do not have rights to view /albums/${albumSlug}`,
       "/albums.",
     );
   }
@@ -62,7 +62,7 @@ export default async function AlbumPage({
 
   // get album data from gateway
   const result = await callGatewayData<Album>({
-    endpoint: `/albums/${slug}`,
+    endpoint: `/albums/${albumSlug}`,
     session: cookiesResult.data.session,
   });
   if (!result.ok) {
@@ -116,7 +116,7 @@ export default async function AlbumPage({
           >
             {/* share album - copy link button */}
             <ClipboardButton
-              text={album ? `${baseUrl}/albums/${slug}` : "Album"}
+              text={album ? `${baseUrl}/albums/${albumSlug}` : "Album"}
               label={album ? `'${album.title}'` : "Album"}
             />
 
@@ -130,7 +130,7 @@ export default async function AlbumPage({
         <AlbumDisplay
           csrf={csrf}
           editAllowed={editAllowed}
-          slug={slug}
+          slug={albumSlug}
           albumData={album}
           albumFormUpdate={handleAlbumUpdate}
         />
@@ -144,30 +144,26 @@ export default async function AlbumPage({
             sortedImages.length > 0 &&
             sortedImages.map((image) => (
               <div key={image.id ? image.id : Math.random()}>
-                {image.id ? (
+                {image.id && (
                   <Tile
                     key={image.slug}
                     title={image.title}
                     link={`/images/${image.slug}?returnUrl=${encodeURIComponent(
-                      `/albums/${slug}`,
+                      `/albums/${albumSlug}`,
                     )}&returnDestination=${encodeURIComponent(
                       album.title ?? "album",
                     )}`}
                     imageData={image}
                   />
-                ) : (
-                  <p key={Math.random()}>
-                    <span className="highlight-error">Empty image record.</span>
-                  </p>
                 )}
               </div>
             ))}
           {(!album.images || album.images.length <= 0) && (
-            <p>
+            <div>
               <span className="highlight-info">
                 No images found in this album.
               </span>
-            </p>
+            </div>
           )}
         </div>
       </main>

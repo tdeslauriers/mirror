@@ -20,11 +20,15 @@ const pageError = "Failed to load image record page";
 
 export default async function Page({
   params,
+  searchParams,
 }: {
   params: Promise<{ slug: string }>;
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }) {
   // get slug param from url
   const slug = (await params).slug;
+  const returnUrl = (await searchParams).returnUrl;
+  const returnDestination = (await searchParams).returnDestination;
 
   // quick check for redirect if auth'd cookies not present
   const cookies = await getAuthCookies(`/images/${slug}`);
@@ -46,7 +50,8 @@ export default async function Page({
     return handlePageLoadFailure(
       401,
       `you do not have rights to view /images/${slug}.`,
-      "/albums",
+      `${returnUrl}`,
+      `${returnDestination}`,
     );
   }
 
@@ -68,7 +73,8 @@ export default async function Page({
     return handlePageLoadFailure(
       imgResult.error.code,
       imgResult.error.message,
-      "/albums",
+      `${returnUrl}`,
+      `${returnDestination}`,
     );
   }
   const imageData = imgResult.data;
@@ -101,7 +107,8 @@ export default async function Page({
       return handlePageLoadFailure(
         csrfResult.error.code,
         csrfResult.error.message,
-        `/images/${slug}`,
+        `${returnUrl}`,
+        `${returnDestination}`,
       );
     }
     csrf = csrfResult.data.csrf_token;
@@ -113,7 +120,8 @@ export default async function Page({
       return handlePageLoadFailure(
         albumsResult.error.code,
         albumsResult.error.message,
-        `/albums`,
+        `${returnUrl}`,
+        `${returnDestination}`,
       );
     }
     const sortedAlbums = [...(albumsResult.data ?? [])].sort(albumComparator);
@@ -126,7 +134,8 @@ export default async function Page({
       return handlePageLoadFailure(
         permissionsResult.error.code,
         permissionsResult.error.message,
-        `/albums`,
+        `${returnUrl}`,
+        `${returnDestination}`,
       );
     }
     menuPermissions = [
@@ -144,7 +153,6 @@ export default async function Page({
             style={{
               display: "flex",
               justifyContent: "space-between",
-              
             }}
           >
             {/* share image - copy link button */}

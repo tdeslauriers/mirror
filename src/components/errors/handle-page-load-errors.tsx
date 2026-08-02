@@ -5,7 +5,8 @@ import ErrorLoadPage from "@/components/errors/error-load-page";
 export default function handlePageLoadFailure(
   errorCode?: number,
   errorMessage?: string,
-  redirectUrl?: string
+  redirectUrl?: string,
+  redirectLabel?: string,
 ) {
   switch (errorCode) {
     case 400:
@@ -17,7 +18,8 @@ export default function handlePageLoadFailure(
               ? errorMessage
               : "Your request was bad and you should feel bad."
           }
-          redirectUrl={redirectUrl ? redirectUrl : ""}
+          redirectUrl={redirectUrl}
+          redirectLable={redirectLabel}
         />
       );
     case 401:
@@ -25,7 +27,8 @@ export default function handlePageLoadFailure(
         <ErrorLoadPage
           errBanner="401 | That's a no from me, dawg."
           errMsg={errorMessage ? errorMessage : "No ticket."}
-          redirectUrl={redirectUrl ? redirectUrl : ""}
+          redirectUrl={redirectUrl}
+          redirectLable={redirectLabel}
         />
       );
     case 403:
@@ -37,7 +40,8 @@ export default function handlePageLoadFailure(
               ? errorMessage
               : "I am a servant of the Secret Fire, wielder of the flame of Anor. You cannot pass. The dark fire will not avail you, flame of Udun. Go back to the Shadow! You cannot pass."
           }
-          redirectUrl={redirectUrl ? redirectUrl : ""}
+          redirectUrl={redirectUrl}
+          redirectLable={redirectLabel}
         />
       );
     case 404:
@@ -45,7 +49,8 @@ export default function handlePageLoadFailure(
         <ErrorLoadPage
           errBanner="404 | You're off the map."
           errMsg={errorMessage ? errorMessage : "Here there be monsters."}
-          redirectUrl={redirectUrl ? redirectUrl : ""}
+          redirectUrl={redirectUrl}
+          redirectLable={redirectLabel}
         />
       );
     case 405:
@@ -57,7 +62,8 @@ export default function handlePageLoadFailure(
               ? errorMessage
               : "It's not what you asked, but how you asked it."
           }
-          redirectUrl={redirectUrl ? redirectUrl : ""}
+          redirectUrl={redirectUrl}
+          redirectLable={redirectLabel}
         />
       );
     case 410:
@@ -69,7 +75,8 @@ export default function handlePageLoadFailure(
               ? errorMessage
               : "You missed your chance, it's gone now."
           }
-          redirectUrl={redirectUrl ? redirectUrl : ""}
+          redirectUrl={redirectUrl}
+          redirectLable={redirectLabel}
         />
       );
     case 422:
@@ -79,7 +86,8 @@ export default function handlePageLoadFailure(
           errMsg={
             errorMessage ? errorMessage : "What was that even supposed to mean?"
           }
-          redirectUrl={redirectUrl ? redirectUrl : ""}
+          redirectUrl={redirectUrl}
+          redirectLable={redirectLabel}
         />
       );
     case 503:
@@ -87,7 +95,8 @@ export default function handlePageLoadFailure(
         <ErrorLoadPage
           errBanner="503 | Sorry, we're closed."
           errMsg={errorMessage ? errorMessage : "Stuff is down, it's a mess."}
-          redirectUrl={redirectUrl ? redirectUrl : ""}
+          redirectUrl={redirectUrl}
+          redirectLable={redirectLabel}
         />
       );
     default:
@@ -97,7 +106,8 @@ export default function handlePageLoadFailure(
           errMsg={
             errorMessage ? errorMessage : "Something has gone terribly wrong."
           }
-          redirectUrl={redirectUrl ? redirectUrl : ""}
+          redirectUrl={redirectUrl}
+          redirectLable={redirectLabel}
         />
       );
   }

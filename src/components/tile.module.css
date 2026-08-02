@@ -42,13 +42,59 @@
 
 @keyframes glow-input {
   0% {
-    box-shadow: 0 0 5px var(--secondary-site-color),
-      0 0 10px var(--secondary-site-color), 0 0 15px var(--secondary-site-color),
+    box-shadow:
+      0 0 5px var(--secondary-site-color),
+      0 0 10px var(--secondary-site-color),
+      0 0 15px var(--secondary-site-color),
       0 0 20px var(--secondary-site-color);
   }
   100% {
-    box-shadow: 0 0 10px var(--secondary-site-color),
-      0 0 20px var(--secondary-site-color), 0 0 30px var(--secondary-site-color),
+    box-shadow:
+      0 0 10px var(--secondary-site-color),
+      0 0 20px var(--secondary-site-color),
+      0 0 30px var(--secondary-site-color),
       0 0 40px var(--secondary-site-color);
+  }
+}
+
+.tilefail {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+
+  min-width: 0;
+  text-align: center;
+  font-size: 1rem;
+  font-family: "Montserrat", sans-serif;
+  border: 1px solid var(--primary-border-color);
+  border-radius: 4px;
+  box-shadow: 1px 0 55px rgba(7, 8, 7, 0.5);
+  transition: transform 0.3s ease;
+}
+
+.tilefail:hover,
+.tilefail:active,
+.tilefail:focus {
+  transform: scale(1.02);
+  text-shadow: var(--highlight-disabled-glow);
+  outline-style: none;
+  box-shadow: 0 0 40px var(--disabled-site-color);
+  animation: glow-input-disabled 5s ease-in-out infinite alternate;
+}
+
+@keyframes glow-input-disabled {
+  0% {
+    box-shadow:
+      0 0 5px var(--disabled-site-color),
+      0 0 10px var(--disabled-site-color),
+      0 0 15px var(--disabled-site-color),
+      0 0 20px var(--disabled-site-color);
+  }
+  100% {
+    box-shadow:
+      0 0 10px var(--disabled-site-color),
+      0 0 20px var(--disabled-site-color),
+      0 0 30px var(--disabled-site-color),
+      0 0 40px var(--disabled-site-color);
   }
 }
