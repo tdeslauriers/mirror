@@ -3,16 +3,15 @@
 import { Scope, ScopeActionCmd, validateScope } from "..";
 import { GatewayError, isGatewayError } from "@/app/api";
 
-import { getAuthCookies, getSessionCookie } from "@/components/checkCookies";
+import { getAuthCookies } from "@/components/checkCookies";
 
 export async function handleScopeEdit(
+  csrf: string,
+  slug: string,
   previousState: ScopeActionCmd,
-  formData: FormData
+  formData: FormData,
 ) {
-  // get form data
-  const csrf = previousState.csrf;
-  const slug = previousState.slug;
-
+  // set up update object
   let updated: Scope = {
     csrf: csrf ?? "",
 
@@ -30,11 +29,9 @@ export async function handleScopeEdit(
     console.log(
       `Scope update failed because could not verify session cookies: ${
         cookies.error ? cookies.error.message : "unknown error"
-      }`
+      }`,
     );
     return {
-      csrf: csrf,
-      slug: slug,
       scope: updated,
       errors: {
         server: [
@@ -50,11 +47,9 @@ export async function handleScopeEdit(
   // true validation happpens in the gateway
   if (!csrf || csrf.trim().length < 16 || csrf.trim().length > 64) {
     console.log(
-      `User ${cookies.data.identity?.username} submitted CSRF token which is missing or not well formed.`
+      `User ${cookies.data.identity?.username} submitted CSRF token which is missing or not well formed.`,
     );
     return {
-      csrf: csrf,
-      slug: slug,
       scope: updated,
       errors: {
         csrf: [
@@ -68,11 +63,9 @@ export async function handleScopeEdit(
   // the slug will not be found, or invalid, etc.
   if (!slug || slug.trim().length < 16 || slug.trim().length > 64) {
     console.log(
-      `User ${cookies.data.identity?.username} submitted a scope slug which is missing or not well formed.`
+      `User ${cookies.data.identity?.username} submitted a scope slug which is missing or not well formed.`,
     );
     return {
-      csrf: csrf,
-      slug: slug,
       scope: updated,
       errors: {
         server: [
@@ -86,8 +79,6 @@ export async function handleScopeEdit(
   const errors = validateScope(updated);
   if (errors && Object.keys(errors).length > 0) {
     return {
-      csrf: csrf,
-      slug: slug,
       scope: updated,
       errors: errors,
     } as ScopeActionCmd;
@@ -104,17 +95,15 @@ export async function handleScopeEdit(
           Content_Type: "application/json",
         },
         body: JSON.stringify(updated),
-      }
+      },
     );
 
     if (apiResponse.ok) {
       const success = await apiResponse.json();
       console.log(
-        `Scope record ${slug} updated successfully by user ${cookies.data.identity?.username}.`
+        `Scope record ${slug} updated successfully by user ${cookies.data.identity?.username}.`,
       );
       return {
-        csrf: csrf,
-        slug: slug,
         scope: success as Scope,
         errors: errors,
       } as ScopeActionCmd;
@@ -126,21 +115,17 @@ export async function handleScopeEdit(
         console.log(
           `Scope record ${slug} update failed for user ${
             cookies.data.identity?.username
-          }: ${JSON.stringify(errors)}`
+          }: ${JSON.stringify(errors)}`,
         );
         return {
-          csrf: csrf,
-          slug: slug,
           scope: updated,
           errors: errors,
         } as ScopeActionCmd;
       } else {
         console.error(
-          `Scope record ${slug} update failed for user ${cookies.data.identity?.username} due to unhandled gateway error: ${fail.message}`
+          `Scope record ${slug} update failed for user ${cookies.data.identity?.username} due to unhandled gateway error: ${fail.message}`,
         );
         return {
-          csrf: csrf,
-          slug,
           scope: updated,
           errors: {
             server: [
@@ -154,11 +139,9 @@ export async function handleScopeEdit(
     }
   } catch (error) {
     console.error(
-      `Scope record ${slug} update failed for user ${cookies.data.identity?.username}: ${error}`
+      `Scope record ${slug} update failed for user ${cookies.data.identity?.username}: ${error}`,
     );
     return {
-      csrf: csrf,
-      slug: slug,
       scope: updated,
       errors: {
         server: ["Scope update failed due to an unhandled gateway error."],

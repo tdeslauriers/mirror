@@ -24,13 +24,12 @@ export type Scope = {
   name?: string;
   description?: string;
   created_at?: string;
+  updated_at?: string;
   active?: boolean;
   slug?: string;
 };
 
 export type ScopeActionCmd = {
-  csrf?: string | null;
-  slug?: string | null;
   scope?: Scope | null;
   errors: { [key: string]: string[] };
 };
@@ -38,6 +37,7 @@ export type ScopeActionCmd = {
 export function validateScope(scope: Scope) {
   const errors: { [key: string]: string[] } = {};
 
+  
   // check csrf
   if (
     scope.csrf &&

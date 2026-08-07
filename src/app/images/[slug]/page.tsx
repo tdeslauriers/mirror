@@ -2,14 +2,19 @@ import callGatewayData from "@/components/call-gateway-data";
 import { getAuthCookies } from "@/components/checkCookies";
 import ImageDisplay from "./image-display";
 import GetCsrf from "@/components/csrf-token";
-import { imageFormUpdate } from "./actions";
+import { handleImageDelete, handleImageUpdate } from "./actions";
 import ClipboardButton from "@/components/clipboard-button";
 import { headers } from "next/headers";
 import { Album, albumComparator } from "@/app/albums";
 import { Permission, sortPermissionsByName } from "@/app/permissions";
 import BackButton from "@/components/nav/nav-back";
 import handlePageLoadFailure from "@/components/errors/handle-page-load-errors";
-import { ImageData } from "..";
+import {
+  DeleteImageActionCmd,
+  UpdateImageActionCmd,
+  ImageData,
+  UpdateImageCmd,
+} from "..";
 import NextPrevButton from "@/components/nav/nav-next-prev";
 
 export const metadata = {
@@ -82,7 +87,7 @@ export default async function Page({
   // check if identity cookie has images_write permission and get csrf if so for image form
   const editAllowed = cookies.data.identity.ux_render?.gallery?.image_write;
 
-  // if edit is allowed, fetch the CSRF token for the form
+  // if edit is allowed, fetch the CSRF token and necessary menus for the form
   let csrf: string | null = null;
   let menuAlbums: Album[] = [];
   let menuPermissions: Permission[] = [];
@@ -143,6 +148,25 @@ export default async function Page({
     ];
   }
 
+  // build wrappers around the action functions
+  async function updateAction(
+    prevState: UpdateImageActionCmd,
+    formData: FormData,
+  ) {
+    // bind csrf and slug
+    "use server";
+    return handleImageUpdate(csrf ?? "", slug, prevState, formData);
+  }
+
+  async function deleteAction(
+    prevState: DeleteImageActionCmd,
+    formData: FormData,
+  ) {
+    // bind csrf, slug, and redirectUrl
+    "use server";
+    return handleImageDelete(csrf ?? "", slug, returnUrl, prevState, formData);
+  }
+
   return (
     <>
       <main className="main main-drawer">
@@ -184,7 +208,8 @@ export default async function Page({
           imageData={imageData}
           menuAlbums={menuAlbums}
           menuPermissions={menuPermissions}
-          imageFormUpdate={imageFormUpdate}
+          imageFormUpdate={updateAction}
+          imageDelete={deleteAction}
         />
       </main>
     </>

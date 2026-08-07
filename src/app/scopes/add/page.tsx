@@ -20,14 +20,14 @@ export default async function ScopesAddPage() {
     console.log(
       `${pageError}: failed auth cookie check: ${
         cookies.error ? cookies.error.message : "unknown error"
-      }`
+      }`,
     );
     return handlePageLoadFailure(
       401,
       cookies.error
         ? cookies.error.message
         : "unknown error related to session cookies.",
-      "/login"
+      "/login",
     );
   }
 
@@ -35,27 +35,27 @@ export default async function ScopesAddPage() {
   // ie, gaurd pattern or access hint gating
   if (!cookies.data.identity?.ux_render?.users?.scope_write) {
     console.log(
-      `${pageError}: user ${cookies.data.identity?.username} does not have rights to add a scope.`
+      `${pageError}: user ${cookies.data.identity?.username} does not have rights to add a scope.`,
     );
     return handlePageLoadFailure(
       401,
       `you do not have rights to add a scope.`,
-      "/scopes"
+      "/scopes",
     );
   }
 
   // get csrf token from gateway for profile form
   const csrfResult = await GetCsrf(
-    cookies.data.session ? cookies.data.session : ""
+    cookies.data.session ? cookies.data.session : "",
   );
   if (!csrfResult.ok) {
     console.log(
-      `${pageError} for user ${cookies.data.identity?.username}: ${csrfResult.error.message}`
+      `${pageError} for user ${cookies.data.identity?.username}: ${csrfResult.error.message}`,
     );
     return handlePageLoadFailure(
       csrfResult.error.code,
       csrfResult.error.message,
-      "/scopes"
+      "/scopes",
     );
   }
   const csrf = csrfResult.data.csrf_token;
@@ -98,11 +98,9 @@ export default async function ScopesAddPage() {
         <Suspense fallback={<Loading />}>
           <div className="card">
             <ScopeForm
-              csrf={csrf}
               editAllowed={cookies.data.identity?.ux_render?.users?.scope_write}
-              slug={null}
               scope={null}
-              scopeFormUpdate={handleScopeAdd}
+              scopeFormUpdate={handleScopeAdd.bind(null, csrf ?? "")}
             />
           </div>
         </Suspense>

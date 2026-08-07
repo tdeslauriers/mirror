@@ -3,15 +3,13 @@
 import { Scope, ScopeActionCmd, validateScope } from "..";
 import { redirect } from "next/navigation";
 import { GatewayError, isGatewayError } from "@/app/api";
-import { getAuthCookies, getSessionCookie } from "@/components/checkCookies";
-import { cookies } from "next/headers";
+import { getAuthCookies } from "@/components/checkCookies";
 
 export async function handleScopeAdd(
+  csrf: string,
   previousState: ScopeActionCmd,
-  formData: FormData
+  formData: FormData,
 ) {
-  const csrf = previousState.csrf;
-
   // slug unnecessary, will be dropped even if submitted (which would indicate tampering from this page)
   let add: Scope = {
     csrf: csrf ?? "",
@@ -29,11 +27,9 @@ export async function handleScopeAdd(
     console.log(
       `Scope add failed because could not verify session cookies: ${
         cookies.error ? cookies.error.message : "unknown error"
-      }`
+      }`,
     );
     return {
-      csrf: csrf,
-      // slug omitted because doesn't exist yet
       scope: add,
       errors: {
         server: [
@@ -47,11 +43,9 @@ export async function handleScopeAdd(
   // true validation happpens in the gateway
   if (!csrf || csrf.trim().length < 16 || csrf.trim().length > 64) {
     console.log(
-      `User ${cookies.data.identity?.username} submitted empty or invalid CSRF token.`
+      `User ${cookies.data.identity?.username} submitted empty or invalid CSRF token.`,
     );
     return {
-      csrf: null,
-      // slug omitted because doesn't exist yet
       scope: add,
       errors: {
         csrf: ["invalid CSRF token"],
@@ -65,10 +59,9 @@ export async function handleScopeAdd(
     console.log(
       `User ${
         cookies.data.identity?.username
-      } submitted invalid scope data: ${JSON.stringify(errors)}`
+      } submitted invalid scope data: ${JSON.stringify(errors)}`,
     );
     return {
-      csrf: csrf,
       scope: add,
       errors: errors,
     } as ScopeActionCmd;
@@ -85,13 +78,13 @@ export async function handleScopeAdd(
           Authorization: `${cookies.data.session}`,
         },
         body: JSON.stringify(add),
-      }
+      },
     );
 
     if (response.ok) {
       add = await response.json();
       console.log(
-        `User ${cookies.data.identity?.username} successfully added scope ${add.scope} for service ${add.service_name}.`
+        `User ${cookies.data.identity?.username} successfully added scope ${add.scope} for service ${add.service_name}.`,
       );
     } else {
       const fail = await response.json();
@@ -100,19 +93,17 @@ export async function handleScopeAdd(
         console.log(
           `User ${
             cookies.data.identity?.username
-          } scope creation failed: ${JSON.stringify(errors)}`
+          } scope creation failed: ${JSON.stringify(errors)}`,
         );
         return {
-          csrf: csrf,
           scope: add,
           errors: errors,
         } as ScopeActionCmd;
       } else {
         console.log(
-          `User ${cookies.data.identity?.username} scope creation failed due to unhandled gateway error.`
+          `User ${cookies.data.identity?.username} scope creation failed due to unhandled gateway error.`,
         );
         return {
-          csrf: csrf,
           scope: add,
           errors: {
             server: [
@@ -127,10 +118,9 @@ export async function handleScopeAdd(
       console.log(
         `User ${cookies.data.identity?.username} scope creation failed: ${
           (error as Error).message
-        }`
+        }`,
       );
       return {
-        csrf: csrf,
         scope: add,
         errors: {
           server: [(error as Error).message],
@@ -138,10 +128,9 @@ export async function handleScopeAdd(
       } as ScopeActionCmd;
     }
     console.log(
-      `User ${cookies.data.identity?.username} scope creation failed due to unknown error.`
+      `User ${cookies.data.identity?.username} scope creation failed due to unknown error.`,
     );
     return {
-      csrf: csrf,
       scope: add,
       errors: {
         server: [

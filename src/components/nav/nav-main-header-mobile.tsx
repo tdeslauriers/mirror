@@ -1,56 +1,35 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import style from "./nav-main-header.module.css";
 import loginStyle from "./nav-login.module.css";
 import Modal from "../modal";
 import { logout } from "@/actions/logout";
 
+import { useIdentity } from "../hooks/use-identity";
+import { broadcastLogout } from "../logout-broadcast";
+
 export default function MobileMenu() {
+  const { hasIdentity } = useIdentity();
   const [showMenu, setShowMenu] = useState(false);
-  const [hasIdentity, setHasIdentity] = useState<boolean>(false);
 
-  useEffect(() => {
-    function getCookie(name: string): string | null {
-      if (typeof document === "undefined") {
-        // If document is not available, return null or handle as needed
-        return null;
-      }
-
-      const value = `; ${document.cookie}`;
-      const parts = value.split(`; ${name}=`);
-      if (parts.length === 2) {
-        return parts.pop()?.split(";").shift() || null;
-      }
-      return null;
-    }
-
-    const identityCookie = getCookie("identity");
-    if (identityCookie) {
-      setHasIdentity(true);
-    } else {
-      setHasIdentity(false);
-    }
-  }, []);
-
-  const toggleMenu = () => {
-    setShowMenu(!showMenu);
-  };
-
+  const toggleMenu = () => setShowMenu((previous) => !previous);
   const closeMenu = () => setShowMenu(false);
 
   return (
     <>
-      <div className={style.mobilemenu}>
+      <div
+        className={`${style.mobilemenu} ${showMenu ? style.menubuttonopen : ""}`}
+      >
         <button onClick={toggleMenu}>
           <span className="highlight">☰</span>
         </button>
       </div>
 
-      <Modal isOpen={showMenu} onClose={closeMenu}>
+      <Modal isOpen={showMenu} onClose={closeMenu} label="Main menu">
         <nav>
-          <ul>
+          <ul className={style.mobilenavlist}>
             <li>
               <Link className={style.locallink} href="/" onClick={closeMenu}>
                 Home
@@ -107,7 +86,9 @@ export default function MobileMenu() {
               </Link>
             </li>
 
-            <hr />
+            <li role="presentation">
+              <hr />
+            </li>
 
             {hasIdentity ? (
               <>
@@ -121,8 +102,17 @@ export default function MobileMenu() {
                   </Link>
                 </li>
                 <li>
-                  <form className={loginStyle.logoutform} action={logout}>
-                    <button className={loginStyle.logoutbutton}>Logout</button>
+                  <form
+                    className={loginStyle.logoutform}
+                    action={logout}
+                    onSubmit={broadcastLogout}
+                  >
+                    <button
+                      className={loginStyle.logoutbutton}
+                      onClick={closeMenu}
+                    >
+                      Logout
+                    </button>
                   </form>
                 </li>
               </>

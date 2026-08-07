@@ -1,15 +1,32 @@
-/* Overlay to darken the background */
-.overlay {
-  position: fixed;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 9999;
-  inset: 0;
-  background-color: rgba(0, 0, 0, 0.7);
+/* ── the <dialog>: positioning + UA resets, no visual styling ── */
+.dialog {
+  margin: auto;
+  padding: 0; /* required for the backdrop-click test */
+  border: none; /* UA gives a 2px solid inset border */
+  background: transparent; /* UA gives white */
+  color: inherit;
+  max-width: min(90vw, var(--modal-width, 300px));
+  max-height: 85dvh;
 }
 
-/* The modal container */
+.dialog::backdrop {
+  background-color: rgb(0 0 0 / 0.7);
+}
+
+/* variant: full-height drawer, flush left */
+.drawer {
+  --modal-width: 18rem;
+  width: min(
+    90vw,
+    var(--modal-width)
+  ); /* UA default is fit-content — without this it's as narrow as its content */
+  max-width: none;
+  max-height: none;
+  height: 100dvh;
+  margin: 0 auto 0 0;
+}
+
+/* ── the visual box ── */
 .content {
   --navmenu-primary: rgb(64, 67, 64);
   --navmenu-fade: rgb(43, 44, 43);
@@ -19,17 +36,22 @@
     var(--navmenu-primary),
     var(--navmenu-fade)
   );
-  width: 80vw;
-  max-width: 300px;
-  height: auto;
   padding: 1rem;
   border-radius: 4px;
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 5px 15px rgb(0 0 0 / 0.2);
   position: relative;
   display: flex;
-  align-items: center;
-  justify-content: center;
+  flex-direction: column;
   text-align: left;
+  max-height: 85dvh;
+  overflow: auto;
+}
+
+.drawer .content {
+  height: 100%;
+  max-height: none; /* otherwise .content's 85dvh wins inside a 100dvh dialog */
+  border-radius: 0;
+  overflow: auto;
 }
 
 .content li {
@@ -47,10 +69,12 @@
 
 /* Close button */
 .close {
-  position: absolute;
-  top: 0.5rem;
-  right: 0.5rem;
-  border: 0;
+  position: sticky;
+  top: 0;
+  align-self: flex-end;
+  z-index: 1;
+  margin-right: 0.5rem;
+  margin-bottom: 1rem;
   border: none;
   border-radius: 4px;
   padding: 0.05rem 0.4rem;
@@ -59,7 +83,6 @@
     var(--disabled-site-fade),
     var(--disabled-site-color)
   );
-
   cursor: pointer;
   font: inherit;
   font-size: 2rem;
@@ -71,10 +94,22 @@
 .close:hover,
 .close:active,
 .close:focus {
-  transition: 0.3s;
   outline-style: none;
   /* box-shadow: 0 0 40px var(--primary-site-color); */
   animation: glow-input 5s ease-in-out infinite alternate;
+}
+
+.close:focus-visible {
+  outline: 2px solid var(--primary-site-color);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .close:hover,
+  .close:active,
+  .close:focus {
+    animation: none;
+  }
 }
 
 @keyframes glow-input {

@@ -4,6 +4,15 @@ import createMDX from "@next/mdx";
 const nextConfig = {
   // Configure `pageExtensions` to include markdown and MDX files
   pageExtensions: ["js", "jsx", "md", "mdx", "ts", "tsx"],
+  experimental: {
+    serverActions: {
+      // form fields only (titles, descriptions, permission/album uuid lists) --
+      // image bytes never pass through a server action, they go straight to
+      // object storage via a presigned url. 100kb is ~10x the realistic
+      // worst case, well under next's 1mb default.
+      bodySizeLimit: "100kb",
+    },
+  },
   images: {
     remotePatterns: [
       {

@@ -18,38 +18,53 @@ import {
 import { Scope, ScopeActionCmd } from "@/app/scopes";
 
 export default function ScopeForm({
-  csrf,
   editAllowed,
-  slug,
   scope,
   scopeFormUpdate,
 }: {
-  csrf: string | null;
   editAllowed?: boolean;
-  slug: string | null;
   scope: Scope | null;
   scopeFormUpdate: (
     prevState: ScopeActionCmd,
-    formData: FormData
+    formData: FormData,
   ) => ScopeActionCmd | Promise<ScopeActionCmd>;
 }) {
   const [scopeState, formAction] = useActionState(scopeFormUpdate, {
-    csrf: csrf,
-    slug: slug,
     scope: scope,
     errors: {},
   });
 
   return (
     <>
-      <form className="form" action={formAction}>
+      <form
+        className="form"
+        action={formAction}
+        key={scopeState.scope?.updated_at ?? "new"}
+      >
+        {/* update banner */}
+        {scopeState.scope?.updated_at && (
+          <div
+            className="row"
+            style={{ fontStyle: "italic", justifyContent: "right" }}
+          >
+            Last updated{" "}
+            {new Date(scopeState.scope?.updated_at).toLocaleString("en-US", {
+              year: "numeric",
+              month: "long",
+              day: "numeric",
+              hour: "numeric",
+              minute: "2-digit",
+              timeZone: "America/Chicago",
+            })}
+          </div>
+        )}
+
+        {/* server errors */}
         {scopeState.errors.server && (
           <ErrorField errorMsgs={scopeState.errors.server} />
         )}
-        {scopeState.errors.csrf && (
-          <ErrorField errorMsgs={scopeState.errors.csrf} />
-        )}
 
+        {/* service name */}
         <div className="row">
           <div className="field">
             <label className="label" htmlFor="service_name">
@@ -74,11 +89,14 @@ export default function ScopeForm({
           </div>
         </div>
 
+        {/* scope */}
         <div className="row">
           <div className="field">
             <label className="label" htmlFor="scope">
               Scope{" "}
-              {slug && (
+              {/* slug will only exist if this is an existing scope
+              ie, wont show on add form */}
+              {scopeState.scope?.slug && (
                 <sup style={{ fontSize: ".7rem" }}>
                   <span className="highlight">
                     *Be very careful changing this field
@@ -105,6 +123,7 @@ export default function ScopeForm({
           </div>
         </div>
 
+        {/* scope name */}
         <div className="row">
           <div className="field">
             <label className="label" htmlFor="name">
@@ -128,6 +147,7 @@ export default function ScopeForm({
           </div>
         </div>
 
+        {/* description */}
         <div className="row">
           <div className="field">
             <label className="label" htmlFor="description">
@@ -146,6 +166,7 @@ export default function ScopeForm({
           </div>
         </div>
 
+        {/* active */}
         <div className="row">
           <div className="field">
             <label className="label" htmlFor="active">
@@ -164,6 +185,7 @@ export default function ScopeForm({
           </div>
         </div>
 
+        {/* submit */}
         {/* submit button */}
         {editAllowed && (
           <div className={`row`}>

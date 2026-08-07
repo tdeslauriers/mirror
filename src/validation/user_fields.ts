@@ -31,9 +31,6 @@ export const NAME_MIN_LENGTH = 1;
 export const NAME_MAX_LENGTH = 64; // needed because of 'fullname' field in cookies
 const NAME_REGEX: RegExp = /^[a-zA-Z_'-\s]+$/;
 
-export const UUID_REGEX =
-  /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
-
 export type FieldValidation = {
   isValid: boolean;
   messages: string[];
@@ -47,7 +44,7 @@ export function checkEmail(email: string) {
     email.trim().length > EMAIL_MAX_LENGTH
   ) {
     errors.push(
-      `Email address must be between ${EMAIL_MIN_LENGTH} and ${EMAIL_MAX_LENGTH} characters long.`
+      `Email address must be between ${EMAIL_MIN_LENGTH} and ${EMAIL_MAX_LENGTH} characters long.`,
     );
   }
 
@@ -69,7 +66,7 @@ export function checkPassword(password: string) {
     password.trim().length > PASSWORD_MAX_LENGTH
   ) {
     errors.push(
-      `Password must be between ${PASSWORD_MIN_LENGTH} and ${PASSWORD_MAX_LENGTH} characters long.`
+      `Password must be between ${PASSWORD_MIN_LENGTH} and ${PASSWORD_MAX_LENGTH} characters long.`,
     );
   }
 
@@ -93,16 +90,16 @@ export function checkPassword(password: string) {
   for (const sequence of PASSWORD_KEYBOARD_SEQUENCES) {
     const substrings = generateSubstrings(
       sequence,
-      PASSWORD_KEYBOARD_SEQUENCE_MAX
+      PASSWORD_KEYBOARD_SEQUENCE_MAX,
     );
     const reversedSubstrings = substrings.map((s) =>
-      s.split("").reverse().join("")
+      s.split("").reverse().join(""),
     );
     const allSubstrings = [...substrings, ...reversedSubstrings];
 
     if (allSubstrings.some((substring) => password.includes(substring))) {
       errors.push(
-        `Password must not include keyboard sequences larger than ${PASSWORD_KEYBOARD_SEQUENCE_MAX} characters long.`
+        `Password must not include keyboard sequences larger than ${PASSWORD_KEYBOARD_SEQUENCE_MAX} characters long.`,
       );
       break;
     }
@@ -141,13 +138,13 @@ export function checkName(name: string) {
     name.trim().length > NAME_MAX_LENGTH
   ) {
     errors.push(
-      `Name must be between ${NAME_MIN_LENGTH} and ${NAME_MAX_LENGTH} characters long.`
+      `Name must be between ${NAME_MIN_LENGTH} and ${NAME_MAX_LENGTH} characters long.`,
     );
   }
 
   if (!NAME_REGEX.test(name.trim())) {
     errors.push(
-      "Name may only contain letters, hyphens, apostrophes, and underscores."
+      "Name may only contain letters, hyphens, apostrophes, and underscores.",
     );
   }
 
@@ -197,7 +194,7 @@ export function checkBirthdate(year: number, month: number, day: number) {
     errors.push(
       `Date of birth must be between ${
         new Date().getFullYear() - 120
-      } and ${new Date().getFullYear()}`
+      } and ${new Date().getFullYear()}`,
     );
   }
 
@@ -221,20 +218,6 @@ export function allNumbersValid(
   ...numbers: (number | null | undefined)[]
 ): boolean {
   return numbers.every((num) => num != undefined && !isNaN(num));
-}
-
-// checks if a UUID is valid
-export function checkUuid(uuid: string) {
-  let errors: string[] = [];
-  if (!UUID_REGEX.test(uuid)) {
-    errors.push("value must be a valid UUID.");
-  }
-
-  if (errors.length > 0) {
-    return { isValid: false, messages: errors };
-  }
-
-  return { isValid: true, messages: [] };
 }
 
 export function isRealDob(dateString: string | undefined): FieldValidation {

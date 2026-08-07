@@ -2,11 +2,18 @@
 
 import styles from "../image.module.css";
 import { useState } from "react";
-import { ImageData, UpdateImageCmd } from "..";
+import {
+  DeleteImageActionCmd,
+  UpdateImageActionCmd,
+  ImageData,
+  UpdateImageCmd,
+} from "..";
 import ImageForm from "@/components/forms/image-form";
 import { Permission } from "@/app/permissions";
 import { Album } from "@/app/albums";
 import Image from "@/components/image";
+import ImageDelete from "@/components/forms/image-delete-button";
+import { useSearchParams } from "next/navigation";
 
 export default function ImageDisplay({
   csrf,
@@ -16,6 +23,7 @@ export default function ImageDisplay({
   menuAlbums,
   menuPermissions,
   imageFormUpdate,
+  imageDelete,
 }: {
   csrf: string | null;
   editAllowed?: boolean;
@@ -23,7 +31,14 @@ export default function ImageDisplay({
   imageData: ImageData | null;
   menuAlbums: Album[];
   menuPermissions: Permission[];
-  imageFormUpdate: (prevState: any, formData: FormData) => any | Promise<any>;
+  imageFormUpdate: (
+    prevState: UpdateImageActionCmd,
+    formData: FormData,
+  ) => UpdateImageActionCmd | Promise<UpdateImageActionCmd>;
+  imageDelete: (
+    prevState: DeleteImageActionCmd,
+    formData: FormData,
+  ) => DeleteImageActionCmd | Promise<DeleteImageActionCmd>;
 }) {
   const [isEditing, setIsEditing] = useState(false);
 
@@ -68,18 +83,28 @@ export default function ImageDisplay({
         <div className={styles.metadata}>
           {/* // edit button switches from display to form */}
           {editAllowed && (
-            <div
-              className={isEditing ? `actionsError ` : `actions`}
-              style={{ paddingBottom: "1rem" }}
-            >
-              <button
-                className="image-edit"
-                type="button"
-                onClick={() => setIsEditing(!isEditing)}
+            <>
+              <div
+                className={isEditing ? `actionsError ` : `actions`}
+                style={{ paddingBottom: ".5rem" }}
               >
-                {isEditing ? "Cancel" : "Edit Image Data"}
-              </button>
-            </div>
+                <button
+                  className="image-edit"
+                  style={{ width: "100%" }}
+                  type="button"
+                  onClick={() => setIsEditing(!isEditing)}
+                >
+                  {isEditing ? "Cancel" : "Edit Image Data"}
+                </button>
+              </div>
+
+              {/* delete button */}
+              {!isEditing && (
+                <div className="delete-image" style={{ paddingBottom: "1rem" }}>
+                  <ImageDelete imageDelete={imageDelete} />
+                </div>
+              )}
+            </>
           )}
 
           {/* standard user display vs edit mode */}

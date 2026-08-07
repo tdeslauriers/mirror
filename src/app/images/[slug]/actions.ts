@@ -1,18 +1,23 @@
 "use server";
 
-import { getAuthCookies, getSessionCookie } from "@/components/checkCookies";
-import { ImageActionCmd, UpdateImageCmd, validateUpdateImageCmd } from "..";
+import { getAuthCookies } from "@/components/checkCookies";
+import {
+  DeleteImageActionCmd,
+  DeleteImageCmd,
+  UpdateImageActionCmd,
+  UpdateImageCmd,
+  validateUpdateImageCmd,
+} from "..";
 import { GatewayError, isGatewayError } from "@/app/api";
 import { redirect } from "next/navigation";
+import { checkCsrf, checkSlug } from "@/validation";
 
-export async function imageFormUpdate(
-  previousState: ImageActionCmd,
-  formData: FormData
+export async function handleImageUpdate(
+  csrf: string,
+  slug: string,
+  previousState: UpdateImageActionCmd,
+  formData: FormData,
 ) {
-  // load form data
-  const csrf = previousState.csrf;
-  const slug = previousState.slug;
-
   // get form date
   let updated: UpdateImageCmd = {
     csrf: csrf,
@@ -35,11 +40,9 @@ export async function imageFormUpdate(
     console.log(
       `Image update failed because could not verify session cookies: ${
         cookies.error ? cookies.error.message : "unknown error"
-      }`
+      }`,
     );
     return {
-      csrf: csrf,
-      slug: slug,
       updateCmd: updated,
       errors: {
         server: [
@@ -48,43 +51,35 @@ export async function imageFormUpdate(
             : "unknown error related to session cookies.",
         ],
       },
-    } as ImageActionCmd;
+    } as UpdateImageActionCmd;
   }
 
-  // light-weight validation of csrf token
-  // true validation happpens in the gateway
-  if (!csrf || csrf.trim().length < 16 || csrf.trim().length > 64) {
+  // check csrf
+  const csrfCheck = checkCsrf(csrf);
+  if (!csrfCheck.isValid) {
     console.log(
-      `user ${cookies.data.identity?.username} image update failed: csrf token missing or not well formed.`
+      `user ${cookies.data.identity?.username} image update failed: csrf token missing or not well formed.`,
     );
     return {
-      csrf: csrf,
-      slug: slug,
       updateCmd: updated,
       errors: {
-        csrf: [
-          "CSRF token is missing or not well formed.  This value is required and cannot be tampered with.",
-        ],
+        csrf: csrfCheck.messages,
       },
-    } as ImageActionCmd;
+    } as UpdateImageActionCmd;
   }
 
-  // light-weight validation of csrf token
-  // true validation happpens in the gateway
-  if (!slug || slug.trim().length < 16 || slug.trim().length > 64) {
+  // check slug
+  const slugCheck = checkSlug(slug);
+  if (!slugCheck.isValid) {
     console.log(
-      `user ${cookies.data.identity?.username} image update failed: image slug missing or not well formed.`
+      `user ${cookies.data.identity?.username} image update failed: image slug missing or not well formed.`,
     );
     return {
-      csrf: csrf,
-      slug: slug,
       updateCmd: updated,
       errors: {
-        slug: [
-          "Image slug is missing or not well formed.  This value is required and cannot be tampered with.",
-        ],
+        slug: slugCheck.messages,
       },
-    } as ImageActionCmd;
+    } as UpdateImageActionCmd;
   }
 
   // validate the updated image data
@@ -94,14 +89,12 @@ export async function imageFormUpdate(
     console.log(
       `user ${
         cookies.data.identity?.username
-      } image update failed validation: ${JSON.stringify(errors)}`
+      } image ${slug} update failed validation: ${JSON.stringify(errors)}`,
     );
     return {
-      csrf: csrf,
-      slug: slug,
       updateCmd: updated,
       errors: errors,
-    } as ImageActionCmd;
+    } as UpdateImageActionCmd;
   }
 
   // send the update command to the gateway
@@ -115,34 +108,30 @@ export async function imageFormUpdate(
           Authorization: `${cookies.data.session}`,
         },
         body: JSON.stringify(updated),
-      }
+      },
     );
 
     if (apiResponse.ok) {
       //   const success = await apiResponse.json();
       console.log(
-        `image metadata updated successfully by user ${cookies.data.identity?.username}.`
+        `image ${slug} metadata updated successfully by user ${cookies.data.identity?.username}.`,
       );
     } else {
       const fail = await apiResponse.json();
-      console.log(
-        `image metadata update failed for user ${cookies.data.identity?.username}: ${fail.message}`
+      console.error(
+        `image ${slug} metadata update failed for user ${cookies.data.identity?.username}: ${fail.message}`,
       );
       if (isGatewayError(fail)) {
         const errors = handleImageUpdateErrors(fail);
         return {
-          csrf: csrf,
-          slug: slug,
           updateCmd: updated,
           errors: errors,
-        } as ImageActionCmd;
+        } as UpdateImageActionCmd;
       } else {
         console.error(
-          `image ${slug} updated failed for user ${cookies.data.identity?.username} due to unhandled gateway error: ${fail.message}`
+          `image ${slug} updated failed for user ${cookies.data.identity?.username} due to unhandled gateway error: ${fail.message}`,
         );
         return {
-          csrf: csrf,
-          slug,
           updateCmd: updated,
           errors: {
             server: [
@@ -151,7 +140,7 @@ export async function imageFormUpdate(
                 : "Image update failed due to an unhandled gateway error.",
             ],
           },
-        } as ImageActionCmd;
+        } as UpdateImageActionCmd;
       }
     }
   } catch (error) {
@@ -160,11 +149,9 @@ export async function imageFormUpdate(
         cookies.data.identity?.username
       } due to unhandled error: ${
         error instanceof Error ? error.message : "unknown error"
-      }`
+      }`,
     );
     return {
-      csrf: csrf,
-      slug,
       updateCmd: updated,
       errors: {
         server: [
@@ -173,10 +160,139 @@ export async function imageFormUpdate(
             : "Image update failed due to an unhandled error.",
         ],
       },
-    } as ImageActionCmd;
+    } as UpdateImageActionCmd;
   }
 
   redirect(`/images/${slug}`);
+}
+
+// handles request to delete image
+export async function handleImageDelete(
+  csrf: string,
+  slug: string,
+  returnUrl: string | string[] | undefined,
+  previousState: DeleteImageActionCmd,
+  formData: FormData,
+) {
+  // prepare fields
+  csrf = csrf.trim();
+  slug = slug.trim();
+  returnUrl = (returnUrl as string).trim();
+
+  // get session cookie for auth
+  const cookies = await getAuthCookies(`/images/${slug}`);
+  if (!cookies.ok) {
+    console.log(
+      `Image ${slug} deletion failed because could not verify session cookies: ${
+        cookies.error ? cookies.error.message : "unknown error"
+      }`,
+    );
+    return {
+      errors: {
+        server: [
+          cookies.error
+            ? cookies.error.message
+            : "unknown error related to session cookies.",
+        ],
+      },
+    } as DeleteImageActionCmd;
+  }
+
+  // check csrf
+  const csrfCheck = checkCsrf(csrf);
+  if (!csrfCheck.isValid) {
+    console.log(
+      `user ${cookies.data.identity?.username} image ${slug} deletion failed: csrf token missing or not well formed.`,
+    );
+    return {
+      errors: {
+        csrf: csrfCheck.messages,
+      },
+    } as DeleteImageActionCmd;
+  }
+
+  // check slug
+  const slugCheck = checkSlug(slug);
+  if (!slugCheck.isValid) {
+    console.log(
+      `user ${cookies.data.identity?.username} image ${slug} deletion failed: image slug missing or not well formed.`,
+    );
+    return {
+      errors: {
+        slug: slugCheck.messages,
+      },
+    } as DeleteImageActionCmd;
+  }
+
+  // prepare command
+  const cmd: DeleteImageCmd = {
+    csrf: csrf,
+  };
+
+  // send the delete image command to the gateway
+  try {
+    const apiResponse = await fetch(
+      `${process.env.GATEWAY_SERVICE_URL}/images/${slug}`,
+      {
+        method: "DELETE",
+        headers: {
+          Content_Type: "application/json",
+          Authorization: `${cookies.data.session}`,
+        },
+        body: JSON.stringify(cmd),
+      },
+    );
+
+    if (apiResponse.ok) {
+      //   const success = await apiResponse.json();
+      console.log(
+        `image ${slug} deleted successfully by user ${cookies.data.identity?.username}.`,
+      );
+    } else {
+      const fail = await apiResponse.json();
+      console.error(
+        `image ${slug} deletion failed for user ${cookies.data.identity?.username}: ${fail.message}`,
+      );
+      if (isGatewayError(fail)) {
+        const errors = handleImageUpdateErrors(fail);
+        return {
+          errors: errors,
+        } as DeleteImageActionCmd;
+      } else {
+        console.error(
+          `image ${slug} deletion failed for user ${cookies.data.identity?.username} due to unhandled gateway error: ${fail.message}`,
+        );
+        return {
+          errors: {
+            server: [
+              fail.message
+                ? fail.message
+                : "Image deletion failed due to an unhandled gateway error.",
+            ],
+          },
+        } as DeleteImageActionCmd;
+      }
+    }
+  } catch (error) {
+    console.error(
+      `image ${slug} deletion failed for user ${
+        cookies.data.identity?.username
+      } due to unhandled error: ${
+        error instanceof Error ? error.message : "unknown error"
+      }`,
+    );
+    return {
+      errors: {
+        server: [
+          error instanceof Error
+            ? error.message
+            : "Image deletion failed due to an unhandled error.",
+        ],
+      },
+    } as DeleteImageActionCmd;
+  }
+
+  redirect(returnUrl as string);
 }
 
 function handleImageUpdateErrors(gatewayError: GatewayError) {

@@ -10,14 +10,12 @@ import {
   IMAGE_TITLE_MAX_LENGTH,
   IMAGE_TITLE_MIN_LENGTH,
 } from "@/validation/image_fields";
-import { ImageActionCmd, UpdateImageCmd } from "@/app/images";
+import { UpdateImageActionCmd, UpdateImageCmd } from "@/app/images";
 import { Album, albumComparator } from "@/app/albums";
 import { Permission } from "@/app/permissions";
 import AssignmentSelect from "./assignment-select";
 
 export default function ImageForm({
-  csrf,
-  slug,
   imageData,
   menuAlbums,
   menuPermissions,
@@ -29,16 +27,16 @@ export default function ImageForm({
   menuAlbums: Album[];
   menuPermissions: Permission[];
   imageFormUpdate: (
-    prevState: ImageActionCmd,
-    formData: FormData
-  ) => ImageActionCmd | Promise<ImageActionCmd>;
+    prevState: UpdateImageActionCmd,
+    formData: FormData,
+  ) => UpdateImageActionCmd | Promise<UpdateImageActionCmd>;
 }) {
   const [currentAlbums, setCurrentAlbums] = useState<Album[]>(
-    imageData && imageData.albums ? imageData.albums : []
+    imageData && imageData.albums ? imageData.albums : [],
   );
   const [selectedAlbum, setSelectedAlbum] = useState("");
   const [currentPermissions, setCurrentPermissions] = useState<Permission[]>(
-    imageData && imageData.permissions ? imageData.permissions : []
+    imageData && imageData.permissions ? imageData.permissions : [],
   );
   const [selectedPermission, setSelectedPermission] = useState("");
 
@@ -128,15 +126,13 @@ export default function ImageForm({
   const removePermission = (permissionSlug: string | undefined) => {
     if (!permissionSlug) return;
     const updatedPermissions = currentPermissions.filter(
-      (p) => p.slug !== permissionSlug
+      (p) => p.slug !== permissionSlug,
     );
     setCurrentPermissions(updatedPermissions);
   };
 
   // form actions and state management
   const [imageState, formAction] = useActionState(imageFormUpdate, {
-    csrf: csrf,
-    slug: slug,
     updateCmd: imageData,
     errors: {},
   });
@@ -146,10 +142,6 @@ export default function ImageForm({
       {/* server errors */}
       {imageState.errors.server && (
         <ErrorField errorMsgs={imageState.errors.server} />
-      )}
-      {/* csrf errors */}
-      {imageState.errors.csrf && (
-        <ErrorField errorMsgs={imageState.errors.csrf} />
       )}
 
       {/* image title */}
