@@ -16,19 +16,13 @@ export default function Tile({ title, link, imageData }: TileProps) {
     <>
       <Link className={styles.tile} href={link}>
         {/* image thumbnail */}
-        {imageData && imageData.blur_url ? (
+        {imageData && (
           <div className={styles.thumbnail}>
             <Image
               alt={imageData.title ?? "Image thumbnail"}
               imageData={imageData}
               sizes="(max-width: 480px) 50vw, (max-width: 768px) 33vw, (max-width: 1200px) 25vw, 20vw"
             />
-          </div>
-        ) : (
-          <div className={styles.thumbnail}>
-            <div className={`${styles.title}`}>
-              <span className={"locallink"}>No Image Available</span>
-            </div>
           </div>
         )}
 

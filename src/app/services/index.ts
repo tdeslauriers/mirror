@@ -8,11 +8,11 @@ import { checkServiceName } from "@/validation/service_client_field";
 import {
   checkName,
   checkPassword,
-  checkUuid,
   FieldValidation,
 } from "@/validation/user_fields";
 import { GatewayError } from "../api";
 import { Scope } from "../scopes";
+import { checkCsrf, checkSlug } from "@/validation";
 
 export type ServiceClient = {
   csrf?: string;
@@ -75,13 +75,9 @@ export function validateScopeSlugs(slugs: string[]) {
       ];
     }
 
-    const slug = checkUuid(s.trim());
-    if (!slug.isValid) {
-      errors.server = [
-        `Scope slug, index ${i}: ${s.substring(0, 9)}xxxxx, is invalid: slug ${
-          slug.messages
-        }`,
-      ];
+    const slugCheck = checkSlug(s);
+    if (!slugCheck.isValid) {
+      errors.server = [...slugCheck.messages];
     }
   });
 
@@ -112,20 +108,10 @@ export function validateClientRegister(cmd: RegisterClient) {
   let errors: { [key: string]: string[] } = {};
 
   // check csrf
-  if (
-    cmd.csrf &&
-    cmd.csrf.trim().length === 16 &&
-    cmd.csrf.trim().length > 64
-  ) {
-    errors.csrf = [
-      "CSRF token is not well formed.  My cannot edit or tamper with this value.",
-    ];
-  }
-
   if (cmd.csrf && cmd.csrf.trim().length > 0) {
-    const csrf = checkUuid(cmd.csrf.trim());
-    if (!csrf.isValid) {
-      errors.server = ["CSRF token is not well formed: ", ...csrf.messages];
+    const csrfCheck = checkCsrf(cmd.csrf.trim());
+    if (!csrfCheck.isValid) {
+      errors.server = [...csrfCheck.messages];
     }
   }
 
@@ -199,19 +185,10 @@ export function validateGeneratePatCmd(cmd: GeneratePatCmd) {
   let errors: { [key: string]: string[] } = {};
 
   // check csrf
-  if (
-    cmd.csrf &&
-    (cmd.csrf.trim().length < 16 || cmd.csrf.trim().length > 64)
-  ) {
-    errors.csrf = [
-      "CSRF token is not well formed.  My cannot edit or tamper with this value.",
-    ];
-  }
-
   if (cmd.csrf && cmd.csrf.trim().length > 0) {
-    const csrf = checkUuid(cmd.csrf.trim());
-    if (!csrf.isValid) {
-      errors.server = ["CSRF token is not well formed: ", ...csrf.messages];
+    const csrfCheck = checkCsrf(cmd.csrf.trim());
+    if (!csrfCheck.isValid) {
+      errors.server = [...csrfCheck.messages];
     }
   }
 
@@ -226,12 +203,9 @@ export function validateGeneratePatCmd(cmd: GeneratePatCmd) {
   }
 
   if (cmd.slug && cmd.slug.trim().length > 0) {
-    const slug = checkUuid(cmd.slug.trim());
-    if (!slug.isValid) {
-      errors.server = [
-        "Service client slug is not well formed: ",
-        ...slug.messages,
-      ];
+    const slugCheck = checkSlug(cmd.slug);
+    if (!slugCheck.isValid) {
+      errors.server = [...slugCheck.messages];
     }
   }
 

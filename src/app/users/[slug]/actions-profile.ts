@@ -317,7 +317,7 @@ export async function handleScopesUpdate(
 
     if (apiResponse.ok) {
       console.log(
-        `User ${cookies.data.identity?.username} successfully updated scopes for user ${slug}.`,
+        `User ${cookies.data.identity?.username} successfully updated scopes for user slug ${slug}.`,
       );
       return {
         csrf: csrf,
