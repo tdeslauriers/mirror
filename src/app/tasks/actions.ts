@@ -1,16 +1,15 @@
 "use server";
 
-import { checkUuid } from "@/validation/user_fields";
 import { TaskStatusCmd, validateStatus } from ".";
-
 import { getAuthCookies } from "@/components/checkCookies";
 import { isGatewayError } from "../api";
+import { checkUuid } from "@/validation";
 
 // NOTE: throws in this function are ok because caught by the caller, not nextjs
 export async function updateTaskStatusAction(
   taskSlug: string | null,
   csrf: string | null,
-  status: string | null
+  status: string | null,
 ) {
   // get session token
   const cookies = await getAuthCookies("/tasks");
@@ -18,12 +17,12 @@ export async function updateTaskStatusAction(
     console.log(
       `Task status update failed because could not verify session cookies: ${
         cookies.error ? cookies.error.message : "unknown error"
-      }`
+      }`,
     );
     throw new Error(
       cookies.error
         ? cookies.error.message
-        : "unknown error related to session cookies."
+        : "unknown error related to session cookies.",
     );
   }
 
@@ -31,7 +30,7 @@ export async function updateTaskStatusAction(
   // check task slug
   if (!taskSlug || taskSlug === "") {
     console.log(
-      `user ${cookies.data.identity?.username} submitted empty task slug.`
+      `user ${cookies.data.identity?.username} submitted empty task slug.`,
     );
     throw new Error("Task slug is required.");
   }
@@ -39,7 +38,7 @@ export async function updateTaskStatusAction(
   if (!checkSlug.isValid) {
     const errMessage = `Invalid task slug: ${checkSlug.messages.join("; ")}.`;
     console.log(
-      `User ${cookies.data.identity?.username} submitted invalid task slug: ${errMessage}`
+      `User ${cookies.data.identity?.username} submitted invalid task slug: ${errMessage}`,
     );
     throw new Error(errMessage);
   }
@@ -47,7 +46,7 @@ export async function updateTaskStatusAction(
   // check csrf token
   if (!csrf || csrf === "") {
     console.log(
-      `user ${cookies.data.identity?.username} submitted empty CSRF token.`
+      `user ${cookies.data.identity?.username} submitted empty CSRF token.`,
     );
     throw new Error("CSRF token is required.");
   }
@@ -55,7 +54,7 @@ export async function updateTaskStatusAction(
   if (!checkCsrf.isValid) {
     const errMessage = `Invalid CSRF: ${checkCsrf.messages.join("; ")}.`;
     console.log(
-      `User ${cookies.data.identity?.username} submitted invalid CSRF token: ${errMessage}`
+      `User ${cookies.data.identity?.username} submitted invalid CSRF token: ${errMessage}`,
     );
     throw new Error(errMessage);
   }
@@ -63,7 +62,7 @@ export async function updateTaskStatusAction(
   // check status
   if (!status || status === "") {
     console.log(
-      `user ${cookies.data.identity?.username} submitted empty status.`
+      `user ${cookies.data.identity?.username} submitted empty status.`,
     );
     throw new Error("Status is required.");
   }
@@ -99,15 +98,15 @@ export async function updateTaskStatusAction(
       const fail = await response.json();
       if (isGatewayError(fail)) {
         console.log(
-          `User ${cookies.data.identity?.username} task status update failed: ${fail.message}`
+          `User ${cookies.data.identity?.username} task status update failed: ${fail.message}`,
         );
         throw new Error(fail.message);
       } else {
         console.log(
-          `User ${cookies.data.identity?.username} task status update failed due to unhandled gateway error.`
+          `User ${cookies.data.identity?.username} task status update failed due to unhandled gateway error.`,
         );
         throw new Error(
-          "Failed to update status due to unhandled gateway error.  Please try again."
+          "Failed to update status due to unhandled gateway error.  Please try again.",
         );
       }
     }
@@ -116,15 +115,15 @@ export async function updateTaskStatusAction(
       console.log(
         `User ${cookies.data.identity?.username} task status update failed: ${
           (error as Error).message
-        }`
+        }`,
       );
       throw new Error((error as Error).message);
     }
     console.log(
-      `User ${cookies.data.identity?.username} task status update failed due to unknown error.`
+      `User ${cookies.data.identity?.username} task status update failed due to unknown error.`,
     );
     throw new Error(
-      "Failed to call task service gateway. If this error persists, please contact me."
+      "Failed to call task service gateway. If this error persists, please contact me.",
     );
   }
 }

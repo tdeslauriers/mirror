@@ -1,6 +1,5 @@
 import {
   checkEmail,
-  checkUuid,
   FieldValidation,
   isRealDob,
 } from "@/validation/user_fields";
@@ -10,6 +9,7 @@ import {
   Allowance,
   UpdateAllowanceCmd,
 } from "@/components/forms";
+import { checkUuid } from "@/validation";
 
 export type UserProfile = {
   id?: string;

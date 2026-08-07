@@ -1,6 +1,7 @@
 import { AllowanceUser } from "@/components/forms";
-import { EMAIL_REGEX, UUID_REGEX } from "@/validation/user_fields";
+import { EMAIL_REGEX } from "@/validation/user_fields";
 import { TaskCadence, TaskCategory } from "../templates";
+import { UUID_REGEX } from "@/validation";
 
 // This is a composite object consisting of the individual task record and fields from the task template
 export type Task = {
