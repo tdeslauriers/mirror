@@ -3,7 +3,6 @@ import {
   IdentityCookie,
   isGatewayError,
 } from "./../../index";
-import { checkUuid } from "@/validation/user_fields";
 import { NextRequest, NextResponse } from "next/server";
 import {
   CallbackCmd,
@@ -12,6 +11,7 @@ import {
   isValidSessionId,
 } from "../..";
 import { cookies } from "next/headers";
+import { checkUuid } from "@/validation";
 export async function POST(req: NextRequest) {
   // field validation
   const errors: { [key: string]: string[] } = {};

@@ -7,9 +7,9 @@ import {
   checkBirthdate,
   checkEmail,
   checkName,
-  checkUuid,
 } from "@/validation/user_fields";
 import { IdentityCookie } from "@/app/api";
+import { checkUuid } from "@/validation";
 
 export type UiCookies = {
   identity: IdentityCookie | null;

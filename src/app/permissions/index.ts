@@ -1,10 +1,11 @@
+import { checkUuid } from "@/validation";
 import {
   checkPermission,
   checkPermissionDescription,
   checkPermissionName,
 } from "@/validation/permission-fields";
 import { checkServiceName } from "@/validation/service_client_field";
-import { checkUuid, FieldValidation } from "@/validation/user_fields";
+import { FieldValidation } from "@/validation/user_fields";
 
 export type PermissionActionCmd = {
   csrf?: string | null;
